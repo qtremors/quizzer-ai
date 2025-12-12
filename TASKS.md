@@ -56,9 +56,8 @@ This file tracks all identified bugs, inconsistencies, and improvements.
 - [x] **Mobile Optimization** - Responsive breakpoints, 44px touch targets
 - [x] **Accessibility** - Skip link, focus-visible, ARIA labels, reduced motion
 - [x] **Timer Per Question** - Live timer with results analytics
-- [x] **Study Mode** - Immediate feedback after each question
 - [x] **Structured Logging** - Console and file logging with timing
-- [x] **Unit Tests** - pytest with 15 tests passing
+- [x] **Unit Tests** - pytest with 14 tests passing
 
 ### Previous Fixes (v1.0.0)
 - [x] Settings Page Shows Email Field

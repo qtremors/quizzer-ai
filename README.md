@@ -27,7 +27,6 @@ Unlike static quiz apps, Quizzer AI generates fresh content on the fly, analyzes
 - **Adaptive Layout:** Automatically switches between text-only and split-code layouts based on the question type.
 - **Instant Interactions:** Powered by **HTMX** for a smooth, single-page-app feel without page reloads.
 - **⏱️ Timer Per Question:** Track time spent on each question with live display and results analytics.
-- **📖 Study Mode:** Get instant feedback after each question with correct answers and explanations.
 
 ### 📊 Analytics & Growth
 - **Smart Explanations:** Don't just see _what_ is wrong, understand _why_. Click "Explain All Mistakes" to get an AI breakdown of your specific logic errors.

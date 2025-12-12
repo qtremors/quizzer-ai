@@ -22,14 +22,13 @@ All notable changes to the **Quizzer AI** project.
 ### ⏱️ Quiz Features
 
 - **Timer Per Question:** Live timer display during quizzes with time tracking per answer.
-- **Study Mode:** New toggle to show correct answer and explanation immediately after each question.
 - **Time Analytics:** Results page now shows total time and average time per question.
 - **AI Model Badge:** Display which AI model was used on results page.
 
 ### 🔧 Technical Improvements
 
 - **Structured Logging:** Added Django logging configuration with console/file handlers and timing metrics.
-- **Unit Tests:** Added pytest + pytest-django setup with 15 initial tests.
+- **Unit Tests:** Added pytest + pytest-django setup with 14 tests.
 - **Test Fixtures:** Created conftest.py with user, quiz, and model fixtures.
 - **Error Handling:** Enhanced AIError class with specific error types (quota, auth, timeout, model_not_found).
 

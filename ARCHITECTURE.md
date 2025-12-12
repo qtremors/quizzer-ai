@@ -30,7 +30,7 @@ quizzer-ai/
 │   │   ├── core/                 # Landing pages & layout
 │   │   ├── quizzes/              # Main Business Logic
 │   │   │   ├── models.py         # Quiz, Question, Option, UserAnswer
-│   │   │   ├── views.py          # HTMX views with study mode & timer
+│   │   │   ├── views.py          # HTMX views with timer
 │   │   │   └── tests/            # Unit tests
 │   │   └── users/                # Custom Auth & Profiles
 │   ├── config/                   # Settings (Split into base/local/prod)
@@ -73,7 +73,6 @@ quizzer-ai/
 - [x] Implement `QuizAttempt` tracking for history.
 - [x] Add `code_snippet` fields to support technical questions.
 - [x] Add `time_taken` field to UserAnswer for timer tracking.
-- [x] Add `is_study_mode` field to Quiz for study mode.
 
 
 ### Phase 3: The AI Service ✅
@@ -103,7 +102,6 @@ quizzer-ai/
 - [x] Integrate Prism.js for syntax highlighting.
 - [x] Create "Explain All Mistakes" logic for bulk AI analysis on results.
 - [x] **Timer Per Question** with live display.
-- [x] **Study Mode** with immediate feedback after each answer.
 
 
 ### Phase 6: The Chat Agent ✅
