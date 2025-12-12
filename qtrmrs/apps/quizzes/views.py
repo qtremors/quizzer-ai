@@ -433,11 +433,16 @@ def quick_quiz(request):
     # Get default model
     try:
         default_model = AIModel.objects.filter(is_active=True).first()
-        model_name = default_model.model_id if default_model else 'gemini-2.0-flash'
+        model_name = default_model.model_name if default_model else 'gemini-2.0-flash'
     except:
         model_name = 'gemini-2.0-flash'
     
     generator = QuizGenerator(model_name=model_name)
+    
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"Quick Quiz: Generating {language} - {topic} with model {model_name}")
+    
     questions_data = generator.generate_quiz(
         language=language, 
         topic=topic, 
@@ -450,8 +455,17 @@ def quick_quiz(request):
     from apps.ai_agent.services import AIError
     if isinstance(questions_data, AIError):
         from django.contrib import messages
-        messages.error(request, f"Quiz generation failed: {questions_data.message}")
+        logger.error(f"Quick Quiz AI Error: {questions_data.error_type} - {questions_data.message}")
+        messages.error(request, f"Quiz generation failed: {questions_data.message}. {questions_data.suggestion}")
         return redirect('home')
+    
+    if not questions_data or len(questions_data) == 0:
+        from django.contrib import messages
+        logger.error("Quick Quiz: Empty questions returned from AI")
+        messages.error(request, "Quiz generation failed: No questions generated. Please try again.")
+        return redirect('home')
+    
+    logger.info(f"Quick Quiz: Generated {len(questions_data)} questions successfully")
     
     if request.user.is_authenticated:
         # For logged-in users: save to database like normal
@@ -469,14 +483,19 @@ def quick_quiz(request):
                     quiz=quiz,
                     text=q_data.get('question', ''),
                     code_snippet=q_data.get('code_snippet'),
-                    code_language=language.lower() if q_data.get('code_snippet') else None
                 )
                 
                 for option_data in q_data.get('options', []):
+                    # Handle both string and dict options from AI
+                    if isinstance(option_data, dict):
+                        option_text = str(option_data.get('text', ''))
+                    else:
+                        option_text = str(option_data)
+                    
                     Option.objects.create(
                         question=question,
-                        text=str(option_data.get('text', '')),
-                        is_correct=(str(option_data.get('text', '')) == str(q_data.get('correct_answer', '')))
+                        text=option_text,
+                        is_correct=(option_text == str(q_data.get('correct_answer', '')))
                     )
         
         return redirect('quiz_player', quiz_id=quiz.id)
@@ -511,6 +530,12 @@ def demo_player(request):
     
     question = questions[current_index]
     
+    # DEBUG: Log question structure
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"Demo question keys: {question.keys() if isinstance(question, dict) else type(question)}")
+    logger.info(f"Demo question data: {question}")
+    
     return render(request, 'quizzes/demo_player.html', {
         'question': question,
         'question_num': current_index + 1,
@@ -543,7 +568,7 @@ def demo_submit(request):
     
     # Update session
     demo_quiz['answers'].append({
-        'question': question.get('question'),
+        'question': question.get('text'),  # AI uses 'text' key
         'selected': selected,
         'correct': correct_answer,
         'is_correct': is_correct,

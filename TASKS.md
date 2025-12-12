@@ -101,9 +101,15 @@ This file tracks all identified bugs, inconsistencies, and improvements.
 
 ## 🔮 Future Ideas
 
-- [ ] Confetti animation on 100% score
+- [x] Confetti animation on 100% score ✅ v1.3.0
+- [x] Daily streaks gamification ✅ v1.3.0
+- [x] XP & Leveling system ✅ v1.3.0
+- [x] Achievement badges ✅ v1.3.0
+- [x] Quick Quiz demo mode ✅ v1.3.0
+- [ ] Settings page with learning interests
+- [ ] Badge display on dashboard/profile
 - [ ] PWA support with service worker
 - [ ] Leaderboards
 - [ ] Export results as PDF
-- [ ] Daily streaks gamification
+- [ ] Topic recommendations based on weak areas
 - [ ] E2E tests with Playwright

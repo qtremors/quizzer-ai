@@ -23,7 +23,7 @@
             {% csrf_token %}
 
             <div class="question-area">
-                <p class="question-text">{{ question.question }}</p>
+                <p class="question-text">{{ question.text }}</p>
 
                 {% if question.code_snippet %}
                 <pre class="code-block"><code>{{ question.code_snippet }}</code></pre>
@@ -33,8 +33,8 @@
             <div class="options-grid">
                 {% for option in question.options %}
                 <label class="option-card">
-                    <input type="radio" name="option" value="{{ option.text }}" required>
-                    <span class="option-text">{{ option.text }}</span>
+                    <input type="radio" name="option" value="{{ option }}" required>
+                    <span class="option-text">{{ option }}</span>
                 </label>
                 {% endfor %}
             </div>
