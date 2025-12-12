@@ -25,17 +25,41 @@
             <span style="color: var(--color-error);">{{ wrong }} Incorrect</span>
         </div>
 
-        <!-- AI Model Info -->
-        {% if quiz.model_used %}
-        <div
-            style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 32px; padding: 8px 16px; background: var(--color-surface-variant); border-radius: 20px; width: fit-content; margin-left: auto; margin-right: auto;">
-            <span class="material-symbols-outlined"
-                style="font-size: 16px; color: var(--color-primary);">psychology</span>
-            <span style="font-size: 0.85rem; color: var(--color-text-muted);">
-                Generated with <strong style="color: var(--color-text-main);">{{ quiz.model_used }}</strong>
-            </span>
+        <!-- AI Model & Time Info -->
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 32px;">
+            {% if quiz.model_used %}
+            <div
+                style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--color-surface-variant); border-radius: 20px;">
+                <span class="material-symbols-outlined"
+                    style="font-size: 16px; color: var(--color-primary);">psychology</span>
+                <span style="font-size: 0.85rem; color: var(--color-text-muted);">
+                    <strong style="color: var(--color-text-main);">{{ quiz.model_used }}</strong>
+                </span>
+            </div>
+            {% endif %}
+
+            {% if total_time > 0 %}
+            <div
+                style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--color-surface-variant); border-radius: 20px;">
+                <span class="material-symbols-outlined"
+                    style="font-size: 16px; color: var(--color-primary);">timer</span>
+                <span style="font-size: 0.85rem; color: var(--color-text-muted);">
+                    Total: <strong style="color: var(--color-text-main);">{% if total_time >= 60 %}{{
+                        total_time|divisibleby:60 }}m {{ total_time|divisibleby:60|floatformat:0 }}s{% else %}{{
+                        total_time }}s{% endif %}</strong>
+                    · Avg: <strong style="color: var(--color-text-main);">{{ avg_time }}s</strong>/q
+                </span>
+            </div>
+            {% endif %}
+
+            {% if quiz.is_study_mode %}
+            <div
+                style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--color-primary-container); border-radius: 20px;">
+                <span style="font-size: 0.85rem; color: var(--color-on-primary-container); font-weight: 600;">📖 Study
+                    Mode</span>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
 
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
             <a href="{% url 'quiz_setup' %}" class="btn btn-filled">New Quiz</a>

@@ -49,6 +49,9 @@ class Quiz(models.Model):
     total_questions = models.IntegerField(default=0)
     score = models.IntegerField(default=0, help_text="Score percentage")
     completed_at = models.DateTimeField(null=True, blank=True)
+    
+    # Quiz Mode
+    is_study_mode = models.BooleanField(default=False, help_text="If True, show correct answer after each question")
 
     class Meta:
         indexes = [
@@ -98,6 +101,9 @@ class UserAnswer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     selected_option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
     is_correct = models.BooleanField(default=False)
+    
+    # Time tracking
+    time_taken = models.PositiveIntegerField(default=0, help_text="Time taken in seconds")
     
     # Store the specific AI explanation for *this* error here if needed
     error_explanation = models.TextField(blank=True)

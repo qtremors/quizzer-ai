@@ -1,0 +1,98 @@
+<!-- Study Mode Feedback - Shows after each answer -->
+<div class="study-feedback" style="animation: fadeIn 0.3s ease;">
+
+    <!-- Result Header -->
+    <div style="text-align: center; padding: 24px; margin-bottom: 24px; border-radius: 12px;
+        background: {% if user_answer.is_correct %}rgba(20, 108, 46, 0.1){% else %}rgba(186, 26, 26, 0.1){% endif %};
+        border: 1px solid {% if user_answer.is_correct %}var(--color-success){% else %}var(--color-error){% endif %};">
+
+        <div style="font-size: 3rem; margin-bottom: 8px;">
+            {% if user_answer.is_correct %}✓{% elif user_answer.selected_option %}✗{% else %}⏭{% endif %}
+        </div>
+
+        <h2
+            style="color: {% if user_answer.is_correct %}var(--color-success){% else %}var(--color-error){% endif %}; margin-bottom: 8px;">
+            {% if user_answer.is_correct %}Correct!
+            {% elif user_answer.selected_option %}Incorrect
+            {% else %}Skipped{% endif %}
+        </h2>
+
+        {% if user_answer.time_taken > 0 %}
+        <p style="color: var(--color-text-muted); font-size: 0.9rem;">
+            Time: {{ user_answer.time_taken }}s
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Question Review -->
+    <div style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px;">{{ question.text }}</h3>
+
+        {% if question.code_snippet %}
+        <pre
+            style="background: var(--color-surface-variant); padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px;">
+            <code>{{ question.code_snippet }}</code>
+        </pre>
+        {% endif %}
+    </div>
+
+    <!-- Answer Comparison -->
+    <div style="display: grid; gap: 12px; margin-bottom: 24px;">
+        {% if user_answer.selected_option and not user_answer.is_correct %}
+        <div
+            style="padding: 16px; border-radius: 8px; background: rgba(186, 26, 26, 0.08); border: 1px solid rgba(186, 26, 26, 0.3);">
+            <span style="font-size: 0.85rem; color: var(--color-error); font-weight: 600;">Your Answer:</span>
+            <p style="margin-top: 4px;">{{ user_answer.selected_option.text }}</p>
+        </div>
+        {% endif %}
+
+        <div
+            style="padding: 16px; border-radius: 8px; background: rgba(20, 108, 46, 0.08); border: 1px solid rgba(20, 108, 46, 0.3);">
+            <span style="font-size: 0.85rem; color: var(--color-success); font-weight: 600;">Correct Answer:</span>
+            <p style="margin-top: 4px;">{{ correct_option.text }}</p>
+        </div>
+    </div>
+
+    <!-- Explanation (if available) -->
+    {% if question.explanation %}
+    <div style="padding: 16px; border-radius: 8px; background: var(--color-surface-variant); margin-bottom: 24px;">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="material-symbols-outlined" style="color: var(--color-primary);">lightbulb</span>
+            <div>
+                <span style="font-weight: 600; display: block; margin-bottom: 4px;">Explanation</span>
+                <p style="color: var(--color-text-muted); line-height: 1.6;">{{ question.explanation }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Continue Button -->
+    <div style="text-align: center;">
+        {% if is_last %}
+        <a href="{% url 'quiz_results' quiz.id %}" class="btn btn-filled" style="min-width: 200px;">
+            <span class="material-symbols-outlined" style="margin-right: 8px;">emoji_events</span>
+            View Results
+        </a>
+        {% else %}
+        <button hx-get="{% url 'quiz_player' quiz.id %}" hx-target="#quiz-container" hx-swap="innerHTML"
+            class="btn btn-filled" style="min-width: 200px;">
+            <span class="material-symbols-outlined" style="margin-right: 8px;">arrow_forward</span>
+            Next Question
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

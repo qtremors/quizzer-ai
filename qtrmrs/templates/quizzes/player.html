@@ -5,7 +5,30 @@
 {% endblock %}
 
 {% block content %}
-<div class="quiz-screen" x-data="{ showExitModal: false }">
+<div class="quiz-screen" x-data="{ 
+    showExitModal: false,
+    timer: 0,
+    timerInterval: null,
+    init() {
+        this.startTimer();
+    },
+    startTimer() {
+        this.timer = 0;
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(() => this.timer++, 1000);
+    },
+    resetTimer() {
+        this.timer = 0;
+    },
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `${secs}s`;
+    },
+    getTimerValue() {
+        return this.timer;
+    }
+}" @htmx:after-swap="startTimer()">
 
     <div class="quiz-header">
         <div class="header-meta">
@@ -14,11 +37,25 @@
                     <span class="material-symbols-outlined">close</span>
                 </button>
                 <span class="topic-badge">{{ quiz.topic_description }}</span>
+                {% if quiz.is_study_mode %}
+                <span
+                    style="background: var(--color-primary-container); color: var(--color-on-primary-container); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                    📖 Study Mode
+                </span>
+                {% endif %}
             </div>
-            <span class="q-count">
-                Question <span id="q-num" style="font-weight: 700;">{{ quiz.answers.count|add:"1" }}</span>
-                <span style="opacity: 0.5; margin: 0 4px;">/</span> {{ quiz.total_questions }}
-            </span>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <!-- Timer -->
+                <span class="q-timer"
+                    style="display: flex; align-items: center; gap: 6px; color: var(--color-text-muted); font-size: 0.9rem;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">timer</span>
+                    <span x-text="formatTime(timer)">0s</span>
+                </span>
+                <span class="q-count">
+                    Question <span id="q-num" style="font-weight: 700;">{{ quiz.answers.count|add:"1" }}</span>
+                    <span style="opacity: 0.5; margin: 0 4px;">/</span> {{ quiz.total_questions }}
+                </span>
+            </div>
         </div>
 
         <div class="progress-track">

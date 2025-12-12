@@ -60,6 +60,7 @@ def create_quiz(request):
         num_questions = 5
     
     include_code = request.POST.get('include_code') == 'on'
+    study_mode = request.POST.get('study_mode') == 'on'
     
     # --- Handle Model Selection ---
     model_id = request.POST.get('ai_model')
@@ -107,7 +108,8 @@ def create_quiz(request):
             difficulty=level,
             total_questions=len(questions_data),
             ai_model=ai_model,
-            model_used=model_name
+            model_used=model_name,
+            is_study_mode=study_mode
         )
 
         options_to_create = []
@@ -190,17 +192,45 @@ def submit_answer(request, quiz_id, question_id):
     
     selected_option_id = request.POST.get('option')
     action = request.POST.get('action')
-
+    
+    # Get time taken (in seconds)
+    try:
+        time_taken = int(request.POST.get('time_taken', 0))
+        time_taken = min(max(time_taken, 0), 3600)  # Clamp 0-1hr
+    except (ValueError, TypeError):
+        time_taken = 0
+    
+    # Create the answer
     if action == 'skip' or not selected_option_id:
-        UserAnswer.objects.create(quiz=quiz, question=question, selected_option=None, is_correct=False)
+        user_answer = UserAnswer.objects.create(
+            quiz=quiz, question=question, selected_option=None, 
+            is_correct=False, time_taken=time_taken
+        )
     else:
         selected_option = get_object_or_404(Option, id=selected_option_id, question=question)
         is_correct = selected_option.is_correct
-        UserAnswer.objects.create(
-            quiz=quiz, question=question, selected_option=selected_option, is_correct=is_correct
+        user_answer = UserAnswer.objects.create(
+            quiz=quiz, question=question, selected_option=selected_option, 
+            is_correct=is_correct, time_taken=time_taken
         )
+    
+    # Study Mode: Show immediate feedback
+    if quiz.is_study_mode:
+        correct_option = question.options.filter(is_correct=True).first()
+        answered_ids = list(quiz.answers.values_list('question_id', flat=True))
+        next_q = quiz.questions.exclude(id__in=answered_ids).first()
+        is_last = next_q is None
+        
+        return render(request, 'quizzes/partials/study_feedback.html', {
+            'quiz': quiz,
+            'question': question,
+            'user_answer': user_answer,
+            'correct_option': correct_option,
+            'next_question': next_q,
+            'is_last': is_last
+        })
 
-    # Get next question
+    # Get next question (normal mode)
     answered_ids = list(quiz.answers.values_list('question_id', flat=True))
     next_q = quiz.questions.exclude(id__in=answered_ids).first()
 
@@ -244,6 +274,10 @@ def quiz_results(request, quiz_id):
     
     # Check if any explanations generated yet
     has_explanations = user_answers.exclude(error_explanation='').exists()
+    
+    # Calculate time statistics
+    total_time = sum(a.time_taken for a in user_answers)
+    avg_time = round(total_time / len(user_answers)) if user_answers else 0
 
     return render(request, 'quizzes/results.html', {
         'quiz': quiz,
@@ -252,7 +286,9 @@ def quiz_results(request, quiz_id):
         'correct': correct_count,
         'skipped': skipped_count,
         'wrong': wrong_count,
-        'has_explanations': has_explanations
+        'has_explanations': has_explanations,
+        'total_time': total_time,
+        'avg_time': avg_time
     })
 
 @login_required
