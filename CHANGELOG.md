@@ -2,50 +2,49 @@
 
 All notable changes to the **Quizzer AI** project.
 
-## [1.2.0] - 2025-12-12
+## [1.3.0] - 2025-12-12
 
-### ✨ New Features
+### 🎮 Gamification System
 
-- **Quiz Session Continuity:** Users can now exit mid-quiz and resume later from the dashboard.
-- **Quiz Retry:** Added retry button on results page and dashboard to retake completed quizzes.
-- **Per-Question Timer:** Time taken for each question is now tracked and displayed in results.
+- **XP & Leveling:**
+  - Earn 10 XP per correct answer + time bonus (1 XP per 5s under 30s)
+  - +50 XP bonus for perfect scores
+  - Level up system (Level 1→2 = 100 XP, scales with level)
+  - XP progress bar on dashboard and results page
 
-### 🎨 UI/UX Improvements
+- **Streaks:**
+  - Daily streak tracking (🔥 emoji display)
+  - Longest streak record
 
-- **AI Chat Interface:** 
-  - Optimistic UI - user messages appear instantly
-  - Loading spinner on send button during API calls
-  - Quick suggestion chips for common topics
-  - Improved welcome screen with gradient headline
+- **Badges:**
+  - 9 achievement badges (Level 5/10/25/50, Week Warrior, Month Master, Perfectionist, Century Club, Knowledge Master)
+  - Auto-awarded on reaching milestones
 
-- **Dashboard Enhancements:**
-  - Pulsing animation on incomplete quiz cards
-  - "In Progress" stat card showing incomplete count
-  - Progress indicator ("3/10 answered") for incomplete quizzes
-  - "Continue" button for incomplete quizzes
-  - Retry icon button for completed quizzes
+- **Confetti Animation:** Celebration effect on 100% quiz scores
 
-- **Results Page:**
-  - Time badge on each question showing time taken
-  - Total time and average time per question in header
-  - Retry Quiz button
+### ⚡ Quick Quiz (Demo Mode)
 
-- **Exit Modal:** Updated to friendly "Pause Quiz" with "progress saved" message
+- **One-Click Demo:** Instant 5-question quiz on random topic
+- **Works for Guests:** No login required, session-based quiz
+- **Sign-up CTA:** Prompt to create account after demo completion
+- **Homepage Button:** "Quick Quiz" button next to "Start Quizzing"
 
-### 🔧 Technical
+### 🗄️ New Models
 
-- **New Files:**
-  - `animations.css` - Centralized animation library (pulse, breathe, typing, spinners)
-  - `quiz_filters.py` - Custom template filters for time formatting
+- `UserProfile`: XP, level, streak, preferences, learning interests
+- `Badge`: Achievement definitions
+- `UserBadge`: User-earned badges
 
-- **Model Updates:**
-  - Added `is_complete`, `answered_count`, `progress_percent` properties to Quiz model
+### 📁 New Files
 
-- **Timer Fix:** Using `htmx:configRequest` event for reliable timer value injection
+- `apps/users/gamification.py` - XP calculation, streak tracking, badge awarding
+- `apps/users/management/commands/seed_gamification.py` - Badge seeder
+- `templates/quizzes/demo_player.html` - Guest quiz player
+- `templates/quizzes/demo_results.html` - Guest quiz results
 
 ---
 
-## [1.1.1] - 2025-12-12
+## [1.2.0] - 2025-12-12
 
 ### 🐛 Bug Fixes
 
