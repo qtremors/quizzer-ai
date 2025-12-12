@@ -10,4 +10,5 @@ urlpatterns = [
     
     path('results/<int:quiz_id>/', views.quiz_results, name='quiz_results'),
     path('results/<int:quiz_id>/explain-all/', views.generate_all_explanations, name='generate_all_explanations'),
+    path('<int:quiz_id>/retry/', views.retry_quiz, name='retry_quiz'),
 ]

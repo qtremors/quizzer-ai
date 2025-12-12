@@ -63,6 +63,23 @@ class Quiz(models.Model):
     def __str__(self):
         return f"{self.language} ({self.difficulty}) - {self.user.email}"
 
+    @property
+    def is_complete(self):
+        """Check if quiz is completed (all questions answered)"""
+        return self.completed_at is not None
+    
+    @property
+    def answered_count(self):
+        """Number of questions answered so far"""
+        return self.answers.count()
+    
+    @property
+    def progress_percent(self):
+        """Progress percentage for resume display"""
+        if self.total_questions == 0:
+            return 0
+        return round((self.answered_count / self.total_questions) * 100)
+
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')

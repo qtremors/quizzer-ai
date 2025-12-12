@@ -76,10 +76,14 @@ def user_dashboard(request):
     total_quizzes = user_quizzes.count()
     avg_score = user_quizzes.aggregate(Avg('score'))['score__avg'] or 0
     
+    # Count incomplete quizzes (no completed_at)
+    incomplete_count = user_quizzes.filter(completed_at__isnull=True).count()
+    
     context = {
         'quizzes': quizzes_page,
         'total_quizzes': total_quizzes,
         'avg_score': round(avg_score, 1),
+        'incomplete_count': incomplete_count,
         'page_obj': quizzes_page,  # For pagination template
     }
     return render(request, 'users/dashboard.html', context)

@@ -1,11 +1,11 @@
 /* =========================================
-   QUIZZER AI - THEME SYSTEM
+   QUIZZER AI - THEME SYSTEM (Minimal Paper)
    ========================================= */
 
 :root {
     /* --- TYPOGRAPHY --- */
-    --font-sans: 'Roboto', system-ui, sans-serif;
-    --font-display: 'Roboto', sans-serif;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Inter', system-ui, sans-serif;
 
     /* --- SHAPE --- */
     --radius-sm: 4px;
@@ -19,58 +19,63 @@
    ========================================= */
 :root,
 [data-theme="light"] {
-    /* PRIMARY: Trustworthy Blue */
-    --color-primary: #005AC1;
-    --color-primary-hover: #004C8C;
-    --color-primary-container: #D8E2FF;
-    --color-on-primary-container: #001A41;
+    /* PRIMARY: Premium Blue (International Style) */
+    --color-primary: #0F62FE; /* IBM Blue / Inter Blue vibe */
+    --color-primary-hover: #0043CE;
+    --color-primary-container: #D0E2FF;
+    --color-on-primary-container: #001D6F;
 
     /* SEMANTIC COLORS */
-    --color-success: #146c2e;
-    --color-warning: #d97706;
-    --color-error: #ba1a1a;
+    --color-success: #198038; /* Crisp Green */
+    --color-warning: #F1C21B; /* Accessible Yellow */
+    --color-error: #DA1E28;   /* Sharp Red */
 
     /* NEUTRALS */
-    --color-text-main: #1F1F1F;
-    --color-text-muted: #757575;
-    --color-border: #E0E2E0;
+    --color-text-main: #161616; /* High Contrast Ink */
+    --color-text-muted: #525252;
+    --color-border: #E0E0E0;    /* Subtle separation */
 
     /* BACKGROUNDS */
-    --color-bg: #FDFDFD;
-    --color-surface: #FFFFFF;
-    --color-surface-variant: #F0F1F3;
+    --color-bg: #F4F4F5;       /* Paper-white offset */
+    --color-surface: #FFFFFF;  /* Pure White Paper */
+    --color-surface-variant: #F2F4F8;
 
-    /* SHADOWS */
-    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    --shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.15);
+    /* SHADOWS (Ambient for Paper Lift) */
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0,0,0,0.02);
+    --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0,0,0,0.04);
 
     /* Theme toggle icon */
     --theme-icon: "light_mode";
 }
 
 /* =========================================
-   DARK THEME
+   DARK THEME (Matte Slate)
    ========================================= */
 [data-theme="dark"] {
-    --color-primary: #ACC7FF;
-    --color-primary-hover: #D8E2FF;
-    --color-primary-container: #004394;
-    --color-on-primary-container: #D8E2FF;
+    /* PRIMARY: Lighter Blue for Dark Mode */
+    --color-primary: #4589FF;
+    --color-primary-hover: #78A9FF;
+    --color-primary-container: #002D9C;
+    --color-on-primary-container: #D0E2FF;
 
-    --color-success: #6DD58C;
-    --color-warning: #FFB74D;
-    --color-error: #FFB4AB;
+    /* SEMANTIC COLORS */
+    --color-success: #42BE65;
+    --color-warning: #FDD13A;
+    --color-error: #FA4D56;
 
-    --color-text-main: #E3E3E3;
-    --color-text-muted: #C4C7C5;
-    --color-border: #444746;
+    /* NEUTRALS */
+    --color-text-main: #F4F4F4;
+    --color-text-muted: #C6C6C6;
+    --color-border: #333333;
 
-    --color-bg: #111318;
-    --color-surface: #1B1B1F;
-    --color-surface-variant: #282A2F;
+    /* BACKGROUNDS */
+    --color-bg: #121212;       /* Deep Matte */
+    --color-surface: #1E1E1E;  /* Elevated Matte */
+    --color-surface-variant: #2D2D2D;
 
-    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4);
+    /* SHADOWS (Subtle Glow/Depth) */
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
 
     --theme-icon: "dark_mode";
 }
@@ -81,25 +86,25 @@
    ========================================= */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
-        --color-primary: #ACC7FF;
-        --color-primary-hover: #D8E2FF;
-        --color-primary-container: #004394;
-        --color-on-primary-container: #D8E2FF;
+        --color-primary: #4589FF;
+        --color-primary-hover: #78A9FF;
+        --color-primary-container: #002D9C;
+        --color-on-primary-container: #D0E2FF;
 
-        --color-success: #6DD58C;
-        --color-warning: #FFB74D;
-        --color-error: #FFB4AB;
+        --color-success: #42BE65;
+        --color-warning: #FDD13A;
+        --color-error: #FA4D56;
 
-        --color-text-main: #E3E3E3;
-        --color-text-muted: #C4C7C5;
-        --color-border: #444746;
+        --color-text-main: #F4F4F4;
+        --color-text-muted: #C6C6C6;
+        --color-border: #333333;
 
-        --color-bg: #111318;
-        --color-surface: #1B1B1F;
-        --color-surface-variant: #282A2F;
+        --color-bg: #121212;
+        --color-surface: #1E1E1E;
+        --color-surface-variant: #2D2D2D;
 
-        --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
-        --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4);
+        --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
     }
 }
 
@@ -114,25 +119,26 @@
     height: 40px;
     border-radius: var(--radius-full);
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
     color: var(--color-text-main);
-    transition: background 0.2s, transform 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .theme-toggle:hover {
     background: var(--color-surface-variant);
+    transform: scale(1.05);
 }
 
 .theme-toggle:active {
-    transform: scale(0.9);
+    transform: scale(0.95);
 }
 
-/* Rotate icon on theme change for fun effect */
+/* Rotate icon on theme change */
 .theme-toggle .material-symbols-outlined {
-    transition: transform 0.3s ease;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .theme-toggle:hover .material-symbols-outlined {
-    transform: rotate(15deg);
+    transform: rotate(180deg);
 }

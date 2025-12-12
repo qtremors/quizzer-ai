@@ -1,133 +1,137 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="max-width: 1100px; margin: 0 auto; padding-top: 40px; padding-bottom: 40px;">
+<div style="height: calc(100vh - 64px); display: flex; flex-direction: column; overflow: hidden;">
+    <div style="flex: 1; overflow-y: auto; padding: 24px;">
+        <div style="max-width: 900px; margin: 0 auto;">
 
-    <div style="margin-bottom: 32px;">
-        <h1 style="margin-bottom: 8px; font-size: 2.5rem;">Configure Session</h1>
-        <p style="color: var(--color-text-muted); font-size: 1.1rem;">Customize your AI generation parameters.</p>
-    </div>
-
-    <div class="card">
-
-        <form hx-post="{% url 'create_quiz' %}" hx-indicator="#generate-btn" hx-disabled-elt="#generate-btn"
-            class="setup-form">
-
-            {% csrf_token %}
-
-            <div class="setup-grid">
-
-                <div class="grid-col">
-                    <h3 class="section-title">Subject Matter</h3>
-
-                    <div class="form-group">
-                        <label>Language / Technology</label>
-                        <div class="select-wrapper" style="margin-bottom: 12px;">
-                            <select name="language_select" id="lang-select">
-                                <option value="Python">Python</option>
-                                <option value="JavaScript">JavaScript</option>
-                                <option value="TypeScript">TypeScript</option>
-                                <option value="React">React</option>
-                                <option value="Django">Django</option>
-                                <option value="SQL">SQL</option>
-                                <option value="Go">Go</option>
-                                <option value="Rust">Rust</option>
-                                <option value="C++">C++</option>
-                                <option value="Java">Java</option>
-                                <option value="CSS">CSS</option>
-                                <option value="HTML">HTML</option>
-                            </select>
-                            <span class="material-symbols-outlined arrow-icon">expand_more</span>
-                        </div>
-                        <input type="text" name="custom_language" placeholder="Or type custom (e.g. Kotlin)..."
-                            class="form-input" style="font-size: 0.9rem; padding: 10px 16px; border-style: dashed;">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Specific Topic</label>
-                        <input type="text" name="topic" required placeholder="e.g. Flexbox, Recursion"
-                            class="form-input">
-                    </div>
-                </div>
-
-                <div class="grid-col">
-                    <h3 class="section-title">Constraints</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Difficulty</label>
-                            <div class="select-wrapper">
-                                <select name="level">
-                                    <option value="Beginner">Beginner</option>
-                                    <option value="Intermediate" selected>Intermediate</option>
-                                    <option value="Expert">Expert</option>
-                                </select>
-                                <span class="material-symbols-outlined arrow-icon">expand_more</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Length</label>
-                            <div class="select-wrapper">
-                                <select name="num_questions">
-                                    <option value="5" selected>5 Qs</option>
-                                    <option value="10">10 Qs</option>
-                                    <option value="15">15 Qs</option>
-                                    <option value="20">20 Qs</option>
-                                </select>
-                                <span class="material-symbols-outlined arrow-icon">expand_more</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- AI Model Selector -->
-                    <div class="form-group">
-                        <label>AI Model</label>
-                        <div class="select-wrapper">
-                            <select name="ai_model">
-                                {% for model in available_models %}
-                                <option value="{{ model.id }}" {% if model.is_default %}selected{% endif %}>
-                                    {{ model.display_name }}
-                                </option>
-                                {% empty %}
-                                <option value="">Default (Flash Lite)</option>
-                                {% endfor %}
-                            </select>
-                            <span class="material-symbols-outlined arrow-icon">expand_more</span>
-                        </div>
-                    </div>
-
-                    <div class="toggle-row">
-                        <div>
-                            <span style="font-weight: 600; display: block; color: var(--color-text-main);">Coding
-                                Challenges</span>
-                            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Include code
-                                snippets</span>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" name="include_code">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
+            <div style="margin-bottom: 24px; text-align: center;">
+                <h1 style="margin-bottom: 8px; font-size: 2rem;">Configure Session</h1>
+                <p style="color: var(--color-text-muted); font-size: 1rem;">Customize your AI generation parameters.</p>
             </div>
 
-            <div
-                style="margin-top: 40px; border-top: 1px solid var(--color-border); padding-top: 24px; text-align: right;">
+            <div class="card" style="padding: 32px; border-radius: 16px;">
 
-                <button type="submit" id="generate-btn" class="btn btn-filled"
-                    style="height: 52px; padding: 0 40px; font-size: 1.05rem; min-width: 200px;">
+                <form hx-post="{% url 'create_quiz' %}" hx-indicator="#generate-btn" hx-disabled-elt="#generate-btn"
+                    class="setup-form">
 
-                    <span class="btn-content" style="display: flex; align-items: center; gap: 12px;">
-                        <span class="material-symbols-outlined">auto_awesome</span> Generate Quiz
-                    </span>
+                    {% csrf_token %}
 
-                    <span class="btn-loading" style="display: none; align-items: center; gap: 12px;">
-                        <span class="mini-spinner"></span> AI is thinking...
-                    </span>
+                    <div class="setup-grid">
 
-                </button>
+                        <div class="grid-col">
+                            <h3 class="section-title">Subject Matter</h3>
+
+                            <div class="form-group">
+                                <label>Language / Technology</label>
+                                <div class="select-wrapper" style="margin-bottom: 12px;">
+                                    <select name="language_select" id="lang-select">
+                                        <option value="Python">Python</option>
+                                        <option value="JavaScript">JavaScript</option>
+                                        <option value="TypeScript">TypeScript</option>
+                                        <option value="React">React</option>
+                                        <option value="Django">Django</option>
+                                        <option value="SQL">SQL</option>
+                                        <option value="Go">Go</option>
+                                        <option value="Rust">Rust</option>
+                                        <option value="C++">C++</option>
+                                        <option value="Java">Java</option>
+                                        <option value="CSS">CSS</option>
+                                        <option value="HTML">HTML</option>
+                                    </select>
+                                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                                </div>
+                                <input type="text" name="custom_language" placeholder="Or type custom (e.g. Kotlin)..."
+                                    class="form-input" style="font-size: 0.9rem; padding: 10px 16px; border-style: dashed;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Specific Topic</label>
+                                <input type="text" name="topic" required placeholder="e.g. Flexbox, Recursion"
+                                    class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="grid-col">
+                            <h3 class="section-title">Constraints</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Difficulty</label>
+                                    <div class="select-wrapper">
+                                        <select name="level">
+                                            <option value="Beginner">Beginner</option>
+                                            <option value="Intermediate" selected>Intermediate</option>
+                                            <option value="Expert">Expert</option>
+                                        </select>
+                                        <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Length</label>
+                                    <div class="select-wrapper">
+                                        <select name="num_questions">
+                                            <option value="5" selected>5 Qs</option>
+                                            <option value="10">10 Qs</option>
+                                            <option value="15">15 Qs</option>
+                                            <option value="20">20 Qs</option>
+                                        </select>
+                                        <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Model Selector -->
+                            <div class="form-group">
+                                <label>AI Model</label>
+                                <div class="select-wrapper">
+                                    <select name="ai_model">
+                                        {% for model in available_models %}
+                                        <option value="{{ model.id }}" {% if model.is_default %}selected{% endif %}>
+                                            {{ model.display_name }}
+                                        </option>
+                                        {% empty %}
+                                        <option value="">Default (Flash Lite)</option>
+                                        {% endfor %}
+                                    </select>
+                                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                                </div>
+                            </div>
+
+                            <div class="toggle-row">
+                                <div>
+                                    <span style="font-weight: 600; display: block; color: var(--color-text-main);">Coding
+                                        Challenges</span>
+                                    <span style="font-size: 0.85rem; color: var(--color-text-muted);">Include code
+                                        snippets</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" name="include_code">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 32px; border-top: 1px solid var(--color-border); padding-top: 24px; text-align: center;">
+
+                        <button type="submit" id="generate-btn" class="btn btn-filled"
+                            style="height: 52px; padding: 0 40px; font-size: 1.05rem; min-width: 240px; width: 100%; max-width: 300px;">
+
+                            <span class="btn-content" style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                                <span class="material-symbols-outlined">auto_awesome</span> Generate Quiz
+                            </span>
+
+                            <span class="btn-loading" style="display: none; align-items: center; justify-content: center; gap: 12px;">
+                                <span class="mini-spinner"></span> AI is thinking...
+                            </span>
+
+                        </button>
+                    </div>
+
+                </form>
             </div>
-
-        </form>
+        </div>
     </div>
 </div>
 

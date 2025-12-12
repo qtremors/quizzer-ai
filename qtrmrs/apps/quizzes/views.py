@@ -260,6 +260,14 @@ def quiz_results(request, quiz_id):
     # Calculate time statistics
     total_time = sum(a.time_taken for a in user_answers)
     avg_time = round(total_time / len(user_answers)) if user_answers else 0
+    
+    # Format total time as MM:SS or just seconds
+    if total_time >= 60:
+        minutes = total_time // 60
+        seconds = total_time % 60
+        total_time_formatted = f"{minutes}m {seconds}s"
+    else:
+        total_time_formatted = f"{total_time}s"
 
     return render(request, 'quizzes/results.html', {
         'quiz': quiz,
@@ -270,6 +278,7 @@ def quiz_results(request, quiz_id):
         'wrong': wrong_count,
         'has_explanations': has_explanations,
         'total_time': total_time,
+        'total_time_formatted': total_time_formatted,
         'avg_time': avg_time
     })
 
@@ -318,3 +327,25 @@ def generate_all_explanations(request, quiz_id):
     
     # We render a partial template that just contains the list loop
     return render(request, 'quizzes/partials/results_list.html', {'user_answers': user_answers})
+
+
+@login_required
+@require_http_methods(["POST"])
+def retry_quiz(request, quiz_id):
+    """
+    Resets a quiz so the user can retake it.
+    - Deletes all UserAnswer records
+    - Resets score and completed_at
+    - Redirects to the quiz player
+    """
+    quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
+    
+    # Delete all existing answers
+    quiz.answers.all().delete()
+    
+    # Reset quiz state
+    quiz.score = 0
+    quiz.completed_at = None
+    quiz.save(update_fields=['score', 'completed_at'])
+    
+    return redirect('quiz_player', quiz_id=quiz.id)

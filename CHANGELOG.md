@@ -2,6 +2,49 @@
 
 All notable changes to the **Quizzer AI** project.
 
+## [1.2.0] - 2025-12-12
+
+### ✨ New Features
+
+- **Quiz Session Continuity:** Users can now exit mid-quiz and resume later from the dashboard.
+- **Quiz Retry:** Added retry button on results page and dashboard to retake completed quizzes.
+- **Per-Question Timer:** Time taken for each question is now tracked and displayed in results.
+
+### 🎨 UI/UX Improvements
+
+- **AI Chat Interface:** 
+  - Optimistic UI - user messages appear instantly
+  - Loading spinner on send button during API calls
+  - Quick suggestion chips for common topics
+  - Improved welcome screen with gradient headline
+
+- **Dashboard Enhancements:**
+  - Pulsing animation on incomplete quiz cards
+  - "In Progress" stat card showing incomplete count
+  - Progress indicator ("3/10 answered") for incomplete quizzes
+  - "Continue" button for incomplete quizzes
+  - Retry icon button for completed quizzes
+
+- **Results Page:**
+  - Time badge on each question showing time taken
+  - Total time and average time per question in header
+  - Retry Quiz button
+
+- **Exit Modal:** Updated to friendly "Pause Quiz" with "progress saved" message
+
+### 🔧 Technical
+
+- **New Files:**
+  - `animations.css` - Centralized animation library (pulse, breathe, typing, spinners)
+  - `quiz_filters.py` - Custom template filters for time formatting
+
+- **Model Updates:**
+  - Added `is_complete`, `answered_count`, `progress_percent` properties to Quiz model
+
+- **Timer Fix:** Using `htmx:configRequest` event for reliable timer value injection
+
+---
+
 ## [1.1.1] - 2025-12-12
 
 ### 🐛 Bug Fixes

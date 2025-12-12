@@ -62,12 +62,14 @@
         style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999;">
         <div class="card" style="max-width: 400px; text-align: center;" @click.outside="showExitModal = false">
             <span class="material-symbols-outlined"
-                style="font-size: 48px; color: var(--color-warning); margin-bottom: 16px;">warning</span>
-            <h3 style="margin-bottom: 8px;">Exit Quiz?</h3>
-            <p style="color: var(--color-text-muted); margin-bottom: 24px;">Your progress will be lost.</p>
+                style="font-size: 48px; color: var(--color-primary); margin-bottom: 16px;">pause_circle</span>
+            <h3 style="margin-bottom: 8px;">Pause Quiz?</h3>
+            <p style="color: var(--color-text-muted); margin-bottom: 24px;">
+                Your progress is saved! You can continue anytime from your dashboard.
+            </p>
             <div style="display: flex; gap: 12px; justify-content: center;">
-                <button @click="showExitModal = false" class="btn btn-tonal">Cancel</button>
-                <a href="{% url 'home' %}" class="btn btn-filled" style="background: var(--color-error);">Exit</a>
+                <button @click="showExitModal = false" class="btn btn-tonal">Keep Going</button>
+                <a href="{% url 'dashboard' %}" class="btn btn-filled">Exit to Dashboard</a>
             </div>
         </div>
     </div>
@@ -86,6 +88,22 @@
     // Re-run Prism highlighting every time HTMX swaps the question card
     document.body.addEventListener('htmx:afterSwap', function (event) {
         Prism.highlightAll();
+    });
+
+    // INJECT TIMER VALUE: Use htmx:configRequest to add timer to all quiz form submissions
+    document.body.addEventListener('htmx:configRequest', function (event) {
+        // Only apply to quiz answer submissions
+        const form = event.target;
+        if (form && form.classList.contains('quiz-form')) {
+            // Get the timer value from the Alpine component
+            const quizScreen = document.querySelector('.quiz-screen');
+            if (quizScreen && quizScreen._x_dataStack) {
+                const alpineData = quizScreen._x_dataStack[0];
+                if (alpineData && typeof alpineData.timer !== 'undefined') {
+                    event.detail.parameters['time_taken'] = alpineData.timer;
+                }
+            }
+        }
     });
 </script>
 

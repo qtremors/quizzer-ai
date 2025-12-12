@@ -1,5 +1,5 @@
 <form hx-post="{% url 'submit_answer' quiz.id question.id %}" hx-target="#quiz-card-container" hx-swap="innerHTML"
-    class="quiz-form fade-in" x-data @submit="$el.querySelector('[name=time_taken]').value = $root.getTimerValue()">
+    class="quiz-form fade-in">
 
     {% csrf_token %}
     <input type="hidden" name="time_taken" value="0">
