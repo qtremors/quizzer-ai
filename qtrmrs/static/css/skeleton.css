@@ -1,0 +1,185 @@
+/* =========================================
+   SKELETON LOADER SYSTEM
+   ========================================= */
+
+/* Base skeleton with shimmer effect */
+.skeleton {
+    background: var(--color-surface-variant);
+    background-image: linear-gradient(90deg,
+            var(--color-surface-variant) 0%,
+            var(--color-surface) 50%,
+            var(--color-surface-variant) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Text line skeleton */
+.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+}
+
+.skeleton-text:last-child {
+    width: 80%;
+}
+
+.skeleton-text-sm {
+    height: 0.875em;
+}
+
+.skeleton-text-lg {
+    height: 1.5em;
+}
+
+/* Heading skeleton */
+.skeleton-heading {
+    height: 2em;
+    width: 60%;
+    margin-bottom: 1em;
+}
+
+/* Button skeleton */
+.skeleton-button {
+    height: 44px;
+    width: 120px;
+    border-radius: var(--radius-full);
+}
+
+.skeleton-button-wide {
+    width: 100%;
+}
+
+/* Card skeleton */
+.skeleton-card {
+    padding: 24px;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+}
+
+/* Avatar/Circle skeleton */
+.skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.skeleton-avatar-sm {
+    width: 32px;
+    height: 32px;
+}
+
+.skeleton-avatar-lg {
+    width: 64px;
+    height: 64px;
+}
+
+/* Image skeleton */
+.skeleton-image {
+    height: 200px;
+    border-radius: var(--radius-md);
+}
+
+/* Option/Choice skeleton */
+.skeleton-option {
+    height: 56px;
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+}
+
+/* =========================================
+   QUIZ-SPECIFIC SKELETONS
+   ========================================= */
+
+/* Question card loading state */
+.skeleton-question-card {
+    padding: 32px;
+}
+
+.skeleton-question-card .skeleton-heading {
+    margin-bottom: 24px;
+}
+
+.skeleton-question-card .skeleton-option:last-child {
+    margin-bottom: 0;
+}
+
+/* Results card skeleton */
+.skeleton-results {
+    text-align: center;
+    padding: 40px;
+}
+
+.skeleton-results .skeleton-score {
+    height: 80px;
+    width: 120px;
+    margin: 24px auto;
+    border-radius: var(--radius-md);
+}
+
+.skeleton-results .skeleton-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.skeleton-results .skeleton-stat {
+    height: 24px;
+    width: 80px;
+}
+
+/* Dashboard quiz card skeleton */
+.skeleton-quiz-card {
+    height: 160px;
+    border-radius: var(--radius-lg);
+}
+
+/* =========================================
+   HTMX INTEGRATION
+   ========================================= */
+
+/* Show skeletons while HTMX is loading */
+.htmx-request .skeleton-hide,
+.htmx-request .hide-while-loading {
+    display: none !important;
+}
+
+.htmx-request .skeleton-show,
+.htmx-request .show-while-loading {
+    display: block !important;
+}
+
+/* For inline elements */
+.htmx-request .skeleton-show-inline {
+    display: inline-block !important;
+}
+
+/* Default hidden state for skeleton placeholders */
+.skeleton-show,
+.show-while-loading {
+    display: none;
+}
+
+/* =========================================
+   ACCESSIBILITY
+   ========================================= */
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton {
+        animation: none;
+        background-image: none;
+    }
+}

@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/toast.css' %}">
+    <link rel="stylesheet" href="{% static 'css/skeleton.css' %}">
 
     <script src="https://unpkg.com/htmx.org@1.9.10"
         integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
@@ -43,8 +44,11 @@
 
 <body hx-boost="true" x-data="themeToggle()" :data-theme="theme">
 
-    <header class="top-app-bar">
-        <a href="{% url 'home' %}" class="app-logo" style="text-decoration: none;">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="top-app-bar" role="banner">
+        <a href="{% url 'home' %}" class="app-logo" style="text-decoration: none;" aria-label="Quizzer AI Home">
             <span class="material-symbols-outlined filled" style="color: var(--color-primary); font-size: 32px;">
                 psychology
             </span>
@@ -111,7 +115,7 @@
         </div>
     </header>
 
-    <main class="container">
+    <main id="main-content" class="container" role="main">
         {% block content %}{% endblock %}
     </main>
 

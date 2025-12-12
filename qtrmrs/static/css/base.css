@@ -217,3 +217,172 @@ input[type="file"] {
 [x-cloak] {
     display: none !important;
 }
+
+/* =========================================
+   ACCESSIBILITY
+   ========================================= */
+
+/* Skip to content link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--color-primary);
+    color: white;
+    padding: 8px 16px;
+    z-index: 10000;
+    text-decoration: none;
+    border-radius: 0 0 var(--radius-md) 0;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Focus visible styles */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Remove focus outline for mouse users */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Screen reader only */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* =========================================
+   MOBILE OPTIMIZATION
+   ========================================= */
+
+/* Ensure touch targets are at least 44px */
+.btn,
+button,
+a.btn,
+.dropdown-item {
+    min-height: 44px;
+}
+
+/* Mobile: max-width 768px */
+@media (max-width: 768px) {
+
+    /* Navbar adjustments */
+    .top-app-bar {
+        padding: 0 16px;
+        height: 56px;
+    }
+
+    .app-logo span:last-child {
+        display: none;
+        /* Hide "Quizzer AI" text on mobile */
+    }
+
+    /* Container padding */
+    .container {
+        padding: 16px;
+    }
+
+    /* Stack buttons on mobile */
+    .btn-group-mobile {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-group-mobile .btn {
+        width: 100%;
+    }
+
+    /* Cards on mobile */
+    .card {
+        padding: 20px;
+    }
+
+    /* Form inputs larger on mobile */
+    .form-input,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+        padding: 14px 16px;
+        font-size: 16px;
+        /* Prevents zoom on iOS */
+    }
+
+    /* Dropdown full width on mobile */
+    .dropdown-menu {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        width: auto;
+    }
+}
+
+/* Small mobile: max-width 480px */
+@media (max-width: 480px) {
+
+    /* Heading sizes */
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    /* Even more compact */
+    .container {
+        padding: 12px;
+    }
+
+    .card {
+        padding: 16px;
+        border-radius: var(--radius-md);
+    }
+}
+
+/* =========================================
+   HIGH CONTRAST MODE
+   ========================================= */
+
+@media (prefers-contrast: high) {
+    :root {
+        --color-border: #000;
+    }
+
+    .btn {
+        border-width: 2px;
+    }
+
+    .card {
+        border-width: 2px;
+    }
+}
