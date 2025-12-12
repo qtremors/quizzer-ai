@@ -85,6 +85,7 @@ def user_dashboard(request):
         'avg_score': round(avg_score, 1),
         'incomplete_count': incomplete_count,
         'page_obj': quizzes_page,  # For pagination template
+        'profile': request.user.profile,  # For level/XP/streak display
     }
     return render(request, 'users/dashboard.html', context)
 

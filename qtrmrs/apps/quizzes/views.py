@@ -224,6 +224,47 @@ def submit_answer(request, quiz_id, question_id):
         quiz.completed_at = timezone.now()
         quiz.save()
         
+        # === GAMIFICATION: Award XP, update streak, check badges ===
+        from apps.users.gamification import (
+            calculate_quiz_xp, calculate_level_from_xp, 
+            update_user_streak, check_and_award_badges
+        )
+        from django.contrib import messages
+        
+        # Get user profile
+        profile = request.user.profile
+        old_level = profile.level
+        
+        # Calculate and award XP
+        total_time = sum(a.time_taken for a in quiz.answers.all())
+        xp_earned = calculate_quiz_xp(correct_count, total_time, total_qs)
+        profile.xp += xp_earned
+        
+        # Check for level up
+        new_level = calculate_level_from_xp(profile.xp)
+        leveled_up = new_level > old_level
+        profile.level = new_level
+        
+        # Update streak
+        update_user_streak(profile)
+        
+        # Update cached stats
+        profile.total_correct_answers += correct_count
+        profile.total_study_time += total_time
+        if quiz.score > profile.best_score:
+            profile.best_score = quiz.score
+        
+        profile.save()
+        
+        # Check and award badges
+        new_badges = check_and_award_badges(request.user, profile)
+        
+        # Store XP info in session for display on results page
+        request.session['quiz_xp_earned'] = xp_earned
+        request.session['quiz_leveled_up'] = leveled_up
+        request.session['quiz_new_level'] = new_level if leveled_up else None
+        request.session['quiz_new_badges'] = [b.name for b in new_badges] if new_badges else []
+        
         response = HttpResponse()
         response['HX-Redirect'] = f"/quiz/results/{quiz.id}/"
         return response
@@ -269,6 +310,12 @@ def quiz_results(request, quiz_id):
     else:
         total_time_formatted = f"{total_time}s"
 
+    # Get XP info from session (set during quiz completion)
+    xp_earned = request.session.pop('quiz_xp_earned', None)
+    leveled_up = request.session.pop('quiz_leveled_up', False)
+    new_level = request.session.pop('quiz_new_level', None)
+    new_badges = request.session.pop('quiz_new_badges', [])
+
     return render(request, 'quizzes/results.html', {
         'quiz': quiz,
         'user_answers': user_answers,
@@ -279,7 +326,13 @@ def quiz_results(request, quiz_id):
         'has_explanations': has_explanations,
         'total_time': total_time,
         'total_time_formatted': total_time_formatted,
-        'avg_time': avg_time
+        'avg_time': avg_time,
+        # Gamification
+        'xp_earned': xp_earned,
+        'leveled_up': leveled_up,
+        'new_level': new_level,
+        'new_badges': new_badges,
+        'profile': request.user.profile,
     })
 
 @login_required

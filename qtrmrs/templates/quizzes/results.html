@@ -5,11 +5,23 @@
 
     <div class="card" style="text-align: center; margin-bottom: 32px; padding: 40px;">
         {% if score_percent == 100 %}
-        <!-- Perfect Score Celebration -->
+        <!-- Perfect Score Celebration with Confetti -->
         <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
         <h1 style="margin-bottom: 8px; font-size: 2rem; color: var(--color-success);">Perfect Score!</h1>
         <p style="color: var(--color-text-muted); margin-bottom: 16px;">You answered every question correctly.
             Outstanding!</p>
+
+        <!-- Confetti Animation -->
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <script>
+            // Initial burst
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            // Second burst after 300ms
+            setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.5 } }), 300);
+            // Third burst
+            setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0 } }), 600);
+            setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1 } }), 600);
+        </script>
         {% else %}
         <h1 style="margin-bottom: 8px; font-size: 2rem;">Quiz Complete</h1>
         {% endif %}
@@ -49,6 +61,44 @@
                 </span>
             </div>
         </div>
+
+        <!-- XP Earned Display -->
+        {% if xp_earned %}
+        <div class="xp-reward-banner animate-fade-in" style="margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                <div class="xp-badge">
+                    <span class="material-symbols-outlined" style="color: #fbbf24;">star</span>
+                    <span>+{{ xp_earned }} XP</span>
+                </div>
+
+                {% if leveled_up %}
+                <div class="level-up-badge">
+                    <span class="material-symbols-outlined" style="color: #10b981;">trending_up</span>
+                    <span>Level Up! You're now <strong>Level {{ new_level }}</strong></span>
+                </div>
+                {% endif %}
+
+                {% for badge in new_badges %}
+                <div class="new-badge-badge">
+                    <span class="material-symbols-outlined" style="color: #8b5cf6;">workspace_premium</span>
+                    <span>New Badge: <strong>{{ badge }}</strong></span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- XP Progress Bar -->
+            <div style="margin-top: 16px; max-width: 300px; margin-left: auto; margin-right: auto;">
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 4px;">
+                    <span>Level {{ profile.level }}</span>
+                    <span>{{ profile.xp_in_current_level }} / {{ profile.xp_for_next_level }} XP</span>
+                </div>
+                <div class="xp-bar">
+                    <div class="xp-progress" style="width: {{ profile.xp_progress_percent }}%;"></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
             <a href="{% url 'quiz_setup' %}" class="btn btn-filled">New Quiz</a>
@@ -138,6 +188,57 @@
     /* Retry button hover */
     .retry-btn:hover {
         background: var(--color-primary-container);
+    }
+
+    /* XP Reward Banner */
+    .xp-reward-banner {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(139, 92, 246, 0.1));
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        border-radius: 16px;
+        padding: 20px;
+    }
+
+    .xp-badge,
+    .level-up-badge,
+    .new-badge-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--color-surface);
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .xp-badge {
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        color: #fbbf24;
+    }
+
+    .level-up-badge {
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #10b981;
+    }
+
+    .new-badge-badge {
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        color: #8b5cf6;
+    }
+
+    /* XP Progress Bar */
+    .xp-bar {
+        height: 8px;
+        background: var(--color-surface-variant);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .xp-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        border-radius: 4px;
+        transition: width 0.5s ease;
     }
 </style>
 {% endblock %}
