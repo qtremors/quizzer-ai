@@ -2,46 +2,67 @@
 
 {% block content %}
 <div style="max-width: 900px; margin: 0 auto; width: 100%;">
-    
+
     <div class="card" style="text-align: center; margin-bottom: 32px; padding: 40px;">
+        {% if score_percent == 100 %}
+        <!-- Perfect Score Celebration -->
+        <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
+        <h1 style="margin-bottom: 8px; font-size: 2rem; color: var(--color-success);">Perfect Score!</h1>
+        <p style="color: var(--color-text-muted); margin-bottom: 16px;">You answered every question correctly.
+            Outstanding!</p>
+        {% else %}
         <h1 style="margin-bottom: 8px; font-size: 2rem;">Quiz Complete</h1>
-        
-        <div style="font-size: 4rem; font-weight: 800; color: var(--color-text-main); margin: 24px 0;">
+        {% endif %}
+
+        <div
+            style="font-size: 4rem; font-weight: 800; color: {% if score_percent == 100 %}var(--color-success){% elif score_percent >= 80 %}var(--color-primary){% elif score_percent >= 50 %}var(--color-warning){% else %}var(--color-error){% endif %}; margin: 24px 0;">
             {{ score_percent }}%
         </div>
-        
-        <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; font-weight: 500;">
+
+        <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; font-weight: 500;">
             <span style="color: var(--color-success);">{{ correct }} Correct</span>
             <span style="color: var(--color-warning);">{{ skipped }} Skipped</span>
             <span style="color: var(--color-error);">{{ wrong }} Incorrect</span>
         </div>
 
+        <!-- AI Model Info -->
+        {% if quiz.model_used %}
+        <div
+            style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 32px; padding: 8px 16px; background: var(--color-surface-variant); border-radius: 20px; width: fit-content; margin-left: auto; margin-right: auto;">
+            <span class="material-symbols-outlined"
+                style="font-size: 16px; color: var(--color-primary);">psychology</span>
+            <span style="font-size: 0.85rem; color: var(--color-text-muted);">
+                Generated with <strong style="color: var(--color-text-main);">{{ quiz.model_used }}</strong>
+            </span>
+        </div>
+        {% endif %}
+
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
             <a href="{% url 'quiz_setup' %}" class="btn btn-filled">New Quiz</a>
-            
-            {% if wrong > 0 or skipped > 0 %}
-                {% if not has_explanations %}
-                <button hx-get="{% url 'generate_all_explanations' quiz.id %}" 
-                        hx-target="#review-list" 
-                        class="btn btn-tonal explain-btn">
-                    
-                    <span class="btn-content" style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined">psychology</span>
-                        Explain All Mistakes
-                    </span>
 
-                    <span class="btn-loading" style="display: none; align-items: center; gap: 8px;">
-                        <span class="mini-spinner-dark"></span> AI Thinking...
-                    </span>
-                </button>
-                {% endif %}
+            {% if wrong > 0 or skipped > 0 %}
+            {% if not has_explanations %}
+            <button hx-post="{% url 'generate_all_explanations' quiz.id %}" hx-target="#review-list"
+                class="btn btn-tonal explain-btn">
+
+                <span class="btn-content" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined">psychology</span>
+                    Explain All Mistakes
+                </span>
+
+                <span class="btn-loading" style="display: none; align-items: center; gap: 8px;">
+                    <span class="mini-spinner-dark"></span> AI Thinking...
+                </span>
+            </button>
             {% endif %}
-            
+            {% endif %}
+
             <a href="{% url 'home' %}" class="btn btn-text">Home</a>
         </div>
     </div>
 
-    <h3 style="margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; color: var(--color-text-main);">
+    <h3
+        style="margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; color: var(--color-text-main);">
         Review Answers
     </h3>
 
@@ -53,28 +74,43 @@
 
 <style>
     /* --- LOADING STATE MAGIC --- */
-    
+
     /* When the BUTTON itself has 'htmx-request' */
-    .explain-btn.htmx-request .btn-content { display: none !important; }
-    .explain-btn.htmx-request .btn-loading { display: flex !important; }
-    .explain-btn.htmx-request { cursor: wait; opacity: 0.8; }
+    .explain-btn.htmx-request .btn-content {
+        display: none !important;
+    }
+
+    .explain-btn.htmx-request .btn-loading {
+        display: flex !important;
+    }
+
+    .explain-btn.htmx-request {
+        cursor: wait;
+        opacity: 0.8;
+    }
 
     /* Spinner for dark text buttons */
     .mini-spinner-dark {
-        width: 18px; height: 18px;
-        border: 2px solid rgba(0,0,0,0.1);
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
         border-top-color: var(--color-primary);
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
     }
+
     /* In Dark mode, the tonal button text is white, so spinner should be white-ish */
     @media (prefers-color-scheme: dark) {
         .mini-spinner-dark {
-            border-color: rgba(255,255,255,0.1);
+            border-color: rgba(255, 255, 255, 0.1);
             border-top-color: white;
         }
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 {% endblock %}

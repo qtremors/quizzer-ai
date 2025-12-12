@@ -6,11 +6,11 @@ This document outlines the architectural decisions, development phases, and futu
 
 We moved away from a monolithic "spaghetti code" structure to a **Service-Oriented Django Architecture**.
 
-- **Separation of Concerns:** Business logic lives in `services.py`, not `views.py`.
+- **Hybrid Logic:** Core business logic (quizzes, scoring) lives in `views.py` for simplicity and direct HTMX integration.
     
 - **HTMX-First:** We avoid the complexity of a separate React frontend by using Django templates served via HTMX. This allows for SPA-like speed with SEO-friendly HTML.
     
-- **AI-as-a-Service:** The AI integration is isolated in `apps/ai_agent`. The rest of the app doesn't know _how_ the quiz is generated, only that it receives JSON data.
+- **AI-as-a-Service:** The AI integration is isolated in `apps/ai_agent/services.py`. The rest of the app doesn't know _how_ the quiz is generated, only that it receives JSON data.
     
 
 ## 2. Directory Structure
@@ -30,7 +30,7 @@ quizzer-ai/
 
 ## 3. Development Phases (Completed)
 
-### Phase 1: The Foundation
+### Phase 1: The Foundation (Completed)
 
 - [x] Setup Django 5.x with `uv` package manager.
     
@@ -41,7 +41,7 @@ quizzer-ai/
 - [x] Create Custom User Model (`AbstractUser` with email login).
     
 
-### Phase 2: The Data Layer
+### Phase 2: The Data Layer (Completed)
 
 - [x] Design Relational Schema: `Quiz` -> `Question` -> `Option` -> `UserAnswer`.
     
@@ -50,7 +50,7 @@ quizzer-ai/
 - [x] Add `code_snippet` fields to support technical questions.
     
 
-### Phase 3: The AI Service
+### Phase 3: The AI Service (Completed)
 
 - [x] Integrate `google-generativeai` SDK.
     
@@ -61,7 +61,7 @@ quizzer-ai/
 - [x] Switch model to `gemini-flash-lite-latest` for speed.
     
 
-### Phase 4: The Frontend System
+### Phase 4: The Frontend System (Completed)
 
 - [x] Build Base Template with HTMX & Alpine.js integration.
     
@@ -70,7 +70,7 @@ quizzer-ai/
 - [x] Create responsive Grid layouts for Dashboard and Catalog.
     
 
-### Phase 5: The Interactive Player
+### Phase 5: The Interactive Player (Completed)
 
 - [x] Build "Question Card" partials for HTMX swapping.
     
@@ -81,14 +81,14 @@ quizzer-ai/
 - [x] Create "Explain All Mistakes" logic for bulk AI analysis on results.
     
 
-### Phase 6: The Chat Agent
+### Phase 6: The Chat Agent (Completed)
 
 - [x] Build Natural Language Processing (NLP) prompt to extract intent.
     
 - [x] Create Chat UI with "Thinking" states and suggestions.
     
 
-### Phase 7: User Experience Polish
+### Phase 7: User Experience Polish (Completed)
 
 - [x] **Smart Setup:** Auto-fill Language based on referer URL.
     
@@ -99,7 +99,7 @@ quizzer-ai/
 
 ## 4. Future Roadmap
 
-### Short Term
+### Short Term (In Progress)
 
 - **Leaderboards:** Global ranking based on total score/quizzes taken.
     

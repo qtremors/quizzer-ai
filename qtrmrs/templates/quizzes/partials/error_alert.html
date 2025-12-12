@@ -1,0 +1,46 @@
+<div class="error-alert" style="
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+">
+    <div style="
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px auto;
+    ">
+        <span class="material-symbols-outlined" style="color: var(--color-error); font-size: 24px;">
+            {% if error_type == 'quota' %}speed
+            {% elif error_type == 'model_not_found' %}search_off
+            {% elif error_type == 'auth' %}key_off
+            {% elif error_type == 'timeout' %}timer_off
+            {% else %}error{% endif %}
+        </span>
+    </div>
+
+    <h3 style="color: var(--color-error); margin-bottom: 8px; font-size: 1.1rem;">
+        {% if error_type == 'quota' %}Quota Exceeded
+        {% elif error_type == 'model_not_found' %}Model Unavailable
+        {% elif error_type == 'auth' %}Authentication Error
+        {% elif error_type == 'timeout' %}Request Timeout
+        {% else %}Something went wrong{% endif %}
+    </h3>
+
+    <p style="color: var(--color-text-main); margin-bottom: 12px;">
+        {{ message|default:"AI failed to generate. Try again." }}
+    </p>
+
+    {% if suggestion %}
+    <p
+        style="color: var(--color-text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">lightbulb</span>
+        {{ suggestion }}
+    </p>
+    {% endif %}
+</div>

@@ -2,49 +2,51 @@
 
 {% block content %}
 <div style="max-width: 1100px; margin: 0 auto; padding-top: 40px; padding-bottom: 40px;">
-    
+
     <div style="margin-bottom: 32px;">
         <h1 style="margin-bottom: 8px; font-size: 2.5rem;">Configure Session</h1>
         <p style="color: var(--color-text-muted); font-size: 1.1rem;">Customize your AI generation parameters.</p>
     </div>
 
     <div class="card">
-        
-        <form hx-post="{% url 'create_quiz' %}" 
-              hx-indicator="#generate-btn"
-              hx-disabled-elt="#generate-btn"
-              class="setup-form">
-            
+
+        <form hx-post="{% url 'create_quiz' %}" hx-indicator="#generate-btn" hx-disabled-elt="#generate-btn"
+            class="setup-form">
+
             {% csrf_token %}
 
             <div class="setup-grid">
-                
+
                 <div class="grid-col">
                     <h3 class="section-title">Subject Matter</h3>
-                    
+
                     <div class="form-group">
                         <label>Language / Technology</label>
                         <div class="select-wrapper" style="margin-bottom: 12px;">
-                        <select name="language_select" id="lang-select">
-                            <option value="Python">Python</option>
-                            <option value="JavaScript">JavaScript</option>
-                            <option value="TypeScript">TypeScript</option> <option value="React">React</option>
-                            <option value="Django">Django</option>
-                            <option value="SQL">SQL</option>
-                            <option value="Go">Go</option>
-                            <option value="Rust">Rust</option>
-                            <option value="C++">C++</option>       <option value="Java">Java</option>
-                            <option value="CSS">CSS</option>
-                            <option value="HTML">HTML</option>
-                        </select>
+                            <select name="language_select" id="lang-select">
+                                <option value="Python">Python</option>
+                                <option value="JavaScript">JavaScript</option>
+                                <option value="TypeScript">TypeScript</option>
+                                <option value="React">React</option>
+                                <option value="Django">Django</option>
+                                <option value="SQL">SQL</option>
+                                <option value="Go">Go</option>
+                                <option value="Rust">Rust</option>
+                                <option value="C++">C++</option>
+                                <option value="Java">Java</option>
+                                <option value="CSS">CSS</option>
+                                <option value="HTML">HTML</option>
+                            </select>
                             <span class="material-symbols-outlined arrow-icon">expand_more</span>
                         </div>
-                        <input type="text" name="custom_language" placeholder="Or type custom (e.g. Kotlin)..." class="form-input" style="font-size: 0.9rem; padding: 10px 16px; border-style: dashed;">
+                        <input type="text" name="custom_language" placeholder="Or type custom (e.g. Kotlin)..."
+                            class="form-input" style="font-size: 0.9rem; padding: 10px 16px; border-style: dashed;">
                     </div>
 
                     <div class="form-group">
                         <label>Specific Topic</label>
-                        <input type="text" name="topic" required placeholder="e.g. Flexbox, Recursion" class="form-input">
+                        <input type="text" name="topic" required placeholder="e.g. Flexbox, Recursion"
+                            class="form-input">
                     </div>
                 </div>
 
@@ -69,16 +71,36 @@
                                     <option value="5" selected>5 Qs</option>
                                     <option value="10">10 Qs</option>
                                     <option value="15">15 Qs</option>
+                                    <option value="20">20 Qs</option>
                                 </select>
                                 <span class="material-symbols-outlined arrow-icon">expand_more</span>
                             </div>
                         </div>
                     </div>
 
+                    <!-- AI Model Selector -->
+                    <div class="form-group">
+                        <label>AI Model</label>
+                        <div class="select-wrapper">
+                            <select name="ai_model">
+                                {% for model in available_models %}
+                                <option value="{{ model.id }}" {% if model.is_default %}selected{% endif %}>
+                                    {{ model.display_name }}
+                                </option>
+                                {% empty %}
+                                <option value="">Default (Flash Lite)</option>
+                                {% endfor %}
+                            </select>
+                            <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                        </div>
+                    </div>
+
                     <div class="toggle-row">
                         <div>
-                            <span style="font-weight: 600; display: block; color: var(--color-text-main);">Coding Challenges</span>
-                            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Include code snippets</span>
+                            <span style="font-weight: 600; display: block; color: var(--color-text-main);">Coding
+                                Challenges</span>
+                            <span style="font-size: 0.85rem; color: var(--color-text-muted);">Include code
+                                snippets</span>
                         </div>
                         <label class="switch">
                             <input type="checkbox" name="include_code">
@@ -88,14 +110,16 @@
                 </div>
             </div>
 
-            <div style="margin-top: 40px; border-top: 1px solid var(--color-border); padding-top: 24px; text-align: right;">
-                
-                <button type="submit" id="generate-btn" class="btn btn-filled" style="height: 52px; padding: 0 40px; font-size: 1.05rem; min-width: 200px;">
-                    
+            <div
+                style="margin-top: 40px; border-top: 1px solid var(--color-border); padding-top: 24px; text-align: right;">
+
+                <button type="submit" id="generate-btn" class="btn btn-filled"
+                    style="height: 52px; padding: 0 40px; font-size: 1.05rem; min-width: 200px;">
+
                     <span class="btn-content" style="display: flex; align-items: center; gap: 12px;">
                         <span class="material-symbols-outlined">auto_awesome</span> Generate Quiz
                     </span>
-                    
+
                     <span class="btn-loading" style="display: none; align-items: center; gap: 12px;">
                         <span class="mini-spinner"></span> AI is thinking...
                     </span>
@@ -109,13 +133,13 @@
 
 <script>
 
-    (function() {
+    (function () {
         const urlParam = "{{ initial_lang }}";
-        
+
         if (urlParam) {
             const select = document.getElementById('lang-select');
             const customInput = document.querySelector('input[name="custom_language"]');
-            
+
             if (select) {
                 let foundInDropdown = false;
 
@@ -139,41 +163,172 @@
 
 <style>
     /* Layout */
-    .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
-    .section-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 8px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .form-group { margin-bottom: 24px; }
-    .form-group label { display: block; margin-bottom: 8px; font-size: 0.95rem; font-weight: 500; color: var(--color-text-main); }
+    .setup-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+    }
+
+    .section-title {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--color-text-muted);
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 8px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--color-text-main);
+    }
 
     /* Inputs */
-    .form-input, select { width: 100%; padding: 14px 16px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-main); font-size: 1rem; outline: none; appearance: none; transition: border-color 0.2s; }
-    .form-input:focus, select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-container); }
-    .select-wrapper { position: relative; }
-    .arrow-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--color-text-muted); }
+    .form-input,
+    select {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--color-border);
+        background: var(--color-bg);
+        color: var(--color-text-main);
+        font-size: 1rem;
+        outline: none;
+        appearance: none;
+        transition: border-color 0.2s;
+    }
+
+    .form-input:focus,
+    select:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px var(--color-primary-container);
+    }
+
+    .select-wrapper {
+        position: relative;
+    }
+
+    .arrow-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--color-text-muted);
+    }
 
     /* Toggle */
-    .toggle-row { display: flex; justify-content: space-between; align-items: center; background: var(--color-bg); border: 1px solid var(--color-border); padding: 20px; border-radius: 12px; margin-top: 10px; }
-    .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background-color: var(--color-primary); }
-    input:checked + .slider:before { transform: translateX(24px); }
-    @media (prefers-color-scheme: dark) { .slider { background-color: #334155; } }
-    
-    @media (max-width: 768px) { .setup-grid { grid-template-columns: 1fr; gap: 32px; } }
+    .toggle-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 10px;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 26px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.slider {
+        background-color: var(--color-primary);
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(24px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .slider {
+            background-color: #334155;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .setup-grid {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+    }
 
     /* --- ANIMATION LOGIC --- */
-    
-    #generate-btn.htmx-request .btn-content { display: none !important; }
-    #generate-btn.htmx-request .btn-loading { display: flex !important; }
-    #generate-btn.htmx-request { opacity: 0.8; cursor: wait; }
 
-    .mini-spinner { 
-        width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); 
-        border-top-color: white; border-radius: 50%; 
-        animation: spin 0.8s linear infinite; 
+    #generate-btn.htmx-request .btn-content {
+        display: none !important;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #generate-btn.htmx-request .btn-loading {
+        display: flex !important;
+    }
+
+    #generate-btn.htmx-request {
+        opacity: 0.8;
+        cursor: wait;
+    }
+
+    .mini-spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 {% endblock %}

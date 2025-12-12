@@ -30,7 +30,7 @@ class LoginForm(AuthenticationForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['avatar', 'username', 'email']
+        fields = ['avatar', 'username']  # email removed: requires verification flow
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

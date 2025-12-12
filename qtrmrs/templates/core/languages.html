@@ -3,7 +3,7 @@
 
 {% block content %}
 <div style="max-width: 1600px; margin: 0 auto; padding: 40px 24px; width: 100%;">
-    
+
     <div style="text-align: center; margin-bottom: 60px;">
         <h1 style="margin-bottom: 12px; font-size: 3rem;">Explore Technologies</h1>
         <p style="color: var(--color-text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
@@ -12,7 +12,7 @@
     </div>
 
     <div class="lang-grid">
-        
+
         <a href="{% url 'quiz_setup' %}?language=Python" class="lang-card">
             <i class="devicon-python-plain colored icon-lg"></i>
             <h3>Python</h3>
@@ -48,20 +48,20 @@
             <h3>Go</h3>
             <p>Concurrency, channels, and systems.</p>
         </a>
-        
+
         <a href="{% url 'quiz_setup' %}?language=Rust" class="lang-card">
             <i class="devicon-rust-original icon-lg" style="color: var(--color-text-main);"></i>
             <h3>Rust</h3>
             <p>Memory safety, borrowing, and ownership.</p>
         </a>
-        
+
         <a href="{% url 'quiz_setup' %}?language=TypeScript" class="lang-card">
             <i class="devicon-typescript-plain colored icon-lg"></i>
             <h3>TypeScript</h3>
             <p>Static typing, interfaces, and generics.</p>
         </a>
 
-         <a href="{% url 'quiz_setup' %}?language=C++" class="lang-card">
+        <a href="{% url 'quiz_setup' %}?language=C++" class="lang-card">
             <i class="devicon-cplusplus-plain colored icon-lg"></i>
             <h3>C++</h3>
             <p>Pointers, memory management, and OOP.</p>
@@ -96,6 +96,7 @@
         align-items: flex-start;
         height: 100%;
         min-height: 220px;
+        cursor: pointer;
     }
 
     .lang-card:hover {
@@ -104,12 +105,34 @@
         box-shadow: var(--shadow-hover);
     }
 
-    .icon-lg { font-size: 4rem; margin-bottom: 24px; }
-    .lang-card h3 { margin: 0 0 8px 0; font-size: 1.4rem; color: var(--color-text-main); }
-    .lang-card p { margin: 0; font-size: 1rem; color: var(--color-text-muted); line-height: 1.5; }
-    
+    /* Active/click state for immediate feedback */
+    .lang-card:active {
+        transform: scale(0.98);
+        opacity: 0.8;
+    }
+
+    .icon-lg {
+        font-size: 4rem;
+        margin-bottom: 24px;
+    }
+
+    .lang-card h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.4rem;
+        color: var(--color-text-main);
+    }
+
+    .lang-card p {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--color-text-muted);
+        line-height: 1.5;
+    }
+
     @media (max-width: 768px) {
-        .lang-grid { grid-template-columns: 1fr; }
+        .lang-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}

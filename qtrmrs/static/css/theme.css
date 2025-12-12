@@ -1,34 +1,11 @@
+/* =========================================
+   QUIZZER AI - THEME SYSTEM
+   ========================================= */
+
 :root {
     /* --- TYPOGRAPHY --- */
     --font-sans: 'Roboto', system-ui, sans-serif;
     --font-display: 'Roboto', sans-serif;
-
-    /* --- PALETTE: "Academic Professional" (Light Mode Default) --- */
-    
-    /* PRIMARY: Trustworthy Blue */
-    --color-primary: #005AC1;       /* Standard Blue 700 */
-    --color-primary-hover: #004C8C;
-    --color-primary-container: #D8E2FF;
-    --color-on-primary-container: #001A41;
-
-    /* SEMANTIC COLORS (Softer, less neon) */
-    --color-success: #146c2e;       /* Green 700 */
-    --color-warning: #d97706;       /* Amber 600 */
-    --color-error: #ba1a1a;         /* Red 700 */
-
-    /* NEUTRALS (High Contrast Reading) */
-    --color-text-main: #1F1F1F;     /* Near Black */
-    --color-text-muted: #757575;    /* Gray */
-    --color-border: #E0E2E0;        /* Light Gray Border */
-
-    /* BACKGROUNDS: Clean Paper Look */
-    --color-bg: #FDFDFD;            /* Off-White */
-    --color-surface: #FFFFFF;       /* Pure White */
-    --color-surface-variant: #F0F1F3; /* Light Gray for Options */
-
-    /* SHADOWS: Soft & Professional */
-    --shadow-card: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    --shadow-hover: 0 4px 6px rgba(0,0,0,0.15);
 
     /* --- SHAPE --- */
     --radius-sm: 4px;
@@ -37,10 +14,74 @@
     --radius-full: 9999px;
 }
 
-/* DARK MODE SUPPORT (Professional Slate, Not Void Black) */
+/* =========================================
+   LIGHT THEME (Default)
+   ========================================= */
+:root,
+[data-theme="light"] {
+    /* PRIMARY: Trustworthy Blue */
+    --color-primary: #005AC1;
+    --color-primary-hover: #004C8C;
+    --color-primary-container: #D8E2FF;
+    --color-on-primary-container: #001A41;
+
+    /* SEMANTIC COLORS */
+    --color-success: #146c2e;
+    --color-warning: #d97706;
+    --color-error: #ba1a1a;
+
+    /* NEUTRALS */
+    --color-text-main: #1F1F1F;
+    --color-text-muted: #757575;
+    --color-border: #E0E2E0;
+
+    /* BACKGROUNDS */
+    --color-bg: #FDFDFD;
+    --color-surface: #FFFFFF;
+    --color-surface-variant: #F0F1F3;
+
+    /* SHADOWS */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.15);
+
+    /* Theme toggle icon */
+    --theme-icon: "light_mode";
+}
+
+/* =========================================
+   DARK THEME
+   ========================================= */
+[data-theme="dark"] {
+    --color-primary: #ACC7FF;
+    --color-primary-hover: #D8E2FF;
+    --color-primary-container: #004394;
+    --color-on-primary-container: #D8E2FF;
+
+    --color-success: #6DD58C;
+    --color-warning: #FFB74D;
+    --color-error: #FFB4AB;
+
+    --color-text-main: #E3E3E3;
+    --color-text-muted: #C4C7C5;
+    --color-border: #444746;
+
+    --color-bg: #111318;
+    --color-surface: #1B1B1F;
+    --color-surface-variant: #282A2F;
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+    --theme-icon: "dark_mode";
+}
+
+/* =========================================
+   SYSTEM PREFERENCE (Auto Mode)
+   Only applies when no data-theme is set
+   ========================================= */
 @media (prefers-color-scheme: dark) {
-    :root {
-        --color-primary: #ACC7FF;       /* Light Blue */
+    :root:not([data-theme]) {
+        --color-primary: #ACC7FF;
         --color-primary-hover: #D8E2FF;
         --color-primary-container: #004394;
         --color-on-primary-container: #D8E2FF;
@@ -53,10 +94,45 @@
         --color-text-muted: #C4C7C5;
         --color-border: #444746;
 
-        --color-bg: #111318;            /* Soft Dark Slate */
-        --color-surface: #1B1B1F;       /* Slightly Lighter Slate */
+        --color-bg: #111318;
+        --color-surface: #1B1B1F;
         --color-surface-variant: #282A2F;
 
-        --shadow-card: 0 1px 2px rgba(0,0,0,0.3);
+        --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
+}
+
+/* =========================================
+   THEME TOGGLE BUTTON
+   ========================================= */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-main);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.theme-toggle:hover {
+    background: var(--color-surface-variant);
+}
+
+.theme-toggle:active {
+    transform: scale(0.9);
+}
+
+/* Rotate icon on theme change for fun effect */
+.theme-toggle .material-symbols-outlined {
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .material-symbols-outlined {
+    transform: rotate(15deg);
 }

@@ -1,142 +1,292 @@
 {% extends 'base.html' %}
 
+{% block title %}Quiz Agent - Quizzer AI{% endblock %}
+
 {% block content %}
 <div class="chat-container">
-    
-    <!-- Chat Header -->
-    <div style="text-align: center; margin-bottom: 40px; animation: fadeIn 0.5s ease-out;">
-        <div style="width: 60px; height: 60px; background: var(--color-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; box-shadow: 0 0 20px var(--color-primary-glow);">
-            <span class="material-symbols-outlined" style="font-size: 32px; color: white;">smart_toy</span>
+
+    <!-- Header -->
+    <div class="chat-header">
+        <div>
+            <h1 style="margin: 0; font-size: 1.8rem;">General Quiz Agent</h1>
+            <p style="margin: 4px 0 0 0; color: var(--color-text-muted);">Ask me to quiz you on any topic!</p>
         </div>
-        <h1 style="font-size: 2.5rem; margin-bottom: 12px;">Quiz Agent</h1>
-        <p style="color: var(--color-text-muted); font-size: 1.1rem;">
-            Tell me what you want to learn. I'll handle the rest.
-        </p>
     </div>
 
-    <!-- Suggestion Chips -->
-    <div class="suggestions">
-        <button class="chip" onclick="fillChat('Create a hard Python quiz about Decorators')">
-            🐍 Hard Python Decorators
-        </button>
-        <button class="chip" onclick="fillChat('Quiz me on JavaScript Async/Await')">
-            ⚡ JS Async Concepts
-        </button>
-        <button class="chip" onclick="fillChat('System Design basics for beginners')">
-            🏗️ System Design 101
-        </button>
+    <!-- Chat Messages Area -->
+    <div class="chat-messages" id="chat-messages">
+
+        <!-- Welcome Message (AI Bubble) -->
+        <div class="message ai-message">
+            <div class="avatar ai-avatar">
+                <span class="material-symbols-outlined">psychology</span>
+            </div>
+            <div class="bubble">
+                <strong>Hello!</strong> I can create quizzes on any topic you want — history, science, movies,
+                geography, sports, and more.
+                <br><br>
+                Try saying something like:<br>
+                <em>"Quiz me on World War 2"</em> or <em>"10 questions about space exploration"</em>
+            </div>
+        </div>
+
+        <!-- Loading Area (for HTMX) -->
+        <div id="loading-area" class="htmx-indicator">
+            <div class="message ai-message">
+                <div class="avatar ai-avatar">
+                    <span class="material-symbols-outlined">psychology</span>
+                </div>
+                <div class="bubble loading-bubble">
+                    <div class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <span style="margin-left: 8px;">Generating your quiz...</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Chat Input Area -->
-    <div class="input-wrapper">
-        <form hx-post="{% url 'chat_process' %}" 
-              hx-target="#loading-area" 
-              hx-indicator="#loading-area"
-              class="chat-form">
-            
+    <!-- Settings Bar -->
+    <div class="settings-bar">
+        <div class="setting-item">
+            <label>Questions</label>
+            <select id="num-questions-select">
+                <option value="5" selected>5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label>AI Model</label>
+            <select id="ai-model-select">
+                {% for model in available_models %}
+                <option value="{{ model.id }}" {% if model.is_default %}selected{% endif %}>
+                    {{ model.display_name }}
+                </option>
+                {% empty %}
+                <option value="">Flash Lite (Default)</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input-area">
+        <form id="chat-form" hx-post="{% url 'chat_process' %}" hx-target="#loading-area" hx-indicator="#loading-area"
+            hx-disabled-elt="#chat-input, #send-btn">
+
             {% csrf_token %}
-            
-            <input type="text" id="chat-input" name="message" 
-                   placeholder="e.g., 'Generate a quiz on CSS Grid layouts'" 
-                   autocomplete="off" required>
-            
-            <button type="submit" class="send-btn">
+            <input type="hidden" name="num_questions" id="hidden-num-questions" value="5">
+            <input type="hidden" name="ai_model" id="hidden-ai-model" value="">
+
+            <input type="text" id="chat-input" name="message" placeholder="Ask me to quiz you on anything..."
+                autocomplete="off" required>
+
+            <button type="submit" id="send-btn">
                 <span class="material-symbols-outlined">arrow_upward</span>
             </button>
         </form>
     </div>
 
-    <!-- Loading State (The "Thinking" Bubble) -->
-    <div id="loading-area" class="htmx-indicator">
-        <div class="thinking-bubble">
-            <div class="dot-pulse"></div>
-            <span>Analyzing your request & generating questions...</span>
-        </div>
-    </div>
-
 </div>
 
 <script>
-    function fillChat(text) {
-        document.getElementById('chat-input').value = text;
-        document.getElementById('chat-input').focus();
+    // Sync select values to hidden inputs
+    document.getElementById('num-questions-select').addEventListener('change', function () {
+        document.getElementById('hidden-num-questions').value = this.value;
+    });
+    document.getElementById('ai-model-select').addEventListener('change', function () {
+        document.getElementById('hidden-ai-model').value = this.value;
+    });
+
+    // Set initial value for model
+    const modelSelect = document.getElementById('ai-model-select');
+    if (modelSelect.value) {
+        document.getElementById('hidden-ai-model').value = modelSelect.value;
     }
 </script>
 
 <style>
+    .container {
+        max-width: 800px !important;
+    }
+
     .chat-container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding-top: 60px;
-        min-height: 60vh;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-    }
-
-    /* Suggestion Chips */
-    .suggestions {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 40px;
-    }
-    
-    .chip {
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        color: var(--color-text-muted);
-        padding: 10px 20px;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .chip:hover {
-        background: var(--color-surface-variant);
-        border-color: var(--color-primary);
-        color: var(--color-text-main);
-        transform: translateY(-2px);
-    }
-
-    /* Input Area */
-    .input-wrapper {
-        position: relative;
-        max-width: 700px;
-        width: 100%;
+        height: calc(100vh - 80px);
+        max-width: 800px;
         margin: 0 auto;
     }
 
-    .chat-form {
-        position: relative;
+    .chat-header {
+        padding: 24px 0;
+        border-bottom: 1px solid var(--color-border);
+        margin-bottom: 16px;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 0;
+    }
+
+    /* Message Bubbles */
+    .message {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .ai-avatar {
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary, #6366f1));
+        color: white;
+    }
+
+    .bubble {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        padding: 16px 20px;
+        max-width: 85%;
+        line-height: 1.6;
+    }
+
+    .loading-bubble {
+        display: flex;
+        align-items: center;
+        color: var(--color-text-muted);
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+        display: flex;
+        gap: 4px;
+    }
+
+    .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out;
+    }
+
+    .typing-indicator span:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes bounce {
+
+        0%,
+        80%,
+        100% {
+            transform: scale(0.6);
+            opacity: 0.6;
+        }
+
+        40% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Settings Bar */
+    .settings-bar {
+        display: flex;
+        gap: 24px;
+        padding: 16px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+
+    .setting-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .setting-item label {
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+        white-space: nowrap;
+    }
+
+    .setting-item select {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--color-border);
+        background: var(--color-bg);
+        color: var(--color-text-main);
+        font-size: 0.9rem;
+        min-width: 120px;
+    }
+
+    /* Chat Input */
+    .chat-input-area {
+        padding: 16px 0;
+    }
+
+    .chat-input-area form {
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
     #chat-input {
-        width: 100%;
-        background: var(--color-surface);
+        flex: 1;
+        padding: 16px 20px;
+        border-radius: 24px;
         border: 1px solid var(--color-border);
+        background: var(--color-surface);
         color: var(--color-text-main);
-        font-size: 1.1rem;
-        padding: 20px 60px 20px 24px;
-        border-radius: 30px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        font-size: 1rem;
         outline: none;
         transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     #chat-input:focus {
         border-color: var(--color-primary);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 0 0 3px var(--color-primary-container);
     }
 
-    .send-btn {
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 44px;
-        height: 44px;
+    #send-btn {
+        width: 52px;
+        height: 52px;
         border-radius: 50%;
         border: none;
         background: var(--color-primary);
@@ -145,73 +295,48 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.2s;
-    }
-    .send-btn:hover { background: var(--color-primary-hover); }
-
-    /* Loading Animation */
-    .thinking-bubble {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        margin-top: 32px;
-        color: var(--color-text-muted);
-        font-size: 1rem;
-        animation: fadeIn 0.5s ease;
+        transition: all 0.2s;
     }
 
-    .dot-pulse {
-        position: relative;
-        width: 10px;
-        height: 10px;
-        border-radius: 5px;
-        background-color: var(--color-primary);
-        color: var(--color-primary);
-        box-shadow: 9999px 0 0 -5px;
-        animation: dot-pulse 1.5s infinite linear;
-        animation-delay: 0.25s;
-    }
-    .dot-pulse::before, .dot-pulse::after {
-        content: "";
-        display: inline-block;
-        position: absolute;
-        top: 0;
-        width: 10px;
-        height: 10px;
-        border-radius: 5px;
-        background-color: var(--color-primary);
-        color: var(--color-primary);
-    }
-    .dot-pulse::before {
-        box-shadow: 9984px 0 0 -5px;
-        animation: dot-pulse-before 1.5s infinite linear;
-        animation-delay: 0s;
-    }
-    .dot-pulse::after {
-        box-shadow: 10014px 0 0 -5px;
-        animation: dot-pulse-after 1.5s infinite linear;
-        animation-delay: 0.5s;
+    #send-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
     }
 
-    @keyframes dot-pulse-before {
-        0% { box-shadow: 9984px 0 0 -5px; }
-        30% { box-shadow: 9984px 0 0 2px; }
-        60%, 100% { box-shadow: 9984px 0 0 -5px; }
-    }
-    @keyframes dot-pulse {
-        0% { box-shadow: 9999px 0 0 -5px; }
-        30% { box-shadow: 9999px 0 0 2px; }
-        60%, 100% { box-shadow: 9999px 0 0 -5px; }
-    }
-    @keyframes dot-pulse-after {
-        0% { box-shadow: 10014px 0 0 -5px; }
-        30% { box-shadow: 10014px 0 0 2px; }
-        60%, 100% { box-shadow: 10014px 0 0 -5px; }
+    #send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
     }
 
-    .htmx-indicator { display: none; }
-    .htmx-request .htmx-indicator { display: block; }
-    .htmx-request.chat-form { opacity: 0.5; pointer-events: none; }
+    /* HTMX Indicator */
+    .htmx-indicator {
+        display: none;
+    }
+
+    .htmx-request .htmx-indicator {
+        display: block;
+    }
+
+    .htmx-request #chat-form {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+        .settings-bar {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .setting-item {
+            justify-content: space-between;
+        }
+
+        .setting-item select {
+            flex: 1;
+        }
+    }
 </style>
 {% endblock %}

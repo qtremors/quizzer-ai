@@ -1,18 +1,17 @@
 {% for ans in user_answers %}
-<div class="card" 
-     style="margin-bottom: 16px; padding: 24px; border-left: 4px solid 
+<div class="card" style="margin-bottom: 16px; padding: 24px; border-left: 4px solid 
      {% if ans.is_correct %}var(--color-success)
      {% elif ans.selected_option is None %}var(--color-warning)
      {% else %}var(--color-error){% endif %};">
-    
+
     <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">
         {{ forloop.counter }}. {{ ans.question.text }}
     </p>
 
     <div style="display: grid; gap: 8px; font-size: 0.95rem; margin-bottom: 20px;">
-        
+
         <div style="color: var(--color-text-muted);">
-            Your Answer: 
+            Your Answer:
             <span style="font-weight: 600; color: 
                 {% if ans.is_correct %}var(--color-success)
                 {% elif ans.selected_option is None %}var(--color-warning)
@@ -20,28 +19,40 @@
                 {{ ans.selected_option.text|default:"Skipped" }}
             </span>
         </div>
-        
+
         {% if not ans.is_correct %}
         <div style="color: var(--color-text-muted);">
-            Correct Answer: 
+            Correct Answer:
             <span style="color: var(--color-success); font-weight: 600;">
-                {{ ans.question.options.get_correct_option.text }}
+                {% for opt in ans.question.options.all %}{% if opt.is_correct %}{{ opt.text }}{% endif %}{% endfor %}
             </span>
         </div>
         {% endif %}
     </div>
 
     {% if ans.error_explanation %}
-        <div class="fade-in" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--color-border); border-radius: 8px; padding: 16px; display: flex; gap: 12px; font-size: 0.95rem; line-height: 1.5; color: var(--color-text-main);">
-            <span class="material-symbols-outlined" style="color: var(--color-primary);">auto_awesome</span>
-            <div>{{ ans.error_explanation }}</div>
-        </div>
+    <div class="fade-in"
+        style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--color-border); border-radius: 8px; padding: 16px; display: flex; gap: 12px; font-size: 0.95rem; line-height: 1.5; color: var(--color-text-main);">
+        <span class="material-symbols-outlined" style="color: var(--color-primary);">auto_awesome</span>
+        <div>{{ ans.error_explanation }}</div>
+    </div>
     {% endif %}
 
 </div>
 {% endfor %}
 
 <style>
-    .fade-in { animation: fadeIn 0.5s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
 </style>

@@ -58,3 +58,51 @@ STORAGES = {
 
 # Required for django-storages
 INSTALLED_APPS += ['storages']
+
+# --- 4. Security Headers ---
+# HTTPS/SSL
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Cookies
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
+# Other Security Headers
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_BROWSER_XSS_FILTER = True
+
+# Content Security Policy (allow CDNs used by the app)
+# Note: Consider using django-csp for more granular control
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = (
+    "'self'", 
+    "'unsafe-inline'",  # For HTMX inline handlers
+    "https://unpkg.com",  # HTMX
+    "https://cdn.jsdelivr.net",  # Alpine.js
+    "https://cdnjs.cloudflare.com",  # Prism.js
+)
+CSP_STYLE_SRC = (
+    "'self'", 
+    "'unsafe-inline'",  # For inline styles
+    "https://fonts.googleapis.com",
+    "https://cdn.jsdelivr.net",
+    "https://cdnjs.cloudflare.com",
+)
+CSP_FONT_SRC = (
+    "'self'",
+    "https://fonts.gstatic.com",
+)
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",
+    "https:",  # Allow external images
+)
