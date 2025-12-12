@@ -2,6 +2,31 @@
 
 All notable changes to the **Quizzer AI** project.
 
+## [1.1.1] - 2025-12-12
+
+### 🐛 Bug Fixes
+
+- **Type Comparison Fix:** Fixed option matching in quiz creation that could fail when AI returns int vs string.
+- **Theme Flash Fix:** Added inline script to apply theme before body renders, preventing wrong-theme flash on page load.
+- **Slider Theme Fix:** Toggle sliders now respect manual theme toggle (was using `@media prefers-color-scheme`).
+- **Dropdown Hover Fix:** Header dropdown now uses theme-aware hover color instead of hardcoded opacity.
+
+### 🧹 Code Cleanup
+
+- **Removed `is_study_mode`:** Cleaned up stale Quiz model field left over from removed Study Mode feature.
+- **Migration 0008:** Database migration to remove unused field.
+
+### 🎨 UI/UX Improvements
+
+- **Select Dropdowns:** Added SVG chevron arrow, proper focus states, and theme-aware styling.
+- **Viewport Protection:** Comprehensive CSS to ensure all elements (dropdowns, modals, cards, buttons) stay within viewport.
+- **Form Inputs:** Added placeholder styling, iOS zoom prevention, and validation state colors.
+- **Toggle Switches:** Centralized styling with theme-aware colors and focus states.
+- **Button Containment:** Buttons now have max-width and text overflow handling.
+- **Mobile Responsive:** Button groups wrap on small screens, settings bar wraps properly.
+
+---
+
 ## [1.1.0] - 2025-12-12
 
 ### 🎨 UI/UX Enhancements

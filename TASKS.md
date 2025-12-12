@@ -47,9 +47,21 @@ This file tracks all identified bugs, inconsistencies, and improvements.
 
 ---
 
-## ✅ Recently Fixed (v1.1.0)
+## ✅ Recently Fixed (v1.1.1)
 
-### New Features
+### Code Review Fixes
+- [x] **Theme Flash Fix** - Inline script applies theme before Alpine.js loads
+- [x] **Slider Theme Fix** - Toggle uses theme-aware CSS variables
+- [x] **Dropdown Styling** - Theme-aware hover states, SVG arrows on selects
+- [x] **Viewport Protection** - All UI elements constrained to viewport
+- [x] **Type Comparison Fix** - Option matching now normalizes to strings
+- [x] **Removed `is_study_mode`** - Cleaned up stale model field
+
+---
+
+## ✅ Fixed (v1.1.0)
+
+### Features
 - [x] **Dark/Light Theme Toggle** - Sun/moon button with localStorage persistence
 - [x] **Toast Notifications** - Slide-in toasts for all user feedback
 - [x] **Skeleton Loaders** - Shimmer animations for loading states

@@ -67,7 +67,7 @@ a {
 }
 
 .dropdown-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-surface-variant);
 }
 
 .dropdown-item .material-symbols-outlined {
@@ -384,5 +384,302 @@ a.btn,
 
     .card {
         border-width: 2px;
+    }
+}
+
+/* =========================================
+   GLOBAL OVERFLOW & VIEWPORT PROTECTION
+   ========================================= */
+
+html {
+    overflow-x: hidden;
+}
+
+/* Ensure all media stays within bounds */
+img,
+video,
+iframe,
+embed,
+object {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Force long text to wrap */
+.break-word,
+p,
+li,
+td,
+th,
+label {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Ensure tables scroll horizontally if needed */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================
+   ENHANCED SELECT & DROPDOWN STYLING
+   ========================================= */
+
+/* Custom select wrapper for arrow icon */
+.select-wrapper {
+    position: relative;
+    display: block;
+}
+
+.select-wrapper select {
+    width: 100%;
+    padding-right: 40px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.select-wrapper .arrow-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--color-text-muted);
+    font-size: 20px;
+    transition: transform 0.2s;
+}
+
+.select-wrapper select:focus+.arrow-icon {
+    color: var(--color-primary);
+}
+
+/* Native select styling improvements */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23757575' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+/* Override for wrapped selects (they have their own arrow) */
+.select-wrapper select {
+    background-image: none;
+}
+
+select option {
+    background: var(--color-surface);
+    color: var(--color-text-main);
+    padding: 8px 12px;
+}
+
+/* =========================================
+   DROPDOWN MENU IMPROVEMENTS
+   ========================================= */
+
+/* Ensure dropdown menus stay in viewport */
+.dropdown-menu,
+[x-show] {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+/* Header dropdown specific */
+.top-app-bar [x-show] {
+    max-width: calc(100vw - 32px);
+    right: 0;
+}
+
+/* =========================================
+   ENHANCED FORM INPUT STYLING
+   ========================================= */
+
+/* Prevent zoom on iOS for form inputs */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px;
+    }
+}
+
+/* Form input placeholder styling */
+::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.7;
+}
+
+/* Form group spacing */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--color-text-main);
+}
+
+/* Input validation states */
+input:invalid:not(:placeholder-shown),
+select:invalid:not(:placeholder-shown) {
+    border-color: var(--color-error);
+}
+
+input:valid:not(:placeholder-shown) {
+    border-color: var(--color-success);
+}
+
+/* =========================================
+   TOGGLE SWITCH IMPROVEMENTS
+   ========================================= */
+
+/* Ensure toggle switches respect theme */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-border);
+    transition: 0.3s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--color-surface);
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+input:checked+.slider {
+    background-color: var(--color-primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(24px);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 0 2px var(--color-primary-container);
+}
+
+/* =========================================
+   CARD & MODAL VIEWPORT CONTAINMENT
+   ========================================= */
+
+/* Ensure modals don't overflow viewport */
+.modal,
+[style*="position: fixed"] {
+    max-width: 100vw;
+    max-height: 100vh;
+}
+
+/* Cards should not overflow on mobile */
+.card {
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+/* =========================================
+   QUIZ/FORM LAYOUT CONTAINMENT
+   ========================================= */
+
+/* Ensure form layouts stay in viewport */
+.setup-grid,
+.form-row,
+.quiz-form {
+    max-width: 100%;
+}
+
+/* Quiz options should wrap text */
+.option-visual,
+.option-block {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+/* Code blocks should scroll, not overflow */
+pre,
+code {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Settings bar responsive */
+.settings-bar {
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+.setting-item {
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.setting-item select {
+    min-width: 100px;
+    max-width: 200px;
+}
+
+/* =========================================
+   BUTTON CONTAINMENT
+   ========================================= */
+
+/* Prevent buttons from causing overflow */
+.btn {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Button groups should wrap on mobile */
+.btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+@media (max-width: 480px) {
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn-group .btn {
+        width: 100%;
     }
 }

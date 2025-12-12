@@ -123,7 +123,7 @@ def create_quiz(request):
                 options_to_create.append(Option(
                     question=question,
                     text=str(opt_text)[:255],
-                    is_correct=(opt_text == q_data.get('correct_answer'))
+                    is_correct=(str(opt_text) == str(q_data.get('correct_answer', '')))
                 ))
         
         # Bulk create all options at once

@@ -50,8 +50,7 @@ class Quiz(models.Model):
     score = models.IntegerField(default=0, help_text="Score percentage")
     completed_at = models.DateTimeField(null=True, blank=True)
     
-    # Quiz Mode
-    is_study_mode = models.BooleanField(default=False, help_text="If True, show correct answer after each question")
+
 
     class Meta:
         indexes = [
