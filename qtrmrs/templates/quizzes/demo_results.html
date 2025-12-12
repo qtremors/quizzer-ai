@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto; padding: 40px 24px; width: 100%;">
+
+    <div class="card" style="text-align: center; padding: 40px;">
+
+        <!-- Demo Badge -->
+        <div class="demo-badge" style="display: inline-block; margin-bottom: 16px;">
+            Demo Quiz Complete
+        </div>
+
+        <h1 style="margin-bottom: 8px; font-size: 2.5rem;">{{ topic }}</h1>
+
+        <!-- Score Display -->
+        <div
+            style="font-size: 5rem; font-weight: 800; margin: 24px 0; color: {% if score_percent >= 80 %}var(--color-success){% elif score_percent >= 50 %}var(--color-warning){% else %}var(--color-error){% endif %};">
+            {{ score_percent }}%
+        </div>
+
+        <p style="font-size: 1.2rem; color: var(--color-text-muted); margin-bottom: 24px;">
+            You got <strong>{{ score }}</strong> out of <strong>{{ total }}</strong> questions correct!
+        </p>
+
+        <!-- CTA to Sign Up -->
+        <div class="signup-cta" style="margin-bottom: 32px;">
+            <p style="font-size: 1.1rem; margin-bottom: 16px;">
+                🚀 Want to <strong>track your progress</strong>, earn <strong>XP</strong>, and get <strong>AI
+                    explanations</strong>?
+            </p>
+            <a href="{% url 'signup' %}" class="btn btn-filled" style="font-size: 1.1rem; padding: 16px 32px;">
+                Create Free Account
+            </a>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+            <a href="{% url 'quick_quiz' %}" class="btn btn-tonal">
+                <span class="material-symbols-outlined">replay</span>
+                Try Another Quiz
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-text">
+                Already have an account? Log in
+            </a>
+        </div>
+    </div>
+
+    <!-- Answer Review -->
+    {% if answers %}
+    <div style="margin-top: 32px;">
+        <h3 style="margin-bottom: 16px;">Answer Review</h3>
+
+        {% for ans in answers %}
+        <div class="card"
+            style="margin-bottom: 12px; padding: 20px; border-left: 4px solid {% if ans.is_correct %}var(--color-success){% else %}var(--color-error){% endif %};">
+            <p style="font-weight: 600; margin-bottom: 8px;">{{ forloop.counter }}. {{ ans.question }}</p>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.95rem;">
+                <span
+                    style="color: {% if ans.is_correct %}var(--color-success){% else %}var(--color-error){% endif %};">
+                    Your answer: <strong>{{ ans.selected|default:"Skipped" }}</strong>
+                </span>
+                {% if not ans.is_correct %}
+                <span style="color: var(--color-success);">
+                    Correct: <strong>{{ ans.correct }}</strong>
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+    .demo-badge {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .signup-cta {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 16px;
+        padding: 24px;
+    }
+</style>
+{% endblock %}

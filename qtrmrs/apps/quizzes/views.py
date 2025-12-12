@@ -402,3 +402,185 @@ def retry_quiz(request, quiz_id):
     quiz.save(update_fields=['score', 'completed_at'])
     
     return redirect('quiz_player', quiz_id=quiz.id)
+
+
+# ==========================================
+# 6. QUICK QUIZ (DEMO MODE)
+# ==========================================
+
+import random
+
+DEMO_TOPICS = [
+    ('Python', 'Variables and Data Types'),
+    ('Python', 'Functions and Arguments'),
+    ('JavaScript', 'ES6 Arrow Functions'),
+    ('JavaScript', 'Async/Await Basics'),
+    ('SQL', 'SELECT Queries'),
+    ('Git', 'Basic Commands'),
+    ('CSS', 'Flexbox Basics'),
+    ('HTML', 'Semantic Elements'),
+]
+
+
+@ratelimit(key='ip', rate='10/m', method='GET', block=True)
+def quick_quiz(request):
+    """
+    One-click random quiz - works for both guests and logged-in users.
+    Generates a 5-question quiz on a random topic.
+    """
+    language, topic = random.choice(DEMO_TOPICS)
+    
+    # Get default model
+    try:
+        default_model = AIModel.objects.filter(is_active=True).first()
+        model_name = default_model.model_id if default_model else 'gemini-2.0-flash'
+    except:
+        model_name = 'gemini-2.0-flash'
+    
+    generator = QuizGenerator(model_name=model_name)
+    questions_data = generator.generate_quiz(
+        language=language, 
+        topic=topic, 
+        level='Easy', 
+        num_questions=5,
+        include_code=False
+    )
+    
+    # Handle AI error
+    from apps.ai_agent.services import AIError
+    if isinstance(questions_data, AIError):
+        from django.contrib import messages
+        messages.error(request, f"Quiz generation failed: {questions_data.message}")
+        return redirect('home')
+    
+    if request.user.is_authenticated:
+        # For logged-in users: save to database like normal
+        with transaction.atomic():
+            quiz = Quiz.objects.create(
+                user=request.user,
+                topic_description=f"{language} - {topic}",
+                difficulty='Easy',
+                total_questions=len(questions_data),
+                model_used=model_name,
+            )
+            
+            for q_data in questions_data:
+                question = Question.objects.create(
+                    quiz=quiz,
+                    text=q_data.get('question', ''),
+                    code_snippet=q_data.get('code_snippet'),
+                    code_language=language.lower() if q_data.get('code_snippet') else None
+                )
+                
+                for option_data in q_data.get('options', []):
+                    Option.objects.create(
+                        question=question,
+                        text=str(option_data.get('text', '')),
+                        is_correct=(str(option_data.get('text', '')) == str(q_data.get('correct_answer', '')))
+                    )
+        
+        return redirect('quiz_player', quiz_id=quiz.id)
+    else:
+        # For guests: store in session for demo mode
+        request.session['demo_quiz'] = {
+            'questions': questions_data,
+            'topic': f"{language} - {topic}",
+            'current_index': 0,
+            'score': 0,
+            'answers': [],
+        }
+        return redirect('demo_player')
+
+
+def demo_player(request):
+    """
+    Demo quiz player for guests (session-based).
+    No database storage - just session.
+    """
+    demo_quiz = request.session.get('demo_quiz')
+    
+    if not demo_quiz:
+        return redirect('quick_quiz')
+    
+    questions = demo_quiz.get('questions', [])
+    current_index = demo_quiz.get('current_index', 0)
+    
+    if current_index >= len(questions):
+        # Quiz complete - show results
+        return redirect('demo_results')
+    
+    question = questions[current_index]
+    
+    return render(request, 'quizzes/demo_player.html', {
+        'question': question,
+        'question_num': current_index + 1,
+        'total_questions': len(questions),
+        'topic': demo_quiz.get('topic'),
+        'progress': ((current_index) / len(questions) * 100) if questions else 0,
+    })
+
+
+def demo_submit(request):
+    """Handle demo quiz answer submission."""
+    if request.method != 'POST':
+        return redirect('demo_player')
+    
+    demo_quiz = request.session.get('demo_quiz')
+    if not demo_quiz:
+        return redirect('quick_quiz')
+    
+    questions = demo_quiz.get('questions', [])
+    current_index = demo_quiz.get('current_index', 0)
+    
+    if current_index >= len(questions):
+        return redirect('demo_results')
+    
+    question = questions[current_index]
+    selected = request.POST.get('option', '')
+    correct_answer = question.get('correct_answer', '')
+    
+    is_correct = str(selected) == str(correct_answer)
+    
+    # Update session
+    demo_quiz['answers'].append({
+        'question': question.get('question'),
+        'selected': selected,
+        'correct': correct_answer,
+        'is_correct': is_correct,
+    })
+    
+    if is_correct:
+        demo_quiz['score'] = demo_quiz.get('score', 0) + 1
+    
+    demo_quiz['current_index'] = current_index + 1
+    request.session['demo_quiz'] = demo_quiz
+    request.session.modified = True
+    
+    return redirect('demo_player')
+
+
+def demo_results(request):
+    """Show demo quiz results and prompt to sign up."""
+    demo_quiz = request.session.get('demo_quiz')
+    
+    if not demo_quiz:
+        return redirect('quick_quiz')
+    
+    questions = demo_quiz.get('questions', [])
+    score = demo_quiz.get('score', 0)
+    total = len(questions)
+    score_percent = round((score / total * 100)) if total > 0 else 0
+    
+    context = {
+        'topic': demo_quiz.get('topic'),
+        'score': score,
+        'total': total,
+        'score_percent': score_percent,
+        'answers': demo_quiz.get('answers', []),
+    }
+    
+    # Clear demo quiz from session
+    if 'demo_quiz' in request.session:
+        del request.session['demo_quiz']
+    
+    return render(request, 'quizzes/demo_results.html', context)
