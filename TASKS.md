@@ -6,27 +6,27 @@ This file tracks all identified bugs, inconsistencies, and improvements.
 
 ## 🟡 Medium Priority
 
-### 1. Dashboard Missing Pagination (Formerly #6)
+### 1. Dashboard Missing Pagination
 **File:** `users/dashboard.html`
 **Problem:** All quizzes are shown in a single grid. Heavy users could have 100+ quizzes.
-**Fix:** Add pagination (10-20 per page) with load more or page controls.
+**Status:** ✅ Fixed - Added pagination with page controls.
 
-### 2. Signup Password Helper Text Always Hidden (Formerly #11)
+### 2. Signup Password Helper Text Always Hidden
 **File:** `users/signup.html` line 39
 **Problem:** Help text only shows on focus, but validation rules are important upfront.
 **Fix:** Consider always-visible password requirements or show on first interaction.
 
-### 3. Dashboard Stats Could Show More Data (Formerly #12)
+### 3. Dashboard Stats Could Show More Data
 **File:** `users/dashboard.html`
 **Problem:** Only shows "Total Quizzes" and "Average Score".
 **Suggestion:** Add "Best Score", "Total Questions Answered", "Streak".
 
-### 4. No Skip Confirmation (Formerly #14)
+### 4. No Skip Confirmation
 **File:** `quizzes/partials/question_card.html` line 32
 **Problem:** Skip button immediately skips with no confirmation.
 **Suggestion:** Optional "Are you sure?" for users who might click accidentally.
 
-### 5. Language Grid Could Use Search/Filter (Formerly #19)
+### 5. Language Grid Could Use Search/Filter
 **File:** `core/languages.html`
 **Problem:** As more languages are added, browsing becomes slower.
 **Suggestion:** Add search bar or category filters.
@@ -35,23 +35,35 @@ This file tracks all identified bugs, inconsistencies, and improvements.
 
 ## 🟢 Low Priority / Polish
 
-### 6. CSS `!important` Usage (Formerly #15)
+### 6. CSS `!important` Usage
 **File:** `quizzes/partials/question_card.html` lines 154-161
 **Problem:** Multiple `!important` declarations are code smell.
 **Fix:** Increase selector specificity instead.
 
-### 7. Inline Styles Over CSS Classes (Formerly #16)
+### 7. Inline Styles Over CSS Classes
 **Files:** Multiple templates
 **Problem:** Heavy inline style usage makes global theming difficult.
 **Fix:** Extract common patterns to `.btn-*`, `.section-header`, etc.
 
 ---
 
-## ✅ Recently Fixed
+## ✅ Recently Fixed (v1.1.0)
 
-- [x] Settings Page Shows Email Field (Fixed)
-- [x] Logout Link Needs POST Form (Fixed)
-- [x] Hardcoded Prism Language Class (Fixed)
+### New Features
+- [x] **Dark/Light Theme Toggle** - Sun/moon button with localStorage persistence
+- [x] **Toast Notifications** - Slide-in toasts for all user feedback
+- [x] **Skeleton Loaders** - Shimmer animations for loading states
+- [x] **Mobile Optimization** - Responsive breakpoints, 44px touch targets
+- [x] **Accessibility** - Skip link, focus-visible, ARIA labels, reduced motion
+- [x] **Timer Per Question** - Live timer with results analytics
+- [x] **Study Mode** - Immediate feedback after each question
+- [x] **Structured Logging** - Console and file logging with timing
+- [x] **Unit Tests** - pytest with 15 tests passing
+
+### Previous Fixes (v1.0.0)
+- [x] Settings Page Shows Email Field
+- [x] Logout Link Needs POST Form
+- [x] Hardcoded Prism Language Class
 - [x] Rate limiting on AI endpoints
 - [x] Async AI methods added
 - [x] POST requirement on logout
@@ -72,3 +84,15 @@ This file tracks all identified bugs, inconsistencies, and improvements.
 - [x] Keyboard navigation (1-4 keys + Enter)
 - [x] Mobile-responsive chat chips (horizontal scroll)
 - [x] Dark mode favicon support
+- [x] Dashboard pagination
+
+---
+
+## 🔮 Future Ideas
+
+- [ ] Confetti animation on 100% score
+- [ ] PWA support with service worker
+- [ ] Leaderboards
+- [ ] Export results as PDF
+- [ ] Daily streaks gamification
+- [ ] E2E tests with Playwright

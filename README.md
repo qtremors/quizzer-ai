@@ -6,8 +6,9 @@
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![Django](https://img.shields.io/badge/django-5.x-green.svg)
 ![HTMX](https://img.shields.io/badge/htmx-1.9-orange.svg)
+![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen.svg)
 
-Quizzer AI is a modern, adaptive learning platform designed for developers. It leverages **Google's Gemini 2.0 Flash** model to generate infinite, customized quizzes on any programming topic—from Python syntax to System Design architecture.
+Quizzer AI is a modern, adaptive learning platform designed for developers. It leverages **Google's Gemini AI** models to generate infinite, customized quizzes on any programming topic—from Python syntax to System Design architecture.
 
 Unlike static quiz apps, Quizzer AI generates fresh content on the fly, analyzes your answers, and provides context-aware explanations for every mistake you make.
 
@@ -19,28 +20,40 @@ Unlike static quiz apps, Quizzer AI generates fresh content on the fly, analyzes
 - **Dynamic Content:** No database of pre-written questions. Every quiz is generated live based on your specific request (Topic, Difficulty, Language).
 - **Natural Language Agent:** Chat directly with the AI (e.g., _"Give me a hard quiz on React Hooks optimization"_) to generate a session.
 - **Coding Challenges:** Supports code-based questions with a split-screen syntax highlighter (Prism.js) for realistic debugging scenarios.
+- **Multiple AI Models:** Choose from Gemini Flash, Flash Lite, Pro, and more.
 
 ### 🎮 Immersive Player
 - **Distraction-Free UI:** A full-screen, focused interface designed for deep work.
 - **Adaptive Layout:** Automatically switches between text-only and split-code layouts based on the question type.
 - **Instant Interactions:** Powered by **HTMX** for a smooth, single-page-app feel without page reloads.
+- **⏱️ Timer Per Question:** Track time spent on each question with live display and results analytics.
+- **📖 Study Mode:** Get instant feedback after each question with correct answers and explanations.
 
 ### 📊 Analytics & Growth
 - **Smart Explanations:** Don't just see _what_ is wrong, understand _why_. Click "Explain All Mistakes" to get an AI breakdown of your specific logic errors.
 - **History Tracking:** A dashboard that tracks every attempt, score, and topic mastery over time.
+- **Time Analytics:** See total quiz time and average time per question on results.
 - **Persistent Storage:** All AI-generated explanations are cached to save API costs and provide instant retrieval later.
+
+### 🎨 Modern UI/UX
+- **🌙 Dark/Light Theme:** Toggle between themes with persistent preference.
+- **🔔 Toast Notifications:** Beautiful slide-in notifications for all actions.
+- **📱 Mobile Optimized:** Responsive design with proper touch targets.
+- **♿ Accessible:** Skip links, focus management, screen reader support, reduced motion.
+- **⏳ Skeleton Loaders:** Smooth loading states with shimmer animations.
 
 ---
 
 ## 🏗️ Tech Stack
 
 - **Backend:** Django 5.2 (Python 3.11+)
-- **AI Engine:** Google Generative AI SDK (Gemini 2.0 Flash Lite)
+- **AI Engine:** Google Generative AI SDK (Gemini Flash/Pro)
 - **Frontend:**
     - **HTMX:** For server-side reactivity and AJAX navigation.
-    - **Alpine.js:** For client-side interactions (modals, dropdowns).
+    - **Alpine.js:** For client-side interactions (modals, dropdowns, theme toggle).
     - **CSS:** Custom CSS Variables (Theming) & Flex/Grid layouts.
 - **Database:** SQLite (Dev) / PostgreSQL Ready (Prod)
+- **Testing:** pytest + pytest-django + pytest-cov
 - **Utilities:** Prism.js (Syntax Highlighting), Devicon (Logos).
 
 ---
@@ -63,7 +76,7 @@ Follow these instructions to set up the project on your local machine.
    cd quizzer-ai
    ```
 
-3. **Install Dependencies with uv:**
+2. **Install Dependencies with uv:**
    This project uses `uv` for blazing fast package management.
    ```bash
    # Install uv if you don't have it
@@ -71,9 +84,12 @@ Follow these instructions to set up the project on your local machine.
    
    # Sync dependencies (creates .venv automatically)
    uv sync
+   
+   # For development (includes testing tools)
+   uv pip install -e ".[dev]"
    ```
 
-4. **Configure Environment Variables:**
+3. **Configure Environment Variables:**
    Create a `.env` file in the root directory:
    ```bash
    # .env
@@ -82,15 +98,15 @@ Follow these instructions to set up the project on your local machine.
    DEBUG=True
    ```
 
-5. **Initialize Database:**
+4. **Initialize Database:**
    ```bash
    cd qtrmrs
-   uv run manage.py migrate
+   uv run python manage.py migrate
    ```
 
-6. **Create Admin User:**
+5. **Create Admin User:**
    ```bash
-   uv run manage.py createsuperuser
+   uv run python manage.py createsuperuser
    ```
 
 ### Running the Application
@@ -98,10 +114,27 @@ Follow these instructions to set up the project on your local machine.
 Start the development server:
 
 ```bash
-uv run manage.py runserver
+uv run python manage.py runserver
 ```
 
 Visit **http://127.0.0.1:8000/** in your browser.
+
+---
+
+## 🧪 Testing
+
+Run the test suite:
+
+```bash
+cd qtrmrs
+uv run pytest -v
+```
+
+Run with coverage:
+
+```bash
+uv run pytest --cov=apps --cov-report=html
+```
 
 ---
 
@@ -123,12 +156,21 @@ quizzer-ai/
 │   │   ├── ai_agent/         # Gemini Client & Prompt Engineering
 │   │   ├── core/             # Landing pages & layout
 │   │   ├── quizzes/          # Main Business Logic
+│   │   │   └── tests/        # Unit tests
 │   │   └── users/            # Custom Auth & Profiles
 │   ├── config/               # Settings (Split into base/local/prod)
 │   ├── static/               # CSS/JS/Images
-│   └── templates/            # HTML (organized by app)
-├── manage.py
-├── requirements.txt
+│   │   ├── css/
+│   │   │   ├── theme.css     # Theme variables
+│   │   │   ├── base.css      # Core styles + mobile + a11y
+│   │   │   ├── toast.css     # Toast notifications
+│   │   │   └── skeleton.css  # Loading skeletons
+│   │   └── js/
+│   │       └── toast.js      # Toast Alpine.js store
+│   ├── templates/            # HTML (organized by app)
+│   ├── logs/                 # Application logs
+│   └── conftest.py           # Pytest fixtures
+├── pyproject.toml            # Dependencies & pytest config
 └── README.md
 ```
 
@@ -136,10 +178,13 @@ quizzer-ai/
 
 ## 🛠️ Management Commands
 
-We have custom management commands (if applicable) or standard Django commands:
+Standard Django commands:
 
-- **Reset Database:** `python manage.py flush`
-- **Check System:** `python manage.py check`
+- **Run Server:** `uv run python manage.py runserver`
+- **Run Tests:** `uv run pytest -v`
+- **Reset Database:** `uv run python manage.py flush`
+- **Check System:** `uv run python manage.py check`
+- **Make Migrations:** `uv run python manage.py makemigrations`
 
 ---
 
