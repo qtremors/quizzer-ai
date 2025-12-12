@@ -68,7 +68,6 @@ class TestQuiz:
         )
         assert quiz.score == 0
         assert quiz.total_questions == 0
-        assert quiz.is_study_mode is False
 
 
 class TestUserAnswer:

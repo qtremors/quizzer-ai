@@ -34,15 +34,6 @@ class TestQuizPlayer:
         response = authenticated_client.get(reverse('quiz_player', args=[quiz.id]))
         assert response.status_code == 200
         assert quiz.topic_description.encode() in response.content
-    
-    def test_player_shows_study_mode_badge(self, authenticated_client, quiz, db):
-        """Test study mode badge appears when enabled."""
-        quiz.is_study_mode = True
-        quiz.save()
-        
-        response = authenticated_client.get(reverse('quiz_player', args=[quiz.id]))
-        assert response.status_code == 200
-        assert b'Study Mode' in response.content
 
 
 class TestSubmitAnswer:

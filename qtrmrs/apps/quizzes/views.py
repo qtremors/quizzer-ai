@@ -60,7 +60,6 @@ def create_quiz(request):
         num_questions = 5
     
     include_code = request.POST.get('include_code') == 'on'
-    study_mode = request.POST.get('study_mode') == 'on'
     
     # --- Handle Model Selection ---
     model_id = request.POST.get('ai_model')
@@ -108,8 +107,7 @@ def create_quiz(request):
             difficulty=level,
             total_questions=len(questions_data),
             ai_model=ai_model,
-            model_used=model_name,
-            is_study_mode=study_mode
+            model_used=model_name
         )
 
         options_to_create = []
@@ -213,24 +211,8 @@ def submit_answer(request, quiz_id, question_id):
             quiz=quiz, question=question, selected_option=selected_option, 
             is_correct=is_correct, time_taken=time_taken
         )
-    
-    # Study Mode: Show immediate feedback
-    if quiz.is_study_mode:
-        correct_option = question.options.filter(is_correct=True).first()
-        answered_ids = list(quiz.answers.values_list('question_id', flat=True))
-        next_q = quiz.questions.exclude(id__in=answered_ids).first()
-        is_last = next_q is None
-        
-        return render(request, 'quizzes/partials/study_feedback.html', {
-            'quiz': quiz,
-            'question': question,
-            'user_answer': user_answer,
-            'correct_option': correct_option,
-            'next_question': next_q,
-            'is_last': is_last
-        })
 
-    # Get next question (normal mode)
+    # Get next question
     answered_ids = list(quiz.answers.values_list('question_id', flat=True))
     next_q = quiz.questions.exclude(id__in=answered_ids).first()
 

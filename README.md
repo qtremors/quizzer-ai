@@ -72,7 +72,7 @@ Follow these instructions to set up the project on your local machine.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/quizzer-ai.git
+   git clone https://github.com/qtremors/quizzer-ai.git
    cd quizzer-ai
    ```
 
