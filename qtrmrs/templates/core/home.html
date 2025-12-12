@@ -19,7 +19,7 @@
         challenges.
     </p>
 
-    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;" x-data="{ loading: false }">
         <a href="{% url 'quiz_setup' %}" class="btn btn-filled"
             style="height: 52px; padding: 0 40px; font-size: 1.1rem;">
             <span class="material-symbols-outlined" style="font-size: 24px;">play_arrow</span>
@@ -27,9 +27,16 @@
         </a>
 
         <a href="{% url 'quick_quiz' %}" class="btn btn-tonal"
-            style="height: 52px; padding: 0 32px; font-size: 1.05rem;">
-            <span class="material-symbols-outlined" style="font-size: 22px;">bolt</span>
-            Quick Quiz
+            style="height: 52px; padding: 0 32px; font-size: 1.05rem;" @click="loading = true"
+            :class="{ 'btn-loading-active': loading }">
+            <span x-show="!loading" style="display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-outlined" style="font-size: 22px;">bolt</span>
+                Quick Quiz
+            </span>
+            <span x-show="loading" x-cloak style="display: flex; align-items: center; gap: 8px;">
+                <span class="mini-spinner"></span>
+                Generating...
+            </span>
         </a>
     </div>
 
@@ -73,4 +80,15 @@
     </a>
 
 </div>
+
+<style>
+    .btn-loading-active {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+</style>
 {% endblock %}
