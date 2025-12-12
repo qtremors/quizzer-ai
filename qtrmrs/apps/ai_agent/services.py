@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from typing import Optional, Union
 from django.conf import settings
 from .client import get_gemini_client
@@ -98,14 +99,22 @@ class QuizGenerator:
             code_instruction=code_instruction
         )
 
+        start_time = time.time()
+        logger.info(f"Generating quiz: model={self.model_name}, language={language}, topic={topic}, level={level}, num_questions={num_questions}")
+        
         try:
             response = self.model.generate_content(
                 prompt,
                 generation_config={"response_mime_type": "application/json"}
             )
+            elapsed = time.time() - start_time
             quiz_data = json.loads(response.text)
-            return quiz_data.get('questions', [])
+            questions = quiz_data.get('questions', [])
+            logger.info(f"Quiz generated successfully: {len(questions)} questions in {elapsed:.2f}s")
+            return questions
         except Exception as e:
+            elapsed = time.time() - start_time
+            logger.error(f"Quiz generation failed after {elapsed:.2f}s: {e}")
             return self._handle_error(e, "Quiz Generation")
 
     def parse_intent(self, user_message: str) -> dict:
