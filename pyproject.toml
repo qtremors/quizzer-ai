@@ -1,14 +1,13 @@
 [project]
 name = "quizzer-ai"
-version = "1.0.0"
+version = "1.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "boto3>=1.40.76",
     "dj-database-url>=3.0.1",
     "django>=5.2.8",
-    "django-storages[s3]>=1.14.6",
+    "django-ratelimit>=4.1.0",
     "google-generativeai>=0.8.5",
     "gunicorn>=23.0.0",
     "pillow>=12.0.0",
@@ -17,3 +16,16 @@ dependencies = [
     "uvicorn>=0.38.0",
     "whitenoise>=6.11.0",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-django>=4.7.0",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.local"
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v --tb=short"
+testpaths = ["qtrmrs"]

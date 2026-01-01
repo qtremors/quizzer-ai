@@ -15,7 +15,11 @@ load_dotenv(os.path.join(BASE_DIR.parent, '.env'))
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-change-me')
+# In production, this MUST be set via environment variable
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    # Allow development fallback only if DEBUG would be True (local.py)
+    SECRET_KEY = 'django-insecure-dev-only-change-in-production'
 
 # Application definition
 INSTALLED_APPS = [
@@ -105,3 +109,71 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'login'           # Redirect here if user isn't logged in
 LOGIN_REDIRECT_URL = 'home'   # Redirect here after successful login
 LOGOUT_REDIRECT_URL = 'login' # Redirect here after logout
+
+# --- RATE LIMITING ---
+RATELIMIT_VIEW = 'apps.core.views.ratelimited_view'
+
+# --- AI CONFIGURATION ---
+DEFAULT_AI_MODEL = os.getenv('DEFAULT_AI_MODEL', 'gemini-flash-latest')
+QUIZ_RATE_LIMIT = os.getenv('QUIZ_RATE_LIMIT', '10/m')
+
+# --- LOGGING ---
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} [{name}] {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+        'json': {
+            'format': '{"level": "%(levelname)s", "time": "%(asctime)s", "logger": "%(name)s", "message": "%(message)s"}',
+            'datefmt': '%Y-%m-%dT%H:%M:%S',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'quizzer.log',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'apps.ai_agent': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'apps.quizzes': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+# Create logs directory if it doesn't exist
+(BASE_DIR / 'logs').mkdir(exist_ok=True)

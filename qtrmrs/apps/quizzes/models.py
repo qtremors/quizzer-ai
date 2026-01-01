@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 
 
-
 class AIModel(models.Model):
     """Manages available Gemini versions (Flash, Pro, etc.)"""
     display_name = models.CharField(max_length=100)
@@ -12,18 +11,16 @@ class AIModel(models.Model):
 
     def __str__(self):
         return self.display_name
-
-
-class Topic(models.Model):
-    """Predefined topics for the setup page (e.g., 'Decorators', 'Flexbox')"""
-    language = models.CharField(max_length=50, help_text="e.g., python, css")
-    name = models.CharField(max_length=100)
+    
+    def save(self, *args, **kwargs):
+        # Ensure only one default model exists
+        if self.is_default:
+            AIModel.objects.filter(is_default=True).exclude(pk=self.pk).update(is_default=False)
+        super().save(*args, **kwargs)
     
     class Meta:
-        ordering = ['language', 'name']
-
-    def __str__(self):
-        return f"{self.language} - {self.name}"
+        verbose_name = "AI Model"
+        verbose_name_plural = "AI Models"
 
 
 class Quiz(models.Model):
@@ -33,21 +30,55 @@ class Quiz(models.Model):
         ('intermediate', 'Intermediate'),
         ('expert', 'Expert'),
     ]
+    
+    QUIZ_TYPE_CHOICES = [
+        ('tech', 'Programming/Technology'),
+        ('general', 'General Knowledge'),
+    ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='quizzes')
-    language = models.CharField(max_length=50)
+    quiz_type = models.CharField(max_length=20, choices=QUIZ_TYPE_CHOICES, default='tech')
+    language = models.CharField(max_length=50, help_text="Language/subject for the quiz")
     topic_description = models.CharField(max_length=255, help_text="The topic user asked for")
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     
     # Metadata
-    model_used = models.CharField(max_length=100, blank=True)
+    ai_model = models.ForeignKey(AIModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='quizzes')
+    model_used = models.CharField(max_length=100, blank=True)  # Fallback string for display
     total_questions = models.IntegerField(default=0)
     score = models.IntegerField(default=0, help_text="Score percentage")
     completed_at = models.DateTimeField(null=True, blank=True)
+    
+
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['quiz_type']),
+        ]
+        ordering = ['-created_at']
+        verbose_name_plural = "Quizzes"
 
     def __str__(self):
         return f"{self.language} ({self.difficulty}) - {self.user.email}"
+
+    @property
+    def is_complete(self):
+        """Check if quiz is completed (all questions answered)"""
+        return self.completed_at is not None
+    
+    @property
+    def answered_count(self):
+        """Number of questions answered so far"""
+        return self.answers.count()
+    
+    @property
+    def progress_percent(self):
+        """Progress percentage for resume display"""
+        if self.total_questions == 0:
+            return 0
+        return round((self.answered_count / self.total_questions) * 100)
 
 
 class Question(models.Model):
@@ -57,6 +88,11 @@ class Question(models.Model):
     code_snippet = models.TextField(blank=True, null=True, help_text="Code context for the question")
     explanation = models.TextField(blank=True, help_text="AI explanation for the correct answer")
     
+    class Meta:
+        indexes = [
+            models.Index(fields=['quiz']),
+        ]
+    
     def __str__(self):
         return self.text[:50]
 
@@ -65,6 +101,11 @@ class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
     text = models.CharField(max_length=255)
     is_correct = models.BooleanField(default=False)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['question', 'is_correct']),
+        ]
 
     def __str__(self):
         return self.text
@@ -77,9 +118,19 @@ class UserAnswer(models.Model):
     selected_option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
     is_correct = models.BooleanField(default=False)
     
+    # Time tracking
+    time_taken = models.PositiveIntegerField(default=0, help_text="Time taken in seconds")
+    
     # Store the specific AI explanation for *this* error here if needed
     error_explanation = models.TextField(blank=True)
+    
+    class Meta:
+        # Prevent duplicate answers for the same question
+        unique_together = [['quiz', 'question']]
+        indexes = [
+            models.Index(fields=['quiz', 'is_correct']),
+        ]
 
     def __str__(self):
-        status = "Correct" if self.is_correct else "Incorrect"
-        return f"{status} answer for {self.question.id}"
+        status = "✓" if self.is_correct else "✗"
+        return f"{status} Q{self.question_id} - {self.quiz.topic_description[:20]}"

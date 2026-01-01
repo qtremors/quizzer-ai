@@ -1,7 +1,6 @@
-Python
-
+# Python
 *.py[cod]
-pycache/
+__pycache__/
 *.so
 .Python
 env/
@@ -21,33 +20,29 @@ wheels/
 .installed.cfg
 *.egg
 
-Django
-
+# Django
 *.log
+logs/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
 
-Virtual Environment
-
+# Virtual Environment
 venv/
 .venv/
 env/
 
-Environment Variables
-
+# Environment Variables
 .env
 
-IDEs
-
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 
-OS
-
+# OS
 .DS_Store
 Thumbs.db

@@ -2,46 +2,141 @@
 
 {% block content %}
 <div style="max-width: 900px; margin: 0 auto; width: 100%;">
-    
+
     <div class="card" style="text-align: center; margin-bottom: 32px; padding: 40px;">
+        {% if score_percent == 100 %}
+        <!-- Perfect Score Celebration with Confetti -->
+        <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
+        <h1 style="margin-bottom: 8px; font-size: 2rem; color: var(--color-success);">Perfect Score!</h1>
+        <p style="color: var(--color-text-muted); margin-bottom: 16px;">You answered every question correctly.
+            Outstanding!</p>
+
+        <!-- Confetti Animation -->
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <script>
+            // Initial burst
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            // Second burst after 300ms
+            setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.5 } }), 300);
+            // Third burst
+            setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0 } }), 600);
+            setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1 } }), 600);
+        </script>
+        {% else %}
         <h1 style="margin-bottom: 8px; font-size: 2rem;">Quiz Complete</h1>
-        
-        <div style="font-size: 4rem; font-weight: 800; color: var(--color-text-main); margin: 24px 0;">
+        {% endif %}
+
+        <div
+            style="font-size: 4rem; font-weight: 800; color: {% if score_percent == 100 %}var(--color-success){% elif score_percent >= 80 %}var(--color-primary){% elif score_percent >= 50 %}var(--color-warning){% else %}var(--color-error){% endif %}; margin: 24px 0;">
             {{ score_percent }}%
         </div>
-        
-        <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; font-weight: 500;">
+
+        <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; font-weight: 500;">
             <span style="color: var(--color-success);">{{ correct }} Correct</span>
             <span style="color: var(--color-warning);">{{ skipped }} Skipped</span>
             <span style="color: var(--color-error);">{{ wrong }} Incorrect</span>
         </div>
 
+        <!-- AI Model & Time Info -->
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 32px;">
+            {% if quiz.model_used %}
+            <div
+                style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--color-surface-variant); border-radius: 20px;">
+                <span class="material-symbols-outlined"
+                    style="font-size: 16px; color: var(--color-primary);">psychology</span>
+                <span style="font-size: 0.85rem; color: var(--color-text-muted);">
+                    <strong style="color: var(--color-text-main);">{{ quiz.model_used }}</strong>
+                </span>
+            </div>
+            {% endif %}
+
+
+            <div
+                style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--color-surface-variant); border-radius: 20px;">
+                <span class="material-symbols-outlined"
+                    style="font-size: 16px; color: var(--color-primary);">timer</span>
+                <span style="font-size: 0.85rem; color: var(--color-text-muted);">
+                    Total: <strong style="color: var(--color-text-main);">{{ total_time_formatted }}</strong>
+                    · Avg: <strong style="color: var(--color-text-main);">{{ avg_time }}s</strong>/q
+                </span>
+            </div>
+        </div>
+
+        <!-- XP Earned Display -->
+        {% if xp_earned %}
+        <div class="xp-reward-banner animate-fade-in" style="margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                <div class="xp-badge">
+                    <span class="material-symbols-outlined" style="color: #fbbf24;">star</span>
+                    <span>+{{ xp_earned }} XP</span>
+                </div>
+
+                {% if leveled_up %}
+                <div class="level-up-badge">
+                    <span class="material-symbols-outlined" style="color: #10b981;">trending_up</span>
+                    <span>Level Up! You're now <strong>Level {{ new_level }}</strong></span>
+                </div>
+                {% endif %}
+
+                {% for badge in new_badges %}
+                <div class="new-badge-badge">
+                    <span class="material-symbols-outlined" style="color: #8b5cf6;">workspace_premium</span>
+                    <span>New Badge: <strong>{{ badge }}</strong></span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- XP Progress Bar -->
+            <div style="margin-top: 16px; max-width: 300px; margin-left: auto; margin-right: auto;">
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 4px;">
+                    <span>Level {{ profile.level }}</span>
+                    <span>{{ profile.xp_in_current_level }} / {{ profile.xp_for_next_level }} XP</span>
+                </div>
+                <div class="xp-bar">
+                    <div class="xp-progress" style="width: {{ profile.xp_progress_percent }}%;"></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
             <a href="{% url 'quiz_setup' %}" class="btn btn-filled">New Quiz</a>
-            
-            {% if wrong > 0 or skipped > 0 %}
-                {% if not has_explanations %}
-                <button hx-get="{% url 'generate_all_explanations' quiz.id %}" 
-                        hx-target="#review-list" 
-                        class="btn btn-tonal explain-btn">
-                    
-                    <span class="btn-content" style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined">psychology</span>
-                        Explain All Mistakes
-                    </span>
 
-                    <span class="btn-loading" style="display: none; align-items: center; gap: 8px;">
-                        <span class="mini-spinner-dark"></span> AI Thinking...
+            <!-- Retry Button -->
+            <form action="{% url 'retry_quiz' quiz.id %}" method="POST" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-tonal retry-btn">
+                    <span class="btn-content" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined">replay</span>
+                        Retry Quiz
                     </span>
                 </button>
-                {% endif %}
+            </form>
+
+            {% if wrong > 0 or skipped > 0 %}
+            {% if not has_explanations %}
+            <button hx-post="{% url 'generate_all_explanations' quiz.id %}" hx-target="#review-list"
+                hx-disabled-elt="this" class="btn btn-tonal explain-btn">
+
+                <span class="btn-content" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined">psychology</span>
+                    Explain All Mistakes
+                </span>
+
+                <span class="btn-loading" style="display: none; align-items: center; gap: 8px;">
+                    <span class="btn-spinner-dark"></span> AI Thinking...
+                </span>
+            </button>
             {% endif %}
-            
+            {% endif %}
+
             <a href="{% url 'home' %}" class="btn btn-text">Home</a>
         </div>
     </div>
 
-    <h3 style="margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; color: var(--color-text-main);">
+    <h3
+        style="margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; color: var(--color-text-main);">
         Review Answers
     </h3>
 
@@ -53,28 +148,97 @@
 
 <style>
     /* --- LOADING STATE MAGIC --- */
-    
+
     /* When the BUTTON itself has 'htmx-request' */
-    .explain-btn.htmx-request .btn-content { display: none !important; }
-    .explain-btn.htmx-request .btn-loading { display: flex !important; }
-    .explain-btn.htmx-request { cursor: wait; opacity: 0.8; }
+    .explain-btn.htmx-request .btn-content {
+        display: none !important;
+    }
+
+    .explain-btn.htmx-request .btn-loading {
+        display: flex !important;
+    }
+
+    .explain-btn.htmx-request {
+        cursor: wait;
+        opacity: 0.8;
+    }
 
     /* Spinner for dark text buttons */
-    .mini-spinner-dark {
-        width: 18px; height: 18px;
-        border: 2px solid rgba(0,0,0,0.1);
+    .btn-spinner-dark {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
         border-top-color: var(--color-primary);
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
     }
+
     /* In Dark mode, the tonal button text is white, so spinner should be white-ish */
-    @media (prefers-color-scheme: dark) {
-        .mini-spinner-dark {
-            border-color: rgba(255,255,255,0.1);
-            border-top-color: white;
+    [data-theme="dark"] .btn-spinner-dark {
+        border-color: rgba(255, 255, 255, 0.1);
+        border-top-color: white;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
         }
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Retry button hover */
+    .retry-btn:hover {
+        background: var(--color-primary-container);
+    }
+
+    /* XP Reward Banner */
+    .xp-reward-banner {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(139, 92, 246, 0.1));
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        border-radius: 16px;
+        padding: 20px;
+    }
+
+    .xp-badge,
+    .level-up-badge,
+    .new-badge-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--color-surface);
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .xp-badge {
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        color: #fbbf24;
+    }
+
+    .level-up-badge {
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #10b981;
+    }
+
+    .new-badge-badge {
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        color: #8b5cf6;
+    }
+
+    /* XP Progress Bar */
+    .xp-bar {
+        height: 8px;
+        background: var(--color-surface-variant);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .xp-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
 </style>
 {% endblock %}

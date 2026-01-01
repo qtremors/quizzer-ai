@@ -1,0 +1,20 @@
+<div class="message ai-message">
+    <div class="avatar ai-avatar">
+        <span class="material-symbols-outlined">psychology</span>
+    </div>
+    <div class="bubble" style="border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05);">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="material-symbols-outlined" style="color: var(--color-error);">error</span>
+            <div>
+                <p style="margin-bottom: 8px;">{{ message|default:"Something went wrong. Please try again." }}</p>
+                {% if suggestion %}
+                <p
+                    style="font-size: 0.9rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">lightbulb</span>
+                    {{ suggestion }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

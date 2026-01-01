@@ -1,18 +1,27 @@
+{% load quiz_filters %}
+
 {% for ans in user_answers %}
-<div class="card" 
-     style="margin-bottom: 16px; padding: 24px; border-left: 4px solid 
+<div class="card result-card animate-fade-in" style="margin-bottom: 16px; padding: 24px; border-left: 4px solid 
      {% if ans.is_correct %}var(--color-success)
      {% elif ans.selected_option is None %}var(--color-warning)
      {% else %}var(--color-error){% endif %};">
-    
-    <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">
-        {{ forloop.counter }}. {{ ans.question.text }}
-    </p>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <p style="font-size: 1.1rem; font-weight: 600; flex: 1; margin: 0;">
+            {{ forloop.counter }}. {{ ans.question.text }}
+        </p>
+
+        <!-- Time Badge -->
+        <div class="time-badge" style="margin-left: 16px; flex-shrink: 0;">
+            <span class="material-symbols-outlined">schedule</span>
+            {{ ans.time_taken|format_time }}
+        </div>
+    </div>
 
     <div style="display: grid; gap: 8px; font-size: 0.95rem; margin-bottom: 20px;">
-        
+
         <div style="color: var(--color-text-muted);">
-            Your Answer: 
+            Your Answer:
             <span style="font-weight: 600; color: 
                 {% if ans.is_correct %}var(--color-success)
                 {% elif ans.selected_option is None %}var(--color-warning)
@@ -20,28 +29,76 @@
                 {{ ans.selected_option.text|default:"Skipped" }}
             </span>
         </div>
-        
+
         {% if not ans.is_correct %}
         <div style="color: var(--color-text-muted);">
-            Correct Answer: 
+            Correct Answer:
             <span style="color: var(--color-success); font-weight: 600;">
-                {{ ans.question.options.get_correct_option.text }}
+                {% for opt in ans.question.options.all %}{% if opt.is_correct %}{{ opt.text }}{% endif %}{% endfor %}
             </span>
         </div>
         {% endif %}
     </div>
 
     {% if ans.error_explanation %}
-        <div class="fade-in" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--color-border); border-radius: 8px; padding: 16px; display: flex; gap: 12px; font-size: 0.95rem; line-height: 1.5; color: var(--color-text-main);">
-            <span class="material-symbols-outlined" style="color: var(--color-primary);">auto_awesome</span>
-            <div>{{ ans.error_explanation }}</div>
-        </div>
+    <div class="explanation-box animate-fade-in">
+        <span class="material-symbols-outlined" style="color: var(--color-primary); flex-shrink: 0;">auto_awesome</span>
+        <div>{{ ans.error_explanation }}</div>
+    </div>
     {% endif %}
 
 </div>
 {% endfor %}
 
 <style>
-    .fade-in { animation: fadeIn 0.5s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .result-card {
+        transition: transform 0.2s ease;
+    }
+
+    .result-card:hover {
+        transform: translateX(4px);
+    }
+
+    .time-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+        color: var(--color-text-muted);
+        padding: 4px 10px;
+        background: var(--color-surface-variant);
+        border-radius: 12px;
+    }
+
+    .time-badge .material-symbols-outlined {
+        font-size: 14px;
+    }
+
+    .explanation-box {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 16px;
+        display: flex;
+        gap: 12px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: var(--color-text-main);
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>

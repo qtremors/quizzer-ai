@@ -1,14 +1,13 @@
-<form hx-post="{% url 'submit_answer' quiz.id question.id %}" 
-      hx-target="#quiz-card-container" 
-      hx-swap="innerHTML"
-      class="quiz-form fade-in">
-    
+<form hx-post="{% url 'submit_answer' quiz.id question.id %}" hx-target="#quiz-card-container" hx-swap="innerHTML"
+    class="quiz-form fade-in">
+
     {% csrf_token %}
+    <input type="hidden" name="time_taken" value="0">
 
     <div class="split-layout {% if question.code_snippet %}has-code{% endif %}">
 
         <div class="interaction-col">
-            
+
             <div class="question-area">
                 <h2>{{ question.text }}</h2>
             </div>
@@ -16,10 +15,9 @@
             <div class="options-grid">
                 {% for option in question.options.all %}
                 <label class="option-block">
-                    <input type="radio" name="option" value="{{ option.id }}" 
-                           style="display: none;" 
-                           onclick="enableNextBtn()">
-                    
+                    <input type="radio" name="option" value="{{ option.id }}" style="display: none;"
+                        onclick="enableNextBtn()">
+
                     <div class="option-visual">
                         <div class="radio-indicator"></div>
                         <span class="opt-text">{{ option.text }}</span>
@@ -46,7 +44,7 @@
                     <div class="dot green"></div>
                     <span class="lang-label">{{ quiz.language|upper }}</span>
                 </div>
-                <pre><code class="language-python">{{ question.code_snippet }}</code></pre>
+                <pre><code class="language-{{ quiz.language|lower }}">{{ question.code_snippet }}</code></pre>
             </div>
         </div>
         {% endif %}
@@ -63,15 +61,44 @@
 <script>
     function enableNextBtn() {
         const btn = document.getElementById('next-btn');
-        if(btn) {
+        if (btn) {
             btn.disabled = false;
             btn.classList.add('active');
         }
     }
+
+    // Keyboard navigation: 1-4 to select options, Enter to submit
+    document.addEventListener('keydown', function (e) {
+        const key = e.key;
+
+        // Number keys 1-4 select options
+        if (['1', '2', '3', '4'].includes(key)) {
+            const options = document.querySelectorAll('input[name="option"]');
+            const index = parseInt(key) - 1;
+            if (options[index]) {
+                options[index].checked = true;
+                enableNextBtn();
+            }
+        }
+
+        // Enter submits if an option is selected
+        if (key === 'Enter') {
+            const selected = document.querySelector('input[name="option"]:checked');
+            if (selected) {
+                const nextBtn = document.getElementById('next-btn');
+                if (nextBtn && !nextBtn.disabled) {
+                    nextBtn.click();
+                }
+            }
+        }
+    });
 </script>
 
 <style>
-    .quiz-form { height: 100%; width: 100%; }
+    .quiz-form {
+        height: 100%;
+        width: 100%;
+    }
 
     .split-layout {
         display: flex;
@@ -85,7 +112,8 @@
     /* --- PREVENT OVERFLOW IN GRID --- */
     .split-layout.has-code {
         display: grid;
-        grid-template-columns: 1fr 1fr; /* Split evenly or use 60/40 */
+        grid-template-columns: 1fr 1fr;
+        /* Split evenly or use 60/40 */
         gap: 40px;
         height: 100%;
         max-width: 100%;
@@ -97,12 +125,14 @@
         display: flex;
         flex-direction: column;
         height: 100%;
-        overflow-y: auto; 
+        overflow-y: auto;
         min-width: 0;
     }
 
-    .question-area { margin-bottom: 32px; }
-    
+    .question-area {
+        margin-bottom: 32px;
+    }
+
     /* --- FORCE TEXT WRAPPING --- */
     .question-area h2 {
         font-size: 1.5rem;
@@ -115,14 +145,19 @@
         hyphens: auto;
     }
 
-    .options-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: auto; }
+    .options-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: auto;
+    }
 
     /* Code Column */
     .code-col {
         display: flex;
         flex-direction: column;
         height: 100%;
-        max-height: 80vh; 
+        max-height: 80vh;
         min-width: 0;
     }
 
@@ -130,8 +165,8 @@
         background: #1e1e1e;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -145,51 +180,162 @@
         gap: 8px;
         flex-shrink: 0;
     }
-    .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
-    .lang-label { margin-left: auto; color: #888; font-size: 0.8rem; font-family: monospace; text-transform: uppercase; }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .red {
+        background: #ff5f56;
+    }
+
+    .yellow {
+        background: #ffbd2e;
+    }
+
+    .green {
+        background: #27c93f;
+    }
+
+    .lang-label {
+        margin-left: auto;
+        color: #888;
+        font-size: 0.8rem;
+        font-family: monospace;
+        text-transform: uppercase;
+    }
 
     /* --- FIX 3: FORCE CODE SCROLL --- */
-    pre[class*="language-"] { 
-        margin: 0 !important; 
-        border-radius: 0 !important; 
-        padding: 20px !important; 
+    pre[class*="language-"] {
+        margin: 0 !important;
+        border-radius: 0 !important;
+        padding: 20px !important;
         flex-grow: 1;
         overflow: auto;
         white-space: pre;
-        font-size: 0.9rem !important; 
+        font-size: 0.9rem !important;
         width: 100%;
     }
 
     /* Options Styling */
     .option-visual {
-        display: flex; align-items: center; gap: 16px; padding: 16px 20px;
-        background: var(--color-surface); border: 1px solid var(--color-border);
-        border-radius: 8px; color: var(--color-text-main); font-size: 1rem;
-        transition: all 0.2s ease; cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        color: var(--color-text-main);
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
     }
+
     /* Force wrap on long options too */
     .opt-text {
         word-break: break-word;
     }
 
-    .radio-indicator { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--color-text-muted); flex-shrink: 0; }
-    .option-block:hover .option-visual { background: var(--color-surface-variant); }
-    input:checked + .option-visual { background: var(--color-primary-container); border-color: var(--color-primary); color: var(--color-on-primary-container); font-weight: 500; }
-    input:checked + .option-visual .radio-indicator { border-color: var(--color-primary); background: var(--color-primary); box-shadow: inset 0 0 0 4px var(--color-surface); }
+    .radio-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid var(--color-text-muted);
+        flex-shrink: 0;
+    }
 
-    .quiz-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 32px; margin-top: auto; }
-    .btn-skip { background: transparent; color: var(--color-text-muted); border: none; font-size: 0.95rem; cursor: pointer; }
-    .btn-skip:hover { color: var(--color-text-main); text-decoration: underline; }
-    .btn-next { background: var(--color-surface-variant); color: var(--color-text-muted); border: none; padding: 10px 24px; border-radius: 50px; font-size: 1rem; font-weight: 500; display: flex; align-items: center; gap: 8px; cursor: not-allowed; }
-    .btn-next.active { background: var(--color-primary); color: white; cursor: pointer; box-shadow: var(--shadow-hover); }
+    .option-block:hover .option-visual {
+        background: var(--color-surface-variant);
+    }
+
+    input:checked+.option-visual {
+        background: var(--color-primary-container);
+        border-color: var(--color-primary);
+        color: var(--color-on-primary-container);
+        font-weight: 500;
+    }
+
+    input:checked+.option-visual .radio-indicator {
+        border-color: var(--color-primary);
+        background: var(--color-primary);
+        box-shadow: inset 0 0 0 4px var(--color-surface);
+    }
+
+    .quiz-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 32px;
+        margin-top: auto;
+    }
+
+    .btn-skip {
+        background: transparent;
+        color: var(--color-text-muted);
+        border: none;
+        font-size: 0.95rem;
+        cursor: pointer;
+    }
+
+    .btn-skip:hover {
+        color: var(--color-text-main);
+        text-decoration: underline;
+    }
+
+    .btn-next {
+        background: var(--color-surface-variant);
+        color: var(--color-text-muted);
+        border: none;
+        padding: 10px 24px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: not-allowed;
+    }
+
+    .btn-next.active {
+        background: var(--color-primary);
+        color: white;
+        cursor: pointer;
+        box-shadow: var(--shadow-hover);
+    }
 
     @media (max-width: 1000px) {
-        .split-layout.has-code { grid-template-columns: 1fr; gap: 32px; }
-        .code-col { order: -1; height: auto; max-height: 300px; } 
-        .code-window { height: 100%; }
+        .split-layout.has-code {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .code-col {
+            order: -1;
+            height: auto;
+            max-height: 300px;
+        }
+
+        .code-window {
+            height: 100%;
+        }
     }
-    
-    .fade-in { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .fade-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>

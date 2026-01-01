@@ -1,23 +1,76 @@
 {% extends 'base.html' %}
 
 {% block extra_head %}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
-<div class="quiz-screen">
-    
+<div class="quiz-screen" x-data="{ 
+    showExitModal: false,
+    timer: 0,
+    timerInterval: null,
+    init() {
+        this.startTimer();
+    },
+    startTimer() {
+        this.timer = 0;
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(() => this.timer++, 1000);
+    },
+    resetTimer() {
+        this.timer = 0;
+    },
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `${secs}s`;
+    },
+    getTimerValue() {
+        return this.timer;
+    }
+}" @htmx:after-swap="startTimer()">
+
     <div class="quiz-header">
         <div class="header-meta">
-            <span class="topic-badge">{{ quiz.topic_description }}</span>
-            <span class="q-count">
-                Question <span id="q-num" style="font-weight: 700;">{{ quiz.answers.count|add:"1" }}</span> 
-                <span style="opacity: 0.5; margin: 0 4px;">/</span> {{ quiz.total_questions }}
-            </span>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button @click="showExitModal = true" class="exit-btn" title="Exit Quiz">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <span class="topic-badge">{{ quiz.topic_description }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <!-- Timer -->
+                <span class="q-timer"
+                    style="display: flex; align-items: center; gap: 6px; color: var(--color-text-muted); font-size: 0.9rem;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">timer</span>
+                    <span x-text="formatTime(timer)">0s</span>
+                </span>
+                <span class="q-count">
+                    Question <span id="q-num" style="font-weight: 700;">{{ quiz.answers.count|add:"1" }}</span>
+                    <span style="opacity: 0.5; margin: 0 4px;">/</span> {{ quiz.total_questions }}
+                </span>
+            </div>
         </div>
-        
+
         <div class="progress-track">
-            <div id="progress-bar" class="progress-fill" style="width: {{ progress }}%;"></div>
+            <div id="progress-bar" class="progress-fill" style="width: {{ progress }};"></div>
+        </div>
+    </div>
+
+    <!-- Exit Confirmation Modal -->
+    <div x-show="showExitModal" x-cloak
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div class="card" style="max-width: 400px; text-align: center;" @click.outside="showExitModal = false">
+            <span class="material-symbols-outlined"
+                style="font-size: 48px; color: var(--color-primary); margin-bottom: 16px;">pause_circle</span>
+            <h3 style="margin-bottom: 8px;">Pause Quiz?</h3>
+            <p style="color: var(--color-text-muted); margin-bottom: 24px;">
+                Your progress is saved! You can continue anytime from your dashboard.
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button @click="showExitModal = false" class="btn btn-tonal">Keep Going</button>
+                <a href="{% url 'dashboard' %}" class="btn btn-filled">Exit to Dashboard</a>
+            </div>
         </div>
     </div>
 
@@ -33,46 +86,115 @@
 
 <script>
     // Re-run Prism highlighting every time HTMX swaps the question card
-    document.body.addEventListener('htmx:afterSwap', function(event) {
+    document.body.addEventListener('htmx:afterSwap', function (event) {
         Prism.highlightAll();
+    });
+
+    // INJECT TIMER VALUE: Use htmx:configRequest to add timer to all quiz form submissions
+    document.body.addEventListener('htmx:configRequest', function (event) {
+        // Only apply to quiz answer submissions
+        const form = event.target;
+        if (form && form.classList.contains('quiz-form')) {
+            // Get the timer value from the Alpine component
+            const quizScreen = document.querySelector('.quiz-screen');
+            if (quizScreen && quizScreen._x_dataStack) {
+                const alpineData = quizScreen._x_dataStack[0];
+                if (alpineData && typeof alpineData.timer !== 'undefined') {
+                    event.detail.parameters['time_taken'] = alpineData.timer;
+                }
+            }
+        }
     });
 </script>
 
 <style>
-    .container { padding: 0 !important; max-width: none !important; }
-    
+    .container {
+        padding: 0 !important;
+        max-width: none !important;
+    }
+
     .quiz-screen {
         min-height: calc(100vh - 64px);
         display: flex;
         flex-direction: column;
-        max-width: 1400px; 
+        max-width: 1400px;
         margin: 0 auto;
         padding: 0 24px;
         padding-top: 40px;
     }
 
-    .quiz-header { margin-bottom: 30px; flex-shrink: 0; }
+    .quiz-header {
+        margin-bottom: 30px;
+        flex-shrink: 0;
+    }
 
     .header-meta {
-        display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
     }
 
     .topic-badge {
-        background: var(--color-surface-variant); color: var(--color-text-main);
-        padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500;
-        text-transform: uppercase; letter-spacing: 0.5px;
+        background: var(--color-surface-variant);
+        color: var(--color-text-main);
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .q-count { color: var(--color-text-muted); font-size: 0.95rem; }
+    .q-count {
+        color: var(--color-text-muted);
+        font-size: 0.95rem;
+    }
 
     .progress-track {
-        height: 4px; background: var(--color-surface-variant); border-radius: 2px; width: 100%;
-    }
-    
-    .progress-fill {
-        height: 100%; background: var(--color-primary); border-radius: 2px; transition: width 0.4s ease;
+        height: 4px;
+        background: var(--color-surface-variant);
+        border-radius: 2px;
+        width: 100%;
     }
 
-    .quiz-body { flex-grow: 1; display: flex; flex-direction: column; padding-bottom: 40px; }
+    .progress-fill {
+        height: 100%;
+        background: var(--color-primary);
+        border-radius: 2px;
+        transition: width 0.4s ease;
+    }
+
+    .quiz-body {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 40px;
+    }
+
+    /* Exit button */
+    .exit-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        color: var(--color-text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .exit-btn:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: var(--color-error);
+        color: var(--color-error);
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
 </style>
 {% endblock %}

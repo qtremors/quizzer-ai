@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="quiz-screen">
+
+    <div class="quiz-header">
+        <div class="header-meta">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="topic-badge">{{ topic }}</span>
+                <span class="demo-badge">Demo Mode</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ progress }}%;"></div>
+            </div>
+        </div>
+        <span class="question-counter">
+            Question {{ question_num }} of {{ total_questions }}
+        </span>
+    </div>
+
+    <div class="quiz-card-container">
+        <form action="{% url 'demo_submit' %}" method="POST" class="quiz-form">
+            {% csrf_token %}
+
+            <div class="question-area">
+                <p class="question-text">{{ question.text }}</p>
+
+                {% if question.code_snippet %}
+                <pre class="code-block"><code>{{ question.code_snippet }}</code></pre>
+                {% endif %}
+            </div>
+
+            <div class="options-grid">
+                {% for option in question.options %}
+                <label class="option-card">
+                    <input type="radio" name="option" value="{{ option }}" required>
+                    <span class="option-text">{{ option }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-filled">
+                    {% if question_num == total_questions %}
+                    Finish Quiz
+                    {% else %}
+                    Next Question
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<style>
+    .container {
+        padding: 0 !important;
+        max-width: none !important;
+    }
+
+    .quiz-screen {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+    }
+
+    .quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        background: var(--color-surface);
+        border-radius: 16px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .topic-badge {
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .demo-badge {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .progress-bar {
+        height: 6px;
+        background: var(--color-surface-variant);
+        border-radius: 3px;
+        width: 200px;
+        margin-top: 12px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--color-primary);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .question-counter {
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+    }
+
+    .quiz-card-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .quiz-form {
+        max-width: 800px;
+        width: 100%;
+    }
+
+    .question-area {
+        margin-bottom: 32px;
+    }
+
+    .question-text {
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    .code-block {
+        background: var(--color-surface-variant);
+        padding: 16px;
+        border-radius: 12px;
+        overflow-x: auto;
+        font-family: monospace;
+        font-size: 0.95rem;
+    }
+
+    .options-grid {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+
+    .option-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 24px;
+        background: var(--color-surface);
+        border: 2px solid var(--color-border);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .option-card:hover {
+        border-color: var(--color-primary);
+        background: var(--color-primary-container);
+    }
+
+    .option-card:has(input:checked) {
+        border-color: var(--color-primary);
+        background: var(--color-primary-container);
+    }
+
+    .option-card input {
+        display: none;
+    }
+
+    .option-text {
+        font-size: 1.1rem;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
