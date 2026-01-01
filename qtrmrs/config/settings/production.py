@@ -1,7 +1,6 @@
 from .base import *
 import dj_database_url
 import os
-from urllib.parse import urlparse
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -37,27 +36,12 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
-    # Media files (Uploads) -> Served by Supabase (via S3)
+    # Media files (Uploads) -> Uses Django's default FileSystemStorage
+    # NOTE: Files won't persist on Render's free tier (ephemeral filesystem)
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "access_key": os.environ.get("AWS_ACCESS_KEY_ID"),
-            "secret_key": os.environ.get("AWS_SECRET_ACCESS_KEY"),
-            "bucket_name": os.environ.get("AWS_STORAGE_BUCKET_NAME"),
-            "endpoint_url": os.environ.get("AWS_S3_ENDPOINT_URL"),
-            "region_name": os.environ.get("AWS_S3_REGION_NAME"),
-            "default_acl": "public-read", # Makes uploaded files public by default
-            "querystring_auth": False,    # Removes annoying signature params from URLs
-            "object_parameters": {
-                "CacheControl": "max-age=86400",
-            },
-            "custom_domain": f"{urlparse(os.environ.get('AWS_S3_ENDPOINT_URL')).netloc}/storage/v1/object/public/{os.environ.get('AWS_STORAGE_BUCKET_NAME')}",
-        },
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
 }
-
-# Required for django-storages
-INSTALLED_APPS += ['storages']
 
 # --- 4. Security Headers ---
 # HTTPS/SSL
