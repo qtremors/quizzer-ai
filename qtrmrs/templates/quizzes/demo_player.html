@@ -1,7 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="quiz-screen">
+<div class="quiz-screen" x-data="{ 
+    timer: 0,
+    timerInterval: null,
+    init() {
+        this.startTimer();
+    },
+    startTimer() {
+        this.timer = 0;
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(() => this.timer++, 1000);
+    },
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `${secs}s`;
+    }
+}">
 
     <div class="quiz-header">
         <div class="header-meta">
@@ -9,13 +25,21 @@
                 <span class="topic-badge">{{ topic }}</span>
                 <span class="demo-badge">Demo Mode</span>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: {{ progress }}%;"></div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <!-- Timer -->
+                <span class="q-timer"
+                    style="display: flex; align-items: center; gap: 6px; color: var(--color-text-muted); font-size: 0.9rem;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">timer</span>
+                    <span x-text="formatTime(timer)">0s</span>
+                </span>
+                <span class="question-counter">
+                    Question {{ question_num }} of {{ total_questions }}
+                </span>
             </div>
         </div>
-        <span class="question-counter">
-            Question {{ question_num }} of {{ total_questions }}
-        </span>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ progress }}%;"></div>
+        </div>
     </div>
 
     <div class="quiz-card-container">

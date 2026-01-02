@@ -1,12 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET
+from django.contrib import messages
 from django.db import transaction, IntegrityError
 from django.utils import timezone
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
+import logging
+import random
 from .models import Quiz, Question, Option, UserAnswer, AIModel
-from apps.ai_agent.services import QuizGenerator
+from .utils import format_duration
+from apps.ai_agent.services import QuizGenerator, AIError
+from apps.users.gamification import (
+    calculate_quiz_xp, calculate_level_from_xp,
+    update_user_streak, check_and_award_badges
+)
+
+logger = logging.getLogger(__name__)
 
 # ==========================================
 # 1. QUIZ SETUP & CREATION
@@ -86,7 +96,6 @@ def create_quiz(request):
 
     # Handle errors with specific messages
     if not questions_data:
-        from apps.ai_agent.services import AIError
         if isinstance(questions_data, AIError):
             return render(request, 'quizzes/partials/error_alert.html', {
                 'message': questions_data.message,
@@ -222,42 +231,48 @@ def submit_answer(request, quiz_id, question_id):
         total_qs = quiz.total_questions
         quiz.score = round((correct_count / total_qs * 100)) if total_qs > 0 else 0
         quiz.completed_at = timezone.now()
+        
+        # Initialize session variables for results page
+        xp_earned = None
+        leveled_up = False
+        new_level = None
+        new_badges = []
+        
+        # === GAMIFICATION: Award XP only on first completion ===
+        if not quiz.xp_awarded:
+            
+            # Get user profile
+            profile = request.user.profile
+            old_level = profile.level
+            
+            # Calculate and award XP
+            total_time = sum(a.time_taken for a in quiz.answers.all())
+            xp_earned = calculate_quiz_xp(correct_count, total_time, total_qs)
+            profile.xp += xp_earned
+            
+            # Check for level up
+            new_level = calculate_level_from_xp(profile.xp)
+            leveled_up = new_level > old_level
+            profile.level = new_level
+            
+            # Update streak
+            update_user_streak(profile)
+            
+            # Update cached stats
+            profile.total_correct_answers += correct_count
+            profile.total_study_time += total_time
+            if quiz.score > profile.best_score:
+                profile.best_score = quiz.score
+            
+            profile.save()
+            
+            # Check and award badges
+            new_badges = check_and_award_badges(request.user, profile)
+            
+            # Mark XP as awarded for this quiz
+            quiz.xp_awarded = True
+        
         quiz.save()
-        
-        # === GAMIFICATION: Award XP, update streak, check badges ===
-        from apps.users.gamification import (
-            calculate_quiz_xp, calculate_level_from_xp, 
-            update_user_streak, check_and_award_badges
-        )
-        from django.contrib import messages
-        
-        # Get user profile
-        profile = request.user.profile
-        old_level = profile.level
-        
-        # Calculate and award XP
-        total_time = sum(a.time_taken for a in quiz.answers.all())
-        xp_earned = calculate_quiz_xp(correct_count, total_time, total_qs)
-        profile.xp += xp_earned
-        
-        # Check for level up
-        new_level = calculate_level_from_xp(profile.xp)
-        leveled_up = new_level > old_level
-        profile.level = new_level
-        
-        # Update streak
-        update_user_streak(profile)
-        
-        # Update cached stats
-        profile.total_correct_answers += correct_count
-        profile.total_study_time += total_time
-        if quiz.score > profile.best_score:
-            profile.best_score = quiz.score
-        
-        profile.save()
-        
-        # Check and award badges
-        new_badges = check_and_award_badges(request.user, profile)
         
         # Store XP info in session for display on results page
         request.session['quiz_xp_earned'] = xp_earned
@@ -302,13 +317,8 @@ def quiz_results(request, quiz_id):
     total_time = sum(a.time_taken for a in user_answers)
     avg_time = round(total_time / len(user_answers)) if user_answers else 0
     
-    # Format total time as MM:SS or just seconds
-    if total_time >= 60:
-        minutes = total_time // 60
-        seconds = total_time % 60
-        total_time_formatted = f"{minutes}m {seconds}s"
-    else:
-        total_time_formatted = f"{total_time}s"
+    # Format total time using utility
+    total_time_formatted = format_duration(total_time)
 
     # Get XP info from session (set during quiz completion)
     xp_earned = request.session.pop('quiz_xp_earned', None)
@@ -404,11 +414,23 @@ def retry_quiz(request, quiz_id):
     return redirect('quiz_player', quiz_id=quiz.id)
 
 
+@login_required
+@require_http_methods(["POST"])
+def delete_quiz(request, quiz_id):
+    """
+    Deletes a quiz and all associated data.
+    Only the quiz owner can delete it.
+    """
+    quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
+    topic = quiz.topic_description[:50]
+    quiz.delete()
+    messages.success(request, f'Quiz "{topic}" deleted successfully.')
+    return redirect('dashboard')
+
+
 # ==========================================
 # 6. QUICK QUIZ (DEMO MODE)
 # ==========================================
-
-import random
 
 DEMO_TOPICS = [
     ('Python', 'Variables and Data Types'),
@@ -434,13 +456,12 @@ def quick_quiz(request):
     try:
         default_model = AIModel.objects.filter(is_active=True).first()
         model_name = default_model.model_name if default_model else 'gemini-2.0-flash'
-    except:
+    except Exception as e:
+        logger.warning(f"Failed to get AI model: {e}")
         model_name = 'gemini-2.0-flash'
     
     generator = QuizGenerator(model_name=model_name)
     
-    import logging
-    logger = logging.getLogger(__name__)
     logger.info(f"Quick Quiz: Generating {language} - {topic} with model {model_name}")
     
     questions_data = generator.generate_quiz(
@@ -452,15 +473,12 @@ def quick_quiz(request):
     )
     
     # Handle AI error
-    from apps.ai_agent.services import AIError
     if isinstance(questions_data, AIError):
-        from django.contrib import messages
         logger.error(f"Quick Quiz AI Error: {questions_data.error_type} - {questions_data.message}")
         messages.error(request, f"Quiz generation failed: {questions_data.message}. {questions_data.suggestion}")
         return redirect('home')
     
     if not questions_data or len(questions_data) == 0:
-        from django.contrib import messages
         logger.error("Quick Quiz: Empty questions returned from AI")
         messages.error(request, "Quiz generation failed: No questions generated. Please try again.")
         return redirect('home')
@@ -478,10 +496,11 @@ def quick_quiz(request):
                 model_used=model_name,
             )
             
+            options_to_create = []
             for q_data in questions_data:
                 question = Question.objects.create(
                     quiz=quiz,
-                    text=q_data.get('question', ''),
+                    text=q_data.get('text', ''),
                     code_snippet=q_data.get('code_snippet'),
                 )
                 
@@ -492,17 +511,31 @@ def quick_quiz(request):
                     else:
                         option_text = str(option_data)
                     
-                    Option.objects.create(
+                    options_to_create.append(Option(
                         question=question,
                         text=option_text,
                         is_correct=(option_text == str(q_data.get('correct_answer', '')))
-                    )
+                    ))
+            
+            # Bulk create all options at once
+            if options_to_create:
+                Option.objects.bulk_create(options_to_create)
         
         return redirect('quiz_player', quiz_id=quiz.id)
     else:
         # For guests: store in session for demo mode
+        # Optimize session data - keep only essential fields
+        optimized_questions = [
+            {
+                'text': q.get('text', ''),
+                'options': q.get('options', []),
+                'correct_answer': q.get('correct_answer', ''),
+                'code_snippet': q.get('code_snippet') if q.get('code_snippet') else None,
+            }
+            for q in questions_data
+        ]
         request.session['demo_quiz'] = {
-            'questions': questions_data,
+            'questions': optimized_questions,
             'topic': f"{language} - {topic}",
             'current_index': 0,
             'score': 0,
@@ -531,8 +564,6 @@ def demo_player(request):
     question = questions[current_index]
     
     # DEBUG: Log question structure
-    import logging
-    logger = logging.getLogger(__name__)
     logger.info(f"Demo question keys: {question.keys() if isinstance(question, dict) else type(question)}")
     logger.info(f"Demo question data: {question}")
     

@@ -86,6 +86,7 @@ def user_dashboard(request):
         'incomplete_count': incomplete_count,
         'page_obj': quizzes_page,  # For pagination template
         'profile': request.user.profile,  # For level/XP/streak display
+        'badges': request.user.earned_badges.select_related('badge').order_by('-earned_at')[:6],  # Recent badges
     }
     return render(request, 'users/dashboard.html', context)
 
@@ -96,6 +97,7 @@ def account_settings(request):
     # Initialize forms with current user instance
     profile_form = UserUpdateForm(instance=request.user)
     password_form = PasswordChangeForm(request.user)
+    profile = request.user.profile
 
     if request.method == 'POST':
         
@@ -117,6 +119,13 @@ def account_settings(request):
                 return redirect('account_settings')
             else:
                 messages.error(request, 'Error changing password.')
+        
+        elif 'update_interests' in request.POST:
+            interests = request.POST.get('learning_interests', '')
+            profile.learning_interests = interests
+            profile.save(update_fields=['learning_interests'])
+            messages.success(request, 'Learning interests updated!')
+            return redirect('account_settings')
 
     # Apply styles
     for field in password_form.fields.values():
@@ -124,5 +133,6 @@ def account_settings(request):
 
     return render(request, 'users/settings.html', {
         'profile_form': profile_form,
-        'password_form': password_form
+        'password_form': password_form,
+        'profile': profile,
     })

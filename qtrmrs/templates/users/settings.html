@@ -50,9 +50,22 @@
                 <div class="info-value">{{ user.email }}</div>
             </div>
 
-            <div class="info-row" style="border-bottom: none;">
+            <div class="info-row">
                 <label>Password</label>
                 <div class="info-value">••••••••••••••••</div>
+            </div>
+
+            <div class="info-row"
+                style="border-bottom: none; flex-direction: column; align-items: flex-start; gap: 8px;">
+                <label>Learning Interests</label>
+                <div class="info-value" style="word-break: break-word;">
+                    {% if profile.learning_interests %}
+                    {{ profile.learning_interests }}
+                    {% else %}
+                    <span style="color: var(--color-text-muted); font-weight: 400;">Not set - click Edit Profile to
+                        add</span>
+                    {% endif %}
+                </div>
             </div>
 
         </div>
@@ -102,6 +115,22 @@
                     <div style="text-align: right;">
                         <button type="submit" name="change_password" class="btn btn-tonal"
                             style="color: var(--color-error);">Update Password</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 12px;">Learning Interests</h3>
+                <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                    Enter topics you're interested in learning (comma-separated)
+                </p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <textarea name="learning_interests" class="form-input" rows="3"
+                        placeholder="Python, JavaScript, React, Machine Learning, SQL..."
+                        style="resize: vertical;">{{ profile.learning_interests }}</textarea>
+                    <div style="text-align: right; margin-top: 12px;">
+                        <button type="submit" name="update_interests" class="btn btn-tonal">Save Interests</button>
                     </div>
                 </form>
             </div>

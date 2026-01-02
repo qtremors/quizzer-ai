@@ -35,7 +35,7 @@ except ValueError:
 STORAGES = {
     # Static files (CSS/JS) -> Served by WhiteNoise
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
     # Media files (Uploads) -> Uses Django's default FileSystemStorage
     # NOTE: Files won't persist on Render's free tier (ephemeral filesystem)
