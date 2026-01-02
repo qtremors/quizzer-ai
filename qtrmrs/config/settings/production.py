@@ -14,11 +14,12 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# --- 1. Database (Render PostgreSQL) ---
+# --- 1. Database (NeonDB / PostgreSQL) ---
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
 
@@ -34,7 +35,7 @@ except ValueError:
 STORAGES = {
     # Static files (CSS/JS) -> Served by WhiteNoise
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
     # Media files (Uploads) -> Uses Django's default FileSystemStorage
     # NOTE: Files won't persist on Render's free tier (ephemeral filesystem)
