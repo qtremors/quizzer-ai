@@ -6,7 +6,6 @@
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![Django](https://img.shields.io/badge/django-5.x-green.svg)
 ![HTMX](https://img.shields.io/badge/htmx-1.9-orange.svg)
-![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen.svg)
 
 Quizzer AI is a modern, adaptive learning platform designed for developers. It leverages **Google's Gemini AI** models to generate infinite, customized quizzes on any programming topic—from Python syntax to System Design architecture.
 
@@ -40,6 +39,12 @@ Unlike static quiz apps, Quizzer AI generates fresh content on the fly, analyzes
 - **📱 Mobile Optimized:** Responsive design with proper touch targets.
 - **♿ Accessible:** Skip links, focus management, screen reader support, reduced motion.
 - **⏳ Skeleton Loaders:** Smooth loading states with shimmer animations.
+
+### 🏆 Gamification
+- **🔥 Daily Streaks:** Track consecutive days of learning.
+- **⭐ XP & Leveling:** Earn XP for completing quizzes, level up as you progress.
+- **🎖️ Achievement Badges:** Unlock badges for milestones (First Quiz, Perfect Score, etc.).
+- **📈 Progress Dashboard:** View your stats, best scores, and earned badges.
 
 ---
 
@@ -167,7 +172,6 @@ quizzer-ai/
 │   │   └── js/
 │   │       └── toast.js      # Toast Alpine.js store
 │   ├── templates/            # HTML (organized by app)
-│   ├── logs/                 # Application logs
 │   └── conftest.py           # Pytest fixtures
 ├── pyproject.toml            # Dependencies & pytest config
 └── README.md

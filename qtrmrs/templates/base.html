@@ -13,13 +13,11 @@
     <meta property="og:title" content="{% block og_title %}Quizzer AI{% endblock %}">
     <meta property="og:description"
         content="AI-powered quiz platform for developers. Generate custom coding quizzes on any topic.">
-    <meta property="og:image" content="{% static 'assets/quizzer_favicon.png' %}">
+    <meta property="og:image" content="{% static 'assets/qtrmrs.png' %}">
 
     <title>{% block title %}Quizzer AI{% endblock %}</title>
-    <link rel="icon" type="image/png" href="{% static 'assets/quizzer_favicon.png' %}"
-        media="(prefers-color-scheme: light)">
-    <link rel="icon" type="image/png" href="{% static 'assets/quizzer_favicon.png' %}"
-        media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" href="{% static 'assets/qtrmrs.png' %}">
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,9 +57,7 @@
 
     <header class="top-app-bar" role="banner">
         <a href="{% url 'home' %}" class="app-logo" style="text-decoration: none;" aria-label="Quizzer AI Home">
-            <span class="material-symbols-outlined filled" style="color: var(--color-primary); font-size: 32px;">
-                psychology
-            </span>
+            <img src="{% static 'assets/qtrmrs.png' %}" alt="Quizzer AI Logo" style="height: 32px; width: 32px;">
             <span>Quizzer AI</span>
         </a>
 
@@ -80,7 +76,7 @@
                     style="gap: 10px; padding-right: 16px; padding-left: 8px;">
 
                     {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="User"
+                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}'s profile picture"
                         style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-border);">
                     {% else %}
                     <span class="material-symbols-outlined">account_circle</span>

@@ -2,6 +2,39 @@
 
 All notable changes to the **Quizzer AI** project.
 
+## [1.5.0] - 2026-01-02
+
+### 🐛 Bug Fixes (21 Issues Resolved)
+
+- **Quick Quiz Key Mismatch:** Fixed `'question'` → `'text'` key inconsistency
+- **Demo Quiz Timer:** Added Alpine.js timer to match main player UX
+- **Bare Exception:** Added proper exception handling with logging
+- **XP Exploit Fixed:** Added `xp_awarded` field to prevent retry farming
+- **Skip Confirmation:** Added confirm dialog before skipping questions
+- **CSS !important Overuse:** Increased CSS specificity instead of using `!important`
+- **Focus Rings:** Added `:focus-visible` styles to question card buttons
+
+### ✨ Features
+
+- **Badge Display:** Earned badges now shown on dashboard
+- **Quiz Deletion:** Delete button with confirmation on dashboard
+- **Learning Interests UI:** Added to settings page with edit form
+- **Dashboard Stats:** Added Best Score and Correct Answers stats
+- **Password Help Text:** Always visible instead of on-focus only
+
+### 🔧 Technical Improvements
+
+- **Bulk Create:** Options now use `bulk_create()` for fewer DB queries
+- **Session Optimization:** Demo quiz trims unnecessary AI response fields
+- **Removed Unused:** File logging handler removed (console only now)
+- **Import Cleanup:** Consolidated all inline imports to top-level
+- **Time Formatting:** Created `utils.py` with `format_duration()` helper
+- **UserAnswer Ordering:** Added `ordering = ['id']` to Meta class
+- **Client Logging:** Added error logging before ValueError in AI client
+- **Alt Text:** Improved avatar accessibility with descriptive alt text
+
+---
+
 ## [1.3.0] - 2025-12-12
 
 ### 🎮 Gamification System

@@ -27,7 +27,8 @@
             </div>
 
             <div class="quiz-footer">
-                <button type="submit" name="action" value="skip" class="btn-skip">Skip</button>
+                <button type="submit" name="action" value="skip" class="btn-skip"
+                    onclick="return confirm('Skip this question?');">Skip</button>
                 <button type="submit" name="action" value="next" id="next-btn" disabled class="btn-next">
                     {% if is_last %}Finish{% else %}Next{% endif %}
                     <span class="material-symbols-outlined">arrow_forward</span>
@@ -207,15 +208,15 @@
         text-transform: uppercase;
     }
 
-    /* --- FIX 3: FORCE CODE SCROLL --- */
-    pre[class*="language-"] {
-        margin: 0 !important;
-        border-radius: 0 !important;
-        padding: 20px !important;
+    /* Code block styling with high specificity to override Prism */
+    .code-window pre[class*="language-"] {
+        margin: 0;
+        border-radius: 0;
+        padding: 20px;
         flex-grow: 1;
         overflow: auto;
         white-space: pre;
-        font-size: 0.9rem !important;
+        font-size: 0.9rem;
         width: 100%;
     }
 
@@ -337,5 +338,17 @@
             opacity: 1;
             transform: translateY(0);
         }
+    }
+
+    /* Focus visible styles for accessibility */
+    .option-block:focus-within .option-visual {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    .btn-next:focus-visible,
+    .btn-skip:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
     }
 </style>

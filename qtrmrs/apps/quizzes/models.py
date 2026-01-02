@@ -49,6 +49,7 @@ class Quiz(models.Model):
     total_questions = models.IntegerField(default=0)
     score = models.IntegerField(default=0, help_text="Score percentage")
     completed_at = models.DateTimeField(null=True, blank=True)
+    xp_awarded = models.BooleanField(default=False, help_text="Whether XP was already awarded for this quiz")
     
 
 
@@ -127,6 +128,7 @@ class UserAnswer(models.Model):
     class Meta:
         # Prevent duplicate answers for the same question
         unique_together = [['quiz', 'question']]
+        ordering = ['id']  # Consistent iteration order
         indexes = [
             models.Index(fields=['quiz', 'is_correct']),
         ]

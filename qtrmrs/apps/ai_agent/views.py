@@ -49,7 +49,7 @@ def process_chat_message(request):
     # --- Handle Model Selection ---
     model_id = request.POST.get('ai_model')
     ai_model = None
-    model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-2.0-flash-lite')
+    model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
     
     if model_id:
         try:

@@ -34,6 +34,14 @@
                 <span class="stat-label">Average Score</span>
                 <span class="stat-value" style="color: var(--color-primary);">{{ avg_score }}%</span>
             </div>
+            <div class="stat-card">
+                <span class="stat-label">Best Score</span>
+                <span class="stat-value" style="color: var(--color-success);">{{ profile.best_score }}%</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Correct Answers</span>
+                <span class="stat-value">{{ profile.total_correct_answers }}</span>
+            </div>
             {% if incomplete_count > 0 %}
             <div class="stat-card" style="border-color: rgba(245, 158, 11, 0.3);">
                 <span class="stat-label">In Progress</span>
@@ -41,6 +49,17 @@
             </div>
             {% endif %}
         </div>
+
+        {% if badges %}
+        <div class="badges-row">
+            {% for ub in badges %}
+            <div class="badge-item" title="{{ ub.badge.description }}">
+                <span class="badge-icon">{{ ub.badge.icon }}</span>
+                <span class="badge-name">{{ ub.badge.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 
     <div
@@ -95,6 +114,13 @@
                         {% csrf_token %}
                         <button type="submit" class="action-btn retry" title="Retry Quiz">
                             <span class="material-symbols-outlined">replay</span>
+                        </button>
+                    </form>
+                    <form action="{% url 'delete_quiz' quiz.id %}" method="POST" style="display: inline;"
+                        onsubmit="return confirm('Delete this quiz? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="action-btn delete" title="Delete Quiz">
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
                     </form>
                     <a href="{% url 'quiz_results' quiz.id %}" class="view-btn">
@@ -168,6 +194,34 @@
     .stats-row {
         display: flex;
         gap: 24px;
+    }
+
+    .badges-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .badge-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: help;
+    }
+
+    .badge-icon {
+        font-size: 1.2rem;
+    }
+
+    .badge-name {
+        color: var(--color-text-main);
+        font-weight: 500;
     }
 
     .stat-card {
@@ -363,6 +417,12 @@
         background: var(--color-primary-container);
         border-color: var(--color-primary);
         color: var(--color-primary);
+    }
+
+    .action-btn.delete:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: var(--color-error);
+        color: var(--color-error);
     }
 
     @media (max-width: 768px) {
