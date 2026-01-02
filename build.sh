@@ -8,7 +8,10 @@ pip install -r requirements.txt
 # 2. Move into the project folder
 cd qtrmrs
 
-# 3. Collect Static Files
+# 3. Set production settings for collectstatic
+export DJANGO_SETTINGS_MODULE=config.settings.production
+
+# 4. Collect Static Files
 python manage.py collectstatic --no-input
 
 # 4. Apply Migrations
