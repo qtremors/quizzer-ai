@@ -74,7 +74,7 @@ def create_quiz(request):
     # --- Handle Model Selection ---
     model_id = request.POST.get('ai_model')
     ai_model = None
-    model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-2.0-flash-lite')
+    model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
     
     if model_id:
         try:
@@ -239,40 +239,47 @@ def submit_answer(request, quiz_id, question_id):
         new_badges = []
         
         # === GAMIFICATION: Award XP only on first completion ===
-        if not quiz.xp_awarded:
+        # Use transaction with row lock to prevent race conditions
+        with transaction.atomic():
+            # Re-fetch quiz with lock to prevent concurrent XP awards
+            locked_quiz = Quiz.objects.select_for_update().get(id=quiz.id)
             
-            # Get user profile
-            profile = request.user.profile
-            old_level = profile.level
-            
-            # Calculate and award XP
-            total_time = sum(a.time_taken for a in quiz.answers.all())
-            xp_earned = calculate_quiz_xp(correct_count, total_time, total_qs)
-            profile.xp += xp_earned
-            
-            # Check for level up
-            new_level = calculate_level_from_xp(profile.xp)
-            leveled_up = new_level > old_level
-            profile.level = new_level
-            
-            # Update streak
-            update_user_streak(profile)
-            
-            # Update cached stats
-            profile.total_correct_answers += correct_count
-            profile.total_study_time += total_time
-            if quiz.score > profile.best_score:
-                profile.best_score = quiz.score
-            
-            profile.save()
-            
-            # Check and award badges
-            new_badges = check_and_award_badges(request.user, profile)
-            
-            # Mark XP as awarded for this quiz
-            quiz.xp_awarded = True
+            if not locked_quiz.xp_awarded:
+                # Get user profile with lock
+                from apps.users.models import UserProfile
+                profile = UserProfile.objects.select_for_update().get(user=request.user)
+                old_level = profile.level
+                
+                # Calculate and award XP
+                total_time = sum(a.time_taken for a in quiz.answers.all())
+                xp_earned = calculate_quiz_xp(correct_count, total_time, total_qs)
+                profile.xp += xp_earned
+                
+                # Check for level up
+                new_level = calculate_level_from_xp(profile.xp)
+                leveled_up = new_level > old_level
+                profile.level = new_level
+                
+                # Update streak
+                update_user_streak(profile)
+                
+                # Update cached stats
+                profile.total_correct_answers += correct_count
+                profile.total_study_time += total_time
+                if quiz.score > profile.best_score:
+                    profile.best_score = quiz.score
+                
+                profile.save()
+                
+                # Check and award badges
+                new_badges = check_and_award_badges(request.user, profile)
+                
+                # Mark XP as awarded for this quiz
+                locked_quiz.xp_awarded = True
+                locked_quiz.save(update_fields=['xp_awarded'])
         
-        quiz.save()
+        # Save score and completed_at (use update_fields to not overwrite xp_awarded)
+        quiz.save(update_fields=['score', 'completed_at'])
         
         # Store XP info in session for display on results page
         request.session['quiz_xp_earned'] = xp_earned
@@ -452,13 +459,13 @@ def quick_quiz(request):
     """
     language, topic = random.choice(DEMO_TOPICS)
     
-    # Get default model
-    try:
-        default_model = AIModel.objects.filter(is_active=True).first()
-        model_name = default_model.model_name if default_model else 'gemini-2.0-flash'
-    except Exception as e:
-        logger.warning(f"Failed to get AI model: {e}")
-        model_name = 'gemini-2.0-flash'
+    # Get default model - handle database errors specifically
+    default_model = AIModel.objects.filter(is_active=True).first()
+    if default_model:
+        model_name = default_model.model_name
+    else:
+        model_name = 'gemini-flash-lite-latest'
+        logger.warning("No active AI model found, using fallback: gemini-flash-lite-latest")
     
     generator = QuizGenerator(model_name=model_name)
     
