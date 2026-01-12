@@ -3,6 +3,7 @@ import logging
 import time
 from typing import Optional, Union
 from django.conf import settings
+from google.genai import types
 from .client import get_gemini_client
 from .prompts import (
     QUIZ_GENERATION_PROMPT, EXPLANATION_PROMPT, INTENT_PARSING_PROMPT,
@@ -30,9 +31,8 @@ class QuizGenerator:
     """
     
     def __init__(self, model_name: Optional[str] = None):
-        self.genai = get_gemini_client()
+        self.client = get_gemini_client()
         self.model_name = model_name or getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-latest')
-        self.model = self.genai.GenerativeModel(self.model_name)
 
     def _handle_error(self, e: Exception, operation: str) -> AIError:
         """Parse exception and return appropriate AIError."""
@@ -103,9 +103,12 @@ class QuizGenerator:
         logger.info(f"Generating quiz: model={self.model_name}, language={language}, topic={topic}, level={level}, num_questions={num_questions}")
         
         try:
-            response = self.model.generate_content(
-                prompt,
-                generation_config={"response_mime_type": "application/json"}
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
             )
             elapsed = time.time() - start_time
             quiz_data = json.loads(response.text)
@@ -161,9 +164,12 @@ class QuizGenerator:
         )
 
         try:
-            response = self.model.generate_content(
-                prompt,
-                generation_config={"response_mime_type": "application/json"}
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
             )
             quiz_data = json.loads(response.text)
             return quiz_data.get('questions', [])
@@ -212,7 +218,10 @@ class QuizGenerator:
         )
         
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt
+            )
             return response.text.strip()
         except Exception as e:
             logger.error(f"Explanation Generation Error: {e}")

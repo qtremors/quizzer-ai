@@ -1,186 +1,77 @@
-# Changelog
+# Quizzer AI Changelog
 
-All notable changes to the **Quizzer AI** project.
+> **Project:** Quizzer AI  
+> **Version:** 1.5.0  
+> **Last Updated:** 2026-01-12
+
+---
 
 ## [1.5.0] - 2026-01-02
 
-### 🐛 Bug Fixes (21 Issues Resolved)
+### Added
+- Badge Display: Earned badges now shown on dashboard.
+- Quiz Deletion: Delete button with confirmation on dashboard.
+- Learning Interests UI: Added to settings page with edit form.
+- Dashboard Stats: Added Best Score and Correct Answers stats.
 
-- **Quick Quiz Key Mismatch:** Fixed `'question'` → `'text'` key inconsistency
-- **Demo Quiz Timer:** Added Alpine.js timer to match main player UX
-- **Bare Exception:** Added proper exception handling with logging
-- **XP Exploit Fixed:** Added `xp_awarded` field to prevent retry farming
-- **Skip Confirmation:** Added confirm dialog before skipping questions
-- **CSS !important Overuse:** Increased CSS specificity instead of using `!important`
-- **Focus Rings:** Added `:focus-visible` styles to question card buttons
+### Changed
+- Bulk Create: Options now use `bulk_create()` for fewer DB queries.
+- UserAnswer Ordering: Added `ordering = ['id']` to Meta class.
+- Import Cleanup: Consolidated all inline imports to top-level.
 
-### ✨ Features
-
-- **Badge Display:** Earned badges now shown on dashboard
-- **Quiz Deletion:** Delete button with confirmation on dashboard
-- **Learning Interests UI:** Added to settings page with edit form
-- **Dashboard Stats:** Added Best Score and Correct Answers stats
-- **Password Help Text:** Always visible instead of on-focus only
-
-### 🔧 Technical Improvements
-
-- **Bulk Create:** Options now use `bulk_create()` for fewer DB queries
-- **Session Optimization:** Demo quiz trims unnecessary AI response fields
-- **Removed Unused:** File logging handler removed (console only now)
-- **Import Cleanup:** Consolidated all inline imports to top-level
-- **Time Formatting:** Created `utils.py` with `format_duration()` helper
-- **UserAnswer Ordering:** Added `ordering = ['id']` to Meta class
-- **Client Logging:** Added error logging before ValueError in AI client
-- **Alt Text:** Improved avatar accessibility with descriptive alt text
+### Fixed
+- Quick Quiz Key Mismatch: Fixed `'question'` → `'text'` key inconsistency.
+- Demo Quiz Timer: Added Alpine.js timer to match main player UX.
+- XP Exploit: Added `xp_awarded` field to prevent retry farming.
+- Skip Confirmation: Added confirm dialog before skipping questions.
 
 ---
 
 ## [1.3.0] - 2025-12-12
 
-### 🎮 Gamification System
+### Added
+- Gamification System: XP, Leveling, Streaks, and 9 Achievement Badges.
+- Quick Quiz (Demo Mode): One-click guest access for random topic quizzes.
+- Confetti Animation: Celebration effect on 100% scores.
 
-- **XP & Leveling:**
-  - Earn 10 XP per correct answer + time bonus (1 XP per 5s under 30s)
-  - +50 XP bonus for perfect scores
-  - Level up system (Level 1→2 = 100 XP, scales with level)
-  - XP progress bar on dashboard and results page
-
-- **Streaks:**
-  - Daily streak tracking (🔥 emoji display)
-  - Longest streak record
-
-- **Badges:**
-  - 9 achievement badges (Level 5/10/25/50, Week Warrior, Month Master, Perfectionist, Century Club, Knowledge Master)
-  - Auto-awarded on reaching milestones
-
-- **Confetti Animation:** Celebration effect on 100% quiz scores
-
-### ⚡ Quick Quiz (Demo Mode)
-
-- **One-Click Demo:** Instant 5-question quiz on random topic
-- **Works for Guests:** No login required, session-based quiz
-- **Sign-up CTA:** Prompt to create account after demo completion
-- **Homepage Button:** "Quick Quiz" button next to "Start Quizzing"
-
-### 🗄️ New Models
-
-- `UserProfile`: XP, level, streak, preferences, learning interests
-- `Badge`: Achievement definitions
-- `UserBadge`: User-earned badges
-
-### 📁 New Files
-
-- `apps/users/gamification.py` - XP calculation, streak tracking, badge awarding
-- `apps/users/management/commands/seed_gamification.py` - Badge seeder
-- `templates/quizzes/demo_player.html` - Guest quiz player
-- `templates/quizzes/demo_results.html` - Guest quiz results
+### Technical
+- New Models: `UserProfile`, `Badge`, `UserBadge`.
+- Service Layer: `apps/users/gamification.py` for logic.
 
 ---
 
 ## [1.2.0] - 2025-12-12
 
-### 🐛 Bug Fixes
+### Fixed
+- Type Comparison: Fixed option matching (int vs string) in quiz creation.
+- Theme Flash: Added inline script to prevent FOUC (Flash of Unstyled Content).
+- Dropdown Hover: Theme-aware hover colors in navigation.
 
-- **Type Comparison Fix:** Fixed option matching in quiz creation that could fail when AI returns int vs string.
-- **Theme Flash Fix:** Added inline script to apply theme before body renders, preventing wrong-theme flash on page load.
-- **Slider Theme Fix:** Toggle sliders now respect manual theme toggle (was using `@media prefers-color-scheme`).
-- **Dropdown Hover Fix:** Header dropdown now uses theme-aware hover color instead of hardcoded opacity.
-
-### 🧹 Code Cleanup
-
-- **Removed `is_study_mode`:** Cleaned up stale Quiz model field left over from removed Study Mode feature.
-- **Migration 0008:** Database migration to remove unused field.
-
-### 🎨 UI/UX Improvements
-
-- **Select Dropdowns:** Added SVG chevron arrow, proper focus states, and theme-aware styling.
-- **Viewport Protection:** Comprehensive CSS to ensure all elements (dropdowns, modals, cards, buttons) stay within viewport.
-- **Form Inputs:** Added placeholder styling, iOS zoom prevention, and validation state colors.
-- **Toggle Switches:** Centralized styling with theme-aware colors and focus states.
-- **Button Containment:** Buttons now have max-width and text overflow handling.
-- **Mobile Responsive:** Button groups wrap on small screens, settings bar wraps properly.
+### Changed
+- CSS Refinement: Comprehensive viewport protection and wrapping for mobile.
+- Code Cleanup: Removed stale `is_study_mode` field.
 
 ---
 
 ## [1.1.0] - 2025-12-12
 
-### 🎨 UI/UX Enhancements
+### Added
+- Theme Toggle: Dark/Light switcher with localStorage persistence.
+- Toast Notifications: Alpine.js based notification system.
+- Skeleton Loaders: Shimmer animations for loading states.
+- Timer Per Question: Live tracking and results analytics.
 
-- **Theme Toggle:** Added dark/light theme switcher with localStorage persistence and system preference detection.
-- **Toast Notifications:** Implemented slide-in toast notification system with Alpine.js store (success, error, warning, info variants).
-- **Skeleton Loaders:** Added shimmer loading animations for improved perceived performance.
-- **Mobile Optimization:** Responsive breakpoints at 768px and 480px with proper touch targets (44px minimum).
-
-### ♿ Accessibility
-
-- **Skip to Content:** Added skip link for keyboard navigation.
-- **Focus Management:** Implemented `:focus-visible` outlines for better accessibility.
-- **ARIA Labels:** Added `role` attributes and screen reader utilities.
-- **Reduced Motion:** Support for `prefers-reduced-motion` media query.
-- **High Contrast:** Added `prefers-contrast: high` support.
-
-### ⏱️ Quiz Features
-
-- **Timer Per Question:** Live timer display during quizzes with time tracking per answer.
-- **Time Analytics:** Results page now shows total time and average time per question.
-- **AI Model Badge:** Display which AI model was used on results page.
-
-### 🔧 Technical Improvements
-
-- **Structured Logging:** Added Django logging configuration with console/file handlers and timing metrics.
-- **Unit Tests:** Added pytest + pytest-django setup with 14 tests.
-- **Test Fixtures:** Created conftest.py with user, quiz, and model fixtures.
-- **Error Handling:** Enhanced AIError class with specific error types (quota, auth, timeout, model_not_found).
-
-### 📦 Dependencies
-
-- Added `pytest>=8.0.0`, `pytest-django>=4.7.0`, `pytest-cov>=4.1.0` as dev dependencies.
+### Accessibility
+- Skip to Content link.
+- Focus-visible outlines.
+- Reduced Motion & High Contrast support.
 
 ---
 
 ## [1.0.0] - 2025-11-19
 
-### 🚀 Architecture & Core
-
-- **Refactor:** Completely rebuilt the legacy project into a scalable `apps/` based architecture.
-- **Settings:** Split configuration into `base.py` (shared) and `local.py` (dev).
-- **Auth:** Implemented Custom User Model and secure session handling.
-
-
-### 🧠 AI & Logic
-
-- **Service Layer:** Created `QuizGenerator` service to abstract Gemini API calls.
-- **Reliability:** Implemented JSON enforcement in prompts to prevent parsing errors.
-- **Features:** Added support for "Coding Questions" (generating code snippets alongside text).
-- **Agent:** Added a Natural Language Parser to convert chat messages (e.g., "Hard Python Quiz") into structured database queries.
-
-
-### 🎨 UI/UX (The "Midnight" Theme)
-
-- **Design:** Implemented a professional Dark Mode aesthetic using CSS Variables.
-- **Layout:**
-    - Created a 1600px wide responsive container for Dashboards.
-    - Implemented a "Split View" layout for coding challenges (60/40 split).
-    - Designed a Sticky Glassmorphism Navbar.
-        
-- **Interactions:**
-    - Added HTMX loading states (spinners) to all major buttons.
-    - Implemented Alpine.js dropdowns and form focus effects.
-    - Created a seamless "Immersive Mode" for the Quiz Player (no scrolling required).
-        
-
-### 📱 Features
-
-- **Dashboard:** Added a grid-based history view with score badges and stats.
-- **Language Catalog:** Created a dedicated `/languages` page with Devicon integration.
-- **Result Analysis:** Added "Explain All Mistakes" button that batch-processes wrong answers via AI and saves them to the DB.
-- **Settings:** Added Profile management (Avatar upload, Username edit) and Password Reset flows.
-
-
-### 🐛 Bug Fixes
-
-- Fixed `floatform` template error by casting scores to integers in views.
-- Fixed Navbar "Clone" bug by using `HX-Redirect` headers for page transitions.
-- Fixed "Dots" on radio buttons by using `display: none` on inputs and styling labels.
-- Fixed "Edit Button" overlap in settings by using Flexbox gaps.
-- Fixed Language Auto-select logic to prioritize Custom Input over Dropdown.
+### Added
+- Service-Oriented Architecture: Modular `apps/` structure.
+- AI Integration: `QuizGenerator` service for Google Gemini API.
+- Intent Parsing: Natural Language Agent for chat-based quiz requests.
+- Immersive Player: Full-screen, HTMX-powered distraction-free UI.

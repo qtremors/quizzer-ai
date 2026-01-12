@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
+
 
 # 1. Load the environment variables
 load_dotenv()
@@ -13,16 +14,16 @@ if not api_key:
 
 # 2. Configure the client
 try:
-    genai.configure(api_key=api_key)
+    client = genai.Client(api_key=api_key)
     
     print(f"✅ Authenticated successfully with key: ...{api_key[-4:]}")
     print("\n🔍 Fetching available models that support text generation...\n")
 
     # 3. List models
     count = 0
-    for m in genai.list_models():
+    for m in client.models.list():
         # We only care about models that can generate content (chat/text)
-        if 'generateContent' in m.supported_generation_methods:
+        if 'generateContent' in m.supported_actions:
             print(f" • {m.name}")
             print(f"   (Display Name: {m.display_name})")
             print("-" * 40)
