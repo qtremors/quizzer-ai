@@ -1,10 +1,22 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.0  
-> **Last Updated:** 2026-01-12
+> **Version:** 1.5.1  
+> **Last Updated:** 2026-01-23
 
 ---
+
+## [1.5.1] - 2026-01-23
+
+### Changed
+- migrated from `google-generativeai` to new `google-genai` SDK
+- updated `pyproject.toml` to disable package mode
+- standardized DB configuration using `dj-database-url`
+
+### Added
+- management command `sync_models` to populate AI models on deployment
+- management command `set_active_models` to configure default AI models
+
 
 ## [1.5.0] - 2026-01-02
 

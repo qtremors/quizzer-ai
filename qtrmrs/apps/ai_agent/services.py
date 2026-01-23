@@ -127,9 +127,12 @@ class QuizGenerator:
         prompt = INTENT_PARSING_PROMPT.format(user_message=user_message)
         
         try:
-            response = self.model.generate_content(
-                prompt, 
-                generation_config={"response_mime_type": "application/json"}
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
             )
             return json.loads(response.text)
         except Exception as e:
@@ -183,9 +186,12 @@ class QuizGenerator:
         prompt = GENERAL_INTENT_PROMPT.format(user_message=user_message)
         
         try:
-            response = self.model.generate_content(
-                prompt, 
-                generation_config={"response_mime_type": "application/json"}
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
             )
             return json.loads(response.text)
         except Exception as e:

@@ -2,7 +2,7 @@
 
 > Comprehensive documentation for developers working on Quizzer AI.
 
-**Version:** 1.5.0 | **Last Updated:** 2026-01-12
+**Version:** 1.5.1 | **Last Updated:** 2026-01-23
 
 ---
 
@@ -107,6 +107,30 @@ The system uses a 3-step AI pipeline optimized for speed and accuracy:
 
 ---
 
+## AI Model Management
+
+The project includes several tools to manage the connection with Google's Gemini API:
+
+### 1. Verify Connectivity
+Run this script to check if your API key is valid and see which models are available from Google:
+```bash
+uv run check_models.py
+```
+
+### 2. Sync Models to Database
+Populates the `AIModel` table with all available models from the API:
+```bash
+uv run python qtrmrs/manage.py sync_models
+```
+
+### 3. Configure Active Models
+Sets specific models as active and configures the default model (e.g., `gemini-flash-lite-latest`):
+```bash
+uv run python qtrmrs/manage.py set_active_models
+```
+
+---
+
 ## Environment Variables
 
 ### Required
@@ -114,6 +138,7 @@ The system uses a 3-step AI pipeline optimized for speed and accuracy:
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `GEMINI_API_KEY` | API key from Google AI Studio | `AIzaSy...` |
+| `DATABASE_URL` | NeonDB/PostgreSQL Connection String | `postgres://user:pass@host/db` |
 | `SECRET_KEY` | Django secret key for production | `django-insecure...` |
 
 ### Optional
@@ -122,7 +147,7 @@ The system uses a 3-step AI pipeline optimized for speed and accuracy:
 |----------|-------------|---------|
 | `DEBUG` | Enables debug mode | `False` |
 | `DJANGO_LOG_LEVEL` | Log verbosity (INFO, DEBUG, ERROR) | `INFO` |
-| `DEFAULT_AI_MODEL` | Gemini model version | `gemini-flash-latest` |
+| `DEFAULT_AI_MODEL` | Gemini model version | `gemini-flash-litelatest` |
 
 ---
 
