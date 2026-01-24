@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Too Many Requests - Quizzer AI{% endblock %}
+
+{% block content %}
+<div style="min-height: 60vh; display: flex; align-items: center; justify-content: center;">
+    <div class="card" style="max-width: 500px; padding: 48px; text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 16px; color: var(--color-error);">
+            <span class="material-symbols-outlined" style="font-size: inherit;">schedule</span>
+        </div>
+        <h1 style="font-size: 1.75rem; margin-bottom: 12px; color: var(--color-error);">Too Many Requests</h1>
+        <p style="color: var(--color-text-muted); margin-bottom: 24px; line-height: 1.6;">
+            You've made too many requests in a short period. Please wait a moment before trying again.
+        </p>
+        <a href="{% url 'home' %}" class="btn btn-filled">
+            Return to Home
+        </a>
+    </div>
+</div>
+{% endblock %}

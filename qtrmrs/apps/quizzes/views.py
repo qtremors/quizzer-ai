@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET
 from django.contrib import messages
-from django.db import transaction, IntegrityError
+from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
@@ -460,12 +460,15 @@ def quick_quiz(request):
     language, topic = random.choice(DEMO_TOPICS)
     
     # Get default model - handle database errors specifically
-    default_model = AIModel.objects.filter(is_active=True).first()
+    # Priority: 1. DB Default -> 2. Any DB Active -> 3. Settings/Env -> 4. Hardcoded
+    default_model = AIModel.objects.filter(is_active=True, is_default=True).first()
+    if not default_model:
+        default_model = AIModel.objects.filter(is_active=True).first()
     if default_model:
         model_name = default_model.model_name
     else:
-        model_name = 'gemini-flash-lite-latest'
-        logger.warning("No active AI model found, using fallback: gemini-flash-lite-latest")
+        model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
+        logger.warning(f"No active AI model found, using fallback: {model_name}")
     
     generator = QuizGenerator(model_name=model_name)
     
@@ -474,7 +477,7 @@ def quick_quiz(request):
     questions_data = generator.generate_quiz(
         language=language, 
         topic=topic, 
-        level='Easy', 
+        level='beginner',
         num_questions=5,
         include_code=False
     )
@@ -498,7 +501,7 @@ def quick_quiz(request):
             quiz = Quiz.objects.create(
                 user=request.user,
                 topic_description=f"{language} - {topic}",
-                difficulty='Easy',
+                difficulty='beginner',
                 total_questions=len(questions_data),
                 model_used=model_name,
             )
@@ -531,19 +534,23 @@ def quick_quiz(request):
         return redirect('quiz_player', quiz_id=quiz.id)
     else:
         # For guests: store in session for demo mode
-        # Optimize session data - keep only essential fields
+        # SEC-004: Limit session data size to prevent DoS
+        MAX_DEMO_QUESTIONS = 10
+        MAX_TEXT_LENGTH = 500
+        
+        # Optimize and limit session data
         optimized_questions = [
             {
-                'text': q.get('text', ''),
-                'options': q.get('options', []),
-                'correct_answer': q.get('correct_answer', ''),
-                'code_snippet': q.get('code_snippet') if q.get('code_snippet') else None,
+                'text': q.get('text', '')[:MAX_TEXT_LENGTH],
+                'options': q.get('options', [])[:6],  # Max 6 options
+                'correct_answer': str(q.get('correct_answer', ''))[:255],
+                'code_snippet': (q.get('code_snippet') or '')[:1000] if q.get('code_snippet') else None,
             }
-            for q in questions_data
+            for q in questions_data[:MAX_DEMO_QUESTIONS]  # Limit questions
         ]
         request.session['demo_quiz'] = {
             'questions': optimized_questions,
-            'topic': f"{language} - {topic}",
+            'topic': f"{language} - {topic}"[:100],
             'current_index': 0,
             'score': 0,
             'answers': [],
@@ -551,6 +558,7 @@ def quick_quiz(request):
         return redirect('demo_player')
 
 
+@require_GET
 def demo_player(request):
     """
     Demo quiz player for guests (session-based).
@@ -569,11 +577,7 @@ def demo_player(request):
         return redirect('demo_results')
     
     question = questions[current_index]
-    
-    # DEBUG: Log question structure
-    logger.info(f"Demo question keys: {question.keys() if isinstance(question, dict) else type(question)}")
-    logger.info(f"Demo question data: {question}")
-    
+
     return render(request, 'quizzes/demo_player.html', {
         'question': question,
         'question_num': current_index + 1,
@@ -583,11 +587,9 @@ def demo_player(request):
     })
 
 
+@require_http_methods(["POST"])
 def demo_submit(request):
     """Handle demo quiz answer submission."""
-    if request.method != 'POST':
-        return redirect('demo_player')
-    
     demo_quiz = request.session.get('demo_quiz')
     if not demo_quiz:
         return redirect('quick_quiz')

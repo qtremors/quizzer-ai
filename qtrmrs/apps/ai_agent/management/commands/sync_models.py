@@ -4,7 +4,8 @@ Django management command to sync available Gemini models to the database.
 Usage:
     python manage.py sync_models
 """
-import google.generativeai as genai
+import logging
+from google import genai
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from apps.quizzes.models import AIModel
@@ -15,7 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Configure the API
-        genai.configure(api_key=settings.GEMINI_API_KEY)
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
         
         self.stdout.write('🔍 Fetching available models from Gemini API...\n')
         
@@ -23,9 +24,9 @@ class Command(BaseCommand):
         created = 0
         
         try:
-            for model in genai.list_models():
+            for model in client.models.list():
                 # Only models that support content generation
-                if 'generateContent' not in model.supported_generation_methods:
+                if 'generateContent' not in model.supported_actions:
                     continue
                 
                 # Extract model name (remove 'models/' prefix)

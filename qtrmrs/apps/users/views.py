@@ -1,14 +1,43 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods, require_GET
+from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.db.models import Avg
 from django.core.paginator import Paginator
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
 from .forms import SignUpForm, LoginForm, UserUpdateForm 
+from .models import User
 from apps.quizzes.models import Quiz
+
+
+def send_verification_email(user, request):
+    """Send email verification link to user."""
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    
+    verification_url = request.build_absolute_uri(f'/auth/verify-email/{uid}-{token}/')
+    
+    subject = 'Verify your Quizzer AI account'
+    message = render_to_string('users/verification_email.txt', {
+        'user': user,
+        'verification_url': verification_url,
+    })
+    
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+    )
 
 
 @require_http_methods(["GET", "POST"])
@@ -19,8 +48,19 @@ def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user) # Auto-login after signup
+            user = form.save(commit=False)
+            user.is_email_verified = False
+            user.save()
+            
+            # Send verification email
+            try:
+                send_verification_email(user, request)
+                messages.success(request, 'Account created! Please check your email to verify your account.')
+            except Exception as e:
+                messages.warning(request, 'Account created but we couldn\'t send the verification email. You can request a new one after logging in.')
+            
+            # Auto-login (they can still use the app, just with a warning banner)
+            login(request, user)
             return redirect('home')
     else:
         form = SignUpForm()
@@ -53,6 +93,44 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@require_GET
+def verify_email(request, token):
+    """Verify user's email address."""
+    try:
+        # Token format: uid-token
+        uid, token_value = token.rsplit('-', 1)
+        user_id = force_str(urlsafe_base64_decode(uid))
+        user = User.objects.get(pk=user_id)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    
+    if user is not None and default_token_generator.check_token(user, token_value):
+        user.is_email_verified = True
+        user.save(update_fields=['is_email_verified'])
+        messages.success(request, 'Email verified successfully! Your account is now fully activated.')
+        return redirect('home')
+    else:
+        messages.error(request, 'Invalid or expired verification link.')
+        return redirect('login')
+
+
+@login_required
+@require_POST
+def resend_verification(request):
+    """Resend verification email."""
+    if request.user.is_email_verified:
+        messages.info(request, 'Your email is already verified.')
+        return redirect('home')
+    
+    try:
+        send_verification_email(request.user, request)
+        messages.success(request, 'Verification email sent! Please check your inbox.')
+    except Exception as e:
+        messages.error(request, 'Failed to send verification email. Please try again later.')
+    
+    return redirect('home')
 
 
 @login_required

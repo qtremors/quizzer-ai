@@ -2,9 +2,9 @@
 
 {% block content %}
 <div style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
-    
+
     <div class="card" style="width: 100%; max-width: 400px; padding: 40px;">
-        
+
         <div style="text-align: center; margin-bottom: 32px;">
             <h1 style="font-size: 1.75rem; margin-bottom: 8px;">Welcome Back</h1>
             <p style="color: var(--color-text-muted);">Sign in to continue learning</p>
@@ -12,11 +12,12 @@
 
         <form method="POST" class="auth-form">
             {% csrf_token %}
-            
+
             {% if form.non_field_errors %}
-                <div style="background: var(--color-error); color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
-                    {{ form.non_field_errors.0 }}
-                </div>
+            <div
+                style="background: var(--color-error); color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+                {{ form.non_field_errors.0 }}
+            </div>
             {% endif %}
 
             {% for field in form %}
@@ -26,7 +27,7 @@
                 </label>
                 {{ field }}
                 {% if field.errors %}
-                    <span style="color: var(--color-error); font-size: 0.85rem;">{{ field.errors.0 }}</span>
+                <span style="color: var(--color-error); font-size: 0.85rem;">{{ field.errors.0 }}</span>
                 {% endif %}
             </div>
             {% endfor %}
@@ -36,7 +37,13 @@
             </button>
         </form>
 
-        <div style="text-align: center; margin-top: 24px; font-size: 0.9rem;">
+        <div style="text-align: center; margin-top: 16px;">
+            <a href="{% url 'password_reset' %}" style="color: var(--color-text-muted); font-size: 0.9rem;">
+                Forgot your password?
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 16px; font-size: 0.9rem;">
             <span style="color: var(--color-text-muted);">Don't have an account?</span>
             <a href="{% url 'signup' %}" style="color: var(--color-primary); font-weight: 600;">Sign up</a>
         </div>
@@ -57,6 +64,7 @@
         font-size: 1rem;
         transition: border-color 0.2s;
     }
+
     .form-input:focus {
         border-color: var(--color-primary);
         box-shadow: 0 0 0 3px var(--color-primary-container);
