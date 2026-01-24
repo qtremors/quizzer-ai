@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
+# Render Build Script for Quizzer AI
 # exit on error
 set -o errexit
 
-# 1. Install Dependencies
-pip install -r requirements.txt
-
-# 2. Move into the project folder
+# 1. Move into the Django project folder (where pyproject.toml now lives)
 cd qtrmrs
 
-# 3. Set production settings for collectstatic
+# 2. Install Dependencies
+pip install -r requirements.txt
+
+# 3. Set production settings
 export DJANGO_SETTINGS_MODULE=config.settings
 
 # 4. Collect Static Files
