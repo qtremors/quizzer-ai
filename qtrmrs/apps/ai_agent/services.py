@@ -32,7 +32,7 @@ class QuizGenerator:
     
     def __init__(self, model_name: Optional[str] = None):
         self.client = get_gemini_client()
-        self.model_name = model_name or getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-latest')
+        self.model_name = model_name or getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
 
     def _handle_error(self, e: Exception, operation: str) -> AIError:
         """Parse exception and return appropriate AIError."""

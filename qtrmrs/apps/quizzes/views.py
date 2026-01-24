@@ -460,12 +460,15 @@ def quick_quiz(request):
     language, topic = random.choice(DEMO_TOPICS)
     
     # Get default model - handle database errors specifically
-    default_model = AIModel.objects.filter(is_active=True).first()
+    # Priority: 1. DB Default -> 2. Any DB Active -> 3. Settings/Env -> 4. Hardcoded
+    default_model = AIModel.objects.filter(is_active=True, is_default=True).first()
+    if not default_model:
+        default_model = AIModel.objects.filter(is_active=True).first()
     if default_model:
         model_name = default_model.model_name
     else:
-        model_name = 'gemini-flash-lite-latest'
-        logger.warning("No active AI model found, using fallback: gemini-flash-lite-latest")
+        model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
+        logger.warning(f"No active AI model found, using fallback: {model_name}")
     
     generator = QuizGenerator(model_name=model_name)
     
@@ -498,7 +501,7 @@ def quick_quiz(request):
             quiz = Quiz.objects.create(
                 user=request.user,
                 topic_description=f"{language} - {topic}",
-                difficulty='Easy',
+                difficulty='beginner',
                 total_questions=len(questions_data),
                 model_used=model_name,
             )

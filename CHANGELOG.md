@@ -19,6 +19,7 @@
 - **BUG-001:** `ratelimited_view` now uses template instead of inline HTML
 - **BUG-002:** `quick_quiz` level mismatch fixed (`'Easy'` → `'beginner'`)
 - **BUG-003:** Added `@require_GET` and `@require_http_methods` decorators to demo views
+- **BUG-004:** Fixed difficulty mismatch for logged-in users in `quick_quiz`
 
 ---
 

@@ -31,8 +31,8 @@ def ai_model(db):
     """Create a test AI model."""
     from apps.quizzes.models import AIModel
     return AIModel.objects.create(
-        model_name='gemini-flash-latest',
-        display_name='Gemini Flash (Latest)',
+        model_name='gemini-flash-lite-latest',
+        display_name='Gemini Flash Lite (Latest)',
         is_default=True,
         is_active=True
     )
@@ -51,7 +51,7 @@ def quiz(db, user, ai_model):
         difficulty='intermediate',
         total_questions=2,
         ai_model=ai_model,
-        model_used='gemini-flash-latest'
+        model_used='gemini-flash-lite-latest'
     )
     
     # Create questions with options

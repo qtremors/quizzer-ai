@@ -7,16 +7,6 @@
 
 ---
 
-## 🔴 Critical Priority (Fix Immediately)
-
-### Bugs
-- [ ] **BUG-004:** Difficulty mismatch in `quick_quiz` for logged-in users
-  - Line 501 in `quizzes/views.py` sets `difficulty='Easy'` (invalid)
-  - Should be `difficulty='beginner'` (lowercase, matching `DIFFICULTY_CHOICES`)
-  - **Impact:** Database inconsistency, potential query failures
-
----
-
 ## 🟠 High Priority (This Sprint)
 
 ### Testing
