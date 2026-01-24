@@ -26,11 +26,15 @@ dj-database-url==3.1.0
 django==5.2.10 ; python_full_version < '3.12'
     # via
     #   dj-database-url
+    #   django-csp
     #   quizzer-ai
 django==6.0.1 ; python_full_version >= '3.12'
     # via
     #   dj-database-url
+    #   django-csp
     #   quizzer-ai
+django-csp==4.0
+    # via quizzer-ai
 django-ratelimit==4.1.0
     # via quizzer-ai
 google-auth==2.47.0
@@ -53,7 +57,9 @@ idna==3.11
     #   httpx
     #   requests
 packaging==26.0
-    # via gunicorn
+    # via
+    #   django-csp
+    #   gunicorn
 pillow==12.1.0
     # via quizzer-ai
 psycopg2-binary==2.9.11

@@ -10,14 +10,14 @@
 ## � Critical (High Priority)
 
 ### Security
-- [ ] **SEC-001:** CSP headers defined but not enforced - Missing `django-csp` middleware integration
-  - `production.py` defines CSP_* variables but no middleware applies them
+- [x] **SEC-001:** CSP headers defined but not enforced - Missing `django-csp` middleware integration
+  - ✅ Added `django-csp` package and CSP middleware in production
 - [x] **SEC-002:** Missing password reset flow - No forgot password functionality
   - ✅ Implemented with Django auth views and custom templates (30-min token expiry)
 - [x] **SEC-003:** Missing email verification on signup
   - ✅ Implemented with warning banner for unverified users
-- [ ] **SEC-004:** Demo quiz session data not size-limited
-  - `quick_quiz` stores unlimited question data in session, potential DoS vector
+- [x] **SEC-004:** Demo quiz session data not size-limited
+  - ✅ Added limits: max 10 questions, text truncation, option limits
 
 ### Bugs
 - [ ] **BUG-001:** `ratelimited_view` uses inline HTML instead of template

@@ -77,6 +77,9 @@ if not DEBUG:
         MIDDLEWARE.insert(middleware_idx, 'whitenoise.middleware.WhiteNoiseMiddleware')
     except ValueError:
         MIDDLEWARE.insert(0, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    
+    # Add CSP middleware (after WhiteNoise)
+    MIDDLEWARE.append('csp.middleware.CSPMiddleware')
 
 ROOT_URLCONF = 'config.urls'
 

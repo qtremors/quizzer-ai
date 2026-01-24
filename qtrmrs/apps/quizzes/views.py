@@ -531,19 +531,23 @@ def quick_quiz(request):
         return redirect('quiz_player', quiz_id=quiz.id)
     else:
         # For guests: store in session for demo mode
-        # Optimize session data - keep only essential fields
+        # SEC-004: Limit session data size to prevent DoS
+        MAX_DEMO_QUESTIONS = 10
+        MAX_TEXT_LENGTH = 500
+        
+        # Optimize and limit session data
         optimized_questions = [
             {
-                'text': q.get('text', ''),
-                'options': q.get('options', []),
-                'correct_answer': q.get('correct_answer', ''),
-                'code_snippet': q.get('code_snippet') if q.get('code_snippet') else None,
+                'text': q.get('text', '')[:MAX_TEXT_LENGTH],
+                'options': q.get('options', [])[:6],  # Max 6 options
+                'correct_answer': str(q.get('correct_answer', ''))[:255],
+                'code_snippet': (q.get('code_snippet') or '')[:1000] if q.get('code_snippet') else None,
             }
-            for q in questions_data
+            for q in questions_data[:MAX_DEMO_QUESTIONS]  # Limit questions
         ]
         request.session['demo_quiz'] = {
             'questions': optimized_questions,
-            'topic': f"{language} - {topic}",
+            'topic': f"{language} - {topic}"[:100],
             'current_index': 0,
             'score': 0,
             'answers': [],

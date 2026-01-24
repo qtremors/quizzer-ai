@@ -12,10 +12,14 @@
 - **Password Reset Flow:** Complete forgot password functionality with email-based recovery (30-min token expiry)
 - **Email Verification:** Signup sends verification email; unverified users see warning banner with resend option
 - **Google SMTP:** Gmail SMTP configured for production email delivery
+- **CSP Enforcement:** Added `django-csp` middleware to enforce Content Security Policy headers in production
 
 ### Changed
 - **Settings Consolidation:** Merged `base.py`, `local.py`, `production.py` into unified `settings.py` with DEBUG-based toggling
 - **Timezone:** Changed from UTC to IST (Asia/Kolkata)
+
+### Security
+- **Session Size Limits:** Demo quiz session data now capped (max 10 questions, text truncation) to prevent DoS
 
 ---
 
