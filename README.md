@@ -46,14 +46,13 @@
 git clone https://github.com/qtremors/quizzer-ai.git
 cd quizzer-ai
 
-# Install dependencies with uv
-uv sync
-
 # Setup environment
 cp .env.example .env
+# Add your GEMINI_API_KEY to .env
 
-# Run the project
+# Install and run (from qtrmrs folder)
 cd qtrmrs
+uv sync
 uv run python manage.py migrate
 uv run python manage.py runserver
 ```
@@ -87,17 +86,22 @@ Visit **http://127.0.0.1:8000/**
 
 ```
 quizzer-ai/
-├── qtrmrs/
-│   ├── apps/                 # Modular Domain logic
-│   │   ├── ai_agent/         # AI Service layer
-│   │   ├── quizzes/          # Core Quiz domain
-│   │   └── users/            # Auth & Gamification
-│   ├── config/               # Settings & URL configuration
-│   └── static/               # Assets, CSS, and JS
-├── DEVELOPMENT.md            # Architecture & Setup details
+├── .env.example              # Environment template
+├── build.sh                  # Render deployment script
 ├── CHANGELOG.md              # Version history
+├── DEVELOPMENT.md            # Architecture & Setup details
 ├── LICENSE.md                # License terms (TSL)
-└── README.md
+├── README.md                 # This file
+├── TASKS.md                  # Known issues & roadmap
+└── qtrmrs/                   # Django project
+    ├── pyproject.toml        # Python dependencies
+    ├── apps/                 # Modular domain logic
+    │   ├── ai_agent/         # AI Service layer
+    │   ├── quizzes/          # Core Quiz domain
+    │   └── users/            # Auth & Gamification
+    ├── config/               # Settings & URL config
+    ├── static/               # Assets, CSS, and JS
+    └── templates/            # Django templates
 ```
 
 ---

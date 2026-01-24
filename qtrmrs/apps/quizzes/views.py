@@ -474,7 +474,7 @@ def quick_quiz(request):
     questions_data = generator.generate_quiz(
         language=language, 
         topic=topic, 
-        level='Easy', 
+        level='beginner',
         num_questions=5,
         include_code=False
     )
@@ -555,6 +555,7 @@ def quick_quiz(request):
         return redirect('demo_player')
 
 
+@require_GET
 def demo_player(request):
     """
     Demo quiz player for guests (session-based).
@@ -573,11 +574,7 @@ def demo_player(request):
         return redirect('demo_results')
     
     question = questions[current_index]
-    
-    # DEBUG: Log question structure
-    logger.info(f"Demo question keys: {question.keys() if isinstance(question, dict) else type(question)}")
-    logger.info(f"Demo question data: {question}")
-    
+
     return render(request, 'quizzes/demo_player.html', {
         'question': question,
         'question_num': current_index + 1,
@@ -587,11 +584,9 @@ def demo_player(request):
     })
 
 
+@require_http_methods(["POST"])
 def demo_submit(request):
     """Handle demo quiz answer submission."""
-    if request.method != 'POST':
-        return redirect('demo_player')
-    
     demo_quiz = request.session.get('demo_quiz')
     if not demo_quiz:
         return redirect('quick_quiz')

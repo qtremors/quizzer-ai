@@ -1,8 +1,24 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.1  
-> **Last Updated:** 2026-01-23
+> **Version:** 1.5.3  
+> **Last Updated:** 2026-01-24
+
+---
+
+## [1.5.3] - 2026-01-24
+
+### Added
+- **Ratelimited Template:** New `templates/core/ratelimited.html` with proper styling
+
+### Changed
+- **Project Restructure:** Moved `pyproject.toml`, `uv.lock`, `requirements.txt` into `qtrmrs/` folder for cleaner root
+- **UI Consistency:** Replaced all emojis with Material Symbols Outlined icons
+
+### Fixed
+- **BUG-001:** `ratelimited_view` now uses template instead of inline HTML
+- **BUG-002:** `quick_quiz` level mismatch fixed (`'Easy'` → `'beginner'`)
+- **BUG-003:** Added `@require_GET` and `@require_http_methods` decorators to demo views
 
 ---
 
@@ -26,81 +42,82 @@
 ## [1.5.1] - 2026-01-23
 
 ### Changed
-- migrated from `google-generativeai` to new `google-genai` SDK
-- updated `pyproject.toml` to disable package mode
-- standardized DB configuration using `dj-database-url`
+- Migrated from `google-generativeai` to new `google-genai` SDK
+- Updated `pyproject.toml` to disable package mode
+- Standardized DB configuration using `dj-database-url`
 
 ### Added
-- management command `sync_models` to populate AI models on deployment
-- management command `set_active_models` to configure default AI models
+- Management command `sync_models` to populate AI models on deployment
+- Management command `set_active_models` to configure default AI models
 
+---
 
 ## [1.5.0] - 2026-01-02
 
 ### Added
-- Badge Display: Earned badges now shown on dashboard.
-- Quiz Deletion: Delete button with confirmation on dashboard.
-- Learning Interests UI: Added to settings page with edit form.
-- Dashboard Stats: Added Best Score and Correct Answers stats.
+- Badge Display: Earned badges now shown on dashboard
+- Quiz Deletion: Delete button with confirmation on dashboard
+- Learning Interests UI: Added to settings page with edit form
+- Dashboard Stats: Added Best Score and Correct Answers stats
 
 ### Changed
-- Bulk Create: Options now use `bulk_create()` for fewer DB queries.
-- UserAnswer Ordering: Added `ordering = ['id']` to Meta class.
-- Import Cleanup: Consolidated all inline imports to top-level.
+- Bulk Create: Options now use `bulk_create()` for fewer DB queries
+- UserAnswer Ordering: Added `ordering = ['id']` to Meta class
+- Import Cleanup: Consolidated all inline imports to top-level
 
 ### Fixed
-- Quick Quiz Key Mismatch: Fixed `'question'` → `'text'` key inconsistency.
-- Demo Quiz Timer: Added Alpine.js timer to match main player UX.
-- XP Exploit: Added `xp_awarded` field to prevent retry farming.
-- Skip Confirmation: Added confirm dialog before skipping questions.
+- Quick Quiz Key Mismatch: Fixed `'question'` → `'text'` key inconsistency
+- Demo Quiz Timer: Added Alpine.js timer to match main player UX
+- XP Exploit: Added `xp_awarded` field to prevent retry farming
+- Skip Confirmation: Added confirm dialog before skipping questions
 
 ---
 
 ## [1.3.0] - 2025-12-12
 
 ### Added
-- Gamification System: XP, Leveling, Streaks, and 9 Achievement Badges.
-- Quick Quiz (Demo Mode): One-click guest access for random topic quizzes.
-- Confetti Animation: Celebration effect on 100% scores.
+- Gamification System: XP, Leveling, Streaks, and 9 Achievement Badges
+- Quick Quiz (Demo Mode): One-click guest access for random topic quizzes
+- Confetti Animation: Celebration effect on 100% scores
 
 ### Technical
-- New Models: `UserProfile`, `Badge`, `UserBadge`.
-- Service Layer: `apps/users/gamification.py` for logic.
+- New Models: `UserProfile`, `Badge`, `UserBadge`
+- Service Layer: `apps/users/gamification.py` for logic
 
 ---
 
 ## [1.2.0] - 2025-12-12
 
 ### Fixed
-- Type Comparison: Fixed option matching (int vs string) in quiz creation.
-- Theme Flash: Added inline script to prevent FOUC (Flash of Unstyled Content).
-- Dropdown Hover: Theme-aware hover colors in navigation.
+- Type Comparison: Fixed option matching (int vs string) in quiz creation
+- Theme Flash: Added inline script to prevent FOUC (Flash of Unstyled Content)
+- Dropdown Hover: Theme-aware hover colors in navigation
 
 ### Changed
-- CSS Refinement: Comprehensive viewport protection and wrapping for mobile.
-- Code Cleanup: Removed stale `is_study_mode` field.
+- CSS Refinement: Comprehensive viewport protection and wrapping for mobile
+- Code Cleanup: Removed stale `is_study_mode` field
 
 ---
 
 ## [1.1.0] - 2025-12-12
 
 ### Added
-- Theme Toggle: Dark/Light switcher with localStorage persistence.
-- Toast Notifications: Alpine.js based notification system.
-- Skeleton Loaders: Shimmer animations for loading states.
-- Timer Per Question: Live tracking and results analytics.
+- Theme Toggle: Dark/Light switcher with localStorage persistence
+- Toast Notifications: Alpine.js based notification system
+- Skeleton Loaders: Shimmer animations for loading states
+- Timer Per Question: Live tracking and results analytics
 
 ### Accessibility
-- Skip to Content link.
-- Focus-visible outlines.
-- Reduced Motion & High Contrast support.
+- Skip to Content link
+- Focus-visible outlines
+- Reduced Motion & High Contrast support
 
 ---
 
 ## [1.0.0] - 2025-11-19
 
 ### Added
-- Service-Oriented Architecture: Modular `apps/` structure.
-- AI Integration: `QuizGenerator` service for Google Gemini API.
-- Intent Parsing: Natural Language Agent for chat-based quiz requests.
-- Immersive Player: Full-screen, HTMX-powered distraction-free UI.
+- Service-Oriented Architecture: Modular `apps/` structure
+- AI Integration: `QuizGenerator` service for Google Gemini API
+- Intent Parsing: Natural Language Agent for chat-based quiz requests
+- Immersive Player: Full-screen, HTMX-powered distraction-free UI

@@ -1,31 +1,9 @@
 # Quizzer AI - Tasks
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.1  
-> **Last Updated:** 2026-01-23  
+> **Version:** 1.5.3  
+> **Last Updated:** 2026-01-24  
 > **Last Review:** Comprehensive Codebase Review
-
----
-
-## � Critical (High Priority)
-
-### Security
-- [x] **SEC-001:** CSP headers defined but not enforced - Missing `django-csp` middleware integration
-  - ✅ Added `django-csp` package and CSP middleware in production
-- [x] **SEC-002:** Missing password reset flow - No forgot password functionality
-  - ✅ Implemented with Django auth views and custom templates (30-min token expiry)
-- [x] **SEC-003:** Missing email verification on signup
-  - ✅ Implemented with warning banner for unverified users
-- [x] **SEC-004:** Demo quiz session data not size-limited
-  - ✅ Added limits: max 10 questions, text truncation, option limits
-
-### Bugs
-- [ ] **BUG-001:** `ratelimited_view` uses inline HTML instead of template
-  - `core/views.py:16-27` - Inline styled HTML hardcoded in view function
-- [ ] **BUG-002:** `quick_quiz` level mismatch - Uses 'Easy' string but model expects lowercase 'beginner'
-  - `quizzes/views.py:477` - `level='Easy'` should be `level='beginner'`
-- [ ] **BUG-003:** Missing @login_required on `demo_submit` and `demo_player`
-  - Not a bug per se, but these views lack `@require_http_methods` decorator consistency
 
 ---
 
@@ -92,7 +70,6 @@
 - [ ] **CLEAN-001:** Remove commented code in `base.py:34` (rest_framework)
 - [ ] **CLEAN-002:** Empty `models.py` in `core` and `ai_agent` apps
 - [ ] **CLEAN-003:** Unused `tests.py` files in `core` and `ai_agent`
-- [ ] **CLEAN-004:** `check_models.py` in root - appears to be debug script
 
 ### Documentation
 - [ ] **DOC-001:** Missing API documentation for view endpoints
