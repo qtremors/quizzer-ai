@@ -2,7 +2,7 @@
 
 > Comprehensive documentation for developers working on Quizzer AI.
 
-**Version:** 1.5.1 | **Last Updated:** 2026-01-23
+**Version:** 1.5.3 | **Last Updated:** 2026-01-24
 
 ---
 
@@ -63,11 +63,11 @@ quizzer-ai/
 │   │   ├── core/                 # Landing pages & layout
 │   │   ├── quizzes/              # Main Business Logic
 │   │   └── users/                # Custom Auth & Profiles
-│   ├── config/                   # Settings (Split into base/local/prod)
+│   ├── config/                   # Settings & URL config
 │   ├── static/                   # CSS/JS/Images
 │   ├── templates/                # HTML (organized by app)
-│   └── conftest.py               # Pytest fixtures
-├── pyproject.toml                # Dependencies & pytest config
+│   ├── conftest.py               # Pytest fixtures
+│   └── pyproject.toml            # Dependencies & pytest config
 ├── DEVELOPMENT.md                # This file
 ├── CHANGELOG.md                  # Version history
 ├── LICENSE.md                    # License terms
@@ -78,7 +78,7 @@ quizzer-ai/
 
 ## Database Schema
 
-### Models Overview (6 total)
+### Models Overview (9 total)
 
 | Model | Purpose | Key Fields |
 |-------|---------|------------|
@@ -88,6 +88,9 @@ quizzer-ai/
 | **Question** | Generated questions | `text`, `code_snippet`, `explanation` |
 | **Option** | Multiple choice options | `text`, `is_correct` |
 | **UserAnswer** | User responses | `selected_option`, `is_correct`, `time_taken` |
+| **AIModel** | Gemini model versions | `model_name`, `is_active`, `is_default` |
+| **Badge** | Achievement definitions | `name`, `icon`, `requirement_type` |
+| **UserBadge** | Earned achievements | `user`, `badge`, `earned_at` |
 
 ### Relationships
 
@@ -147,7 +150,7 @@ uv run python qtrmrs/manage.py set_active_models
 |----------|-------------|---------|
 | `DEBUG` | Enables debug mode | `False` |
 | `DJANGO_LOG_LEVEL` | Log verbosity (INFO, DEBUG, ERROR) | `INFO` |
-| `DEFAULT_AI_MODEL` | Gemini model version | `gemini-flash-litelatest` |
+| `DEFAULT_AI_MODEL` | Gemini model version | `gemini-flash-lite-latest` |
 
 ---
 
@@ -155,9 +158,7 @@ uv run python qtrmrs/manage.py set_active_models
 
 ### Settings Modules
 
-- `config/settings/base.py`: Shared configuration, logging setup, and AI settings.
-- `config/settings/local.py`: Development overrides (DEBUG=True).
-- `config/settings/production.py`: Security headers, database URL, and static file hosting.
+- `config/settings.py`: Unified settings with DEBUG-based toggling for dev/production.
 
 ---
 
@@ -184,7 +185,7 @@ uv run pytest --cov=apps --cov-report=html
 - [ ] Configure `ALLOWED_HOSTS`.
 - [ ] Run `python manage.py collectstatic`.
 - [ ] Set up PostgreSQL via `DATABASE_URL`.
-- [ ] Configure `SECURE_SSL_REDIRECT` in `production.py`.
+- [ ] Configure `SECURE_SSL_REDIRECT` in `settings.py`.
 
 ---
 

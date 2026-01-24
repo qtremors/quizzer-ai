@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET
 from django.contrib import messages
-from django.db import transaction, IntegrityError
+from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit

@@ -97,6 +97,7 @@ quizzer-ai/
     ├── pyproject.toml        # Python dependencies
     ├── apps/                 # Modular domain logic
     │   ├── ai_agent/         # AI Service layer
+    │   ├── core/             # Landing pages & layout
     │   ├── quizzes/          # Core Quiz domain
     │   └── users/            # Auth & Gamification
     ├── config/               # Settings & URL config

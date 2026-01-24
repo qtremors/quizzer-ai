@@ -5,7 +5,7 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
-from .services import QuizGenerator
+from .services import QuizGenerator, AIError
 from apps.quizzes.models import Quiz, Question, Option, AIModel
 
 
@@ -76,7 +76,6 @@ def process_chat_message(request):
 
     # Handle errors with specific messages
     if not questions_data:
-        from .services import AIError
         if isinstance(questions_data, AIError):
             return render(request, 'ai_agent/partials/chat_error.html', {
                 'message': questions_data.message,

@@ -3,8 +3,7 @@
 # exit on error
 set -o errexit
 
-# 1. Move into the Django project folder (where pyproject.toml now lives)
-cd qtrmrs
+# 1. (Already in project root)
 
 # 2. Install Dependencies
 pip install -r requirements.txt
