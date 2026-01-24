@@ -6,6 +6,19 @@
 
 ---
 
+## [1.5.2] - 2026-01-24
+
+### Added
+- **Password Reset Flow:** Complete forgot password functionality with email-based recovery (30-min token expiry)
+- **Email Verification:** Signup sends verification email; unverified users see warning banner with resend option
+- **Google SMTP:** Gmail SMTP configured for production email delivery
+
+### Changed
+- **Settings Consolidation:** Merged `base.py`, `local.py`, `production.py` into unified `settings.py` with DEBUG-based toggling
+- **Timezone:** Changed from UTC to IST (Asia/Kolkata)
+
+---
+
 ## [1.5.1] - 2026-01-23
 
 ### Changed

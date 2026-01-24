@@ -12,10 +12,10 @@
 ### Security
 - [ ] **SEC-001:** CSP headers defined but not enforced - Missing `django-csp` middleware integration
   - `production.py` defines CSP_* variables but no middleware applies them
-- [ ] **SEC-002:** Missing password reset flow - No forgot password functionality
-  - Users cannot recover accounts if password is forgotten
-- [ ] **SEC-003:** Missing email verification on signup
-  - Accounts created without email confirmation
+- [x] **SEC-002:** Missing password reset flow - No forgot password functionality
+  - ✅ Implemented with Django auth views and custom templates (30-min token expiry)
+- [x] **SEC-003:** Missing email verification on signup
+  - ✅ Implemented with warning banner for unverified users
 - [ ] **SEC-004:** Demo quiz session data not size-limited
   - `quick_quiz` stores unlimited question data in session, potential DoS vector
 
@@ -124,7 +124,7 @@
 - HTMX for single-page interactivity without high JS overhead
 - Custom User model with email as primary identifier
 - Gamification system: XP, Levels (1-∞), Streaks, 9 Badge types
-- Split settings: base/local/production with proper security headers
+- Split settings: unified `settings.py` with DEBUG-based toggling for production security
 - Rate limiting via `django-ratelimit` decorator
 
 ---

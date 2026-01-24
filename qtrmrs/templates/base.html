@@ -121,6 +121,26 @@
         </div>
     </header>
 
+    <!-- Email Verification Warning Banner -->
+    {% if user.is_authenticated and not user.is_email_verified %}
+    <div
+        style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px 20px; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <span style="display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-outlined" style="font-size: 20px;">warning</span>
+                <span>Please verify your email address to fully activate your account.</span>
+            </span>
+            <form action="{% url 'resend_verification' %}" method="POST" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500;">
+                    Resend Email
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
     <main id="main-content" class="container" role="main">
         {% block content %}{% endblock %}
     </main>
