@@ -19,9 +19,12 @@ python manage.py migrate
 
 # 6. Create Superuser (only if it doesn't exist)
 python -c "
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
 from django.contrib.auth import get_user_model
 User = get_user_model()
-import os
 email = os.environ.get('DJANGO_SUPERUSER_EMAIL', '')
 if email and not User.objects.filter(email=email).exists():
     User.objects.create_superuser(
