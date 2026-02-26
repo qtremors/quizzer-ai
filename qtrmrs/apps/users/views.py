@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
+from django_ratelimit.decorators import ratelimit
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
@@ -23,7 +24,7 @@ def send_verification_email(user, request):
     token = default_token_generator.make_token(user)
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     
-    verification_url = request.build_absolute_uri(f'/auth/verify-email/{uid}-{token}/')
+    verification_url = request.build_absolute_uri(f'/auth/verify-email/{uid}/{token}/')
     
     subject = 'Verify your Quizzer AI account'
     message = render_to_string('users/verification_email.txt', {
@@ -96,17 +97,15 @@ def logout_view(request):
 
 
 @require_GET
-def verify_email(request, token):
+def verify_email(request, uidb64, token):
     """Verify user's email address."""
     try:
-        # Token format: uid-token
-        uid, token_value = token.rsplit('-', 1)
-        user_id = force_str(urlsafe_base64_decode(uid))
+        user_id = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=user_id)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     
-    if user is not None and default_token_generator.check_token(user, token_value):
+    if user is not None and default_token_generator.check_token(user, token):
         user.is_email_verified = True
         user.save(update_fields=['is_email_verified'])
         messages.success(request, 'Email verified successfully! Your account is now fully activated.')
@@ -117,6 +116,7 @@ def verify_email(request, token):
 
 
 @login_required
+@ratelimit(key='user', rate='3/h', method='POST', block=True)
 @require_POST
 def resend_verification(request):
     """Resend verification email."""

@@ -11,7 +11,7 @@ urlpatterns = [
     path('settings/', views.account_settings, name='account_settings'),
     
     # Email Verification
-    path('verify-email/<str:token>/', views.verify_email, name='verify_email'),
+    path('verify-email/<uidb64>/<token>/', views.verify_email, name='verify_email'),
     path('resend-verification/', views.resend_verification, name='resend_verification'),
     
     # Password Reset (Django built-in views with custom templates)

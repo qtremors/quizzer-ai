@@ -624,6 +624,7 @@ def demo_submit(request):
     return redirect('demo_player')
 
 
+@require_GET
 def demo_results(request):
     """Show demo quiz results and prompt to sign up."""
     demo_quiz = request.session.get('demo_quiz')

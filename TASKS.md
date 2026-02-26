@@ -1,16 +1,15 @@
 # Quizzer AI - Tasks
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.3  
-> **Last Updated:** 2026-02-18  
-> **Last Review:** Comprehensive End-to-End Codebase Audit (2026-02-18)
+> **Version:** 1.5.4  
+> **Last Updated:** 2026-02-26  
 
 ---
 
 ## 🔴 Critical Priority
 
 ### Security
-- [ ] **SEC-009:** Email verification token parsing uses fragile `rsplit('-', 1)`
+- [x] **SEC-009:** Email verification token parsing uses fragile `rsplit('-', 1)`
   - `verify_email` in `users/views.py` splits the URL token with `rsplit('-', 1)` to separate `uid` from `token`
   - Django's token generator produces tokens containing hyphens (e.g., `cbnh7q-abc123...`), so `rsplit('-', 1)` only splits the *last* hyphen
   - This means the `uid` portion absorbs part of the token, so `check_token()` will always fail
@@ -19,18 +18,18 @@
   - **Fix:** Use separate URL path segments like `verify-email/<uidb64>/<token>/` matching Django's own pattern
   - **Effort:** 30 minutes
 
-- [ ] **SEC-010:** No rate limiting on `resend_verification` endpoint
+- [x] **SEC-010:** No rate limiting on `resend_verification` endpoint
   - Attackers can abuse this to send unlimited verification emails, causing email flooding/DoS
   - Add `@ratelimit(key='user', rate='3/h')` decorator
   - **Effort:** 10 minutes
 
-- [ ] **SEC-011:** `demo_results` view missing HTTP method restriction
+- [x] **SEC-011:** `demo_results` view missing HTTP method restriction
   - `demo_results` in `quizzes/views.py` (line 627) accepts any HTTP method including POST/PUT/DELETE
   - All other views properly use `@require_GET` or `@require_http_methods`
   - Add `@require_GET` decorator for consistency
   - **Effort:** 5 minutes
 
-- [ ] **SEC-012:** `check_models.py` loads `.env` from wrong directory
+- [x] **SEC-012:** `check_models.py` loads `.env` from wrong directory
   - Calls `load_dotenv()` with no path, which only checks the current directory
   - The `.env` file lives at the project root (`quizzer-ai/.env`), but `check_models.py` is in `qtrmrs/`
   - If run as `uv run check_models.py` from `qtrmrs/`, it won't find the API key
@@ -101,10 +100,8 @@
   - Reference from: ai_agent/views.py, quizzes/views.py (×2)
   - **Effort:** 30 minutes
 
-- [ ] **CODE-010:** Settings.py line 150 has typo in DEFAULT_AI_MODEL default
-  - Currently: `gemini-flash-litelatest` (missing hyphen)
-  - Should be: `gemini-flash-lite-latest`
-  - **Effort:** 5 minutes
+- [x] ~~**CODE-010:** Settings.py line 150 has typo in DEFAULT_AI_MODEL default~~
+  - **FALSE:** Verified `settings.py` line 237 has the correct value `'gemini-flash-lite-latest'`. No typo exists.
 
 - [ ] **CODE-011:** `format_duration()` in `quizzes/utils.py` duplicates `format_time` template filter
   - `quiz_filters.py` has a `format_time` filter that does the same thing as `format_duration()` in `utils.py`
@@ -225,10 +222,8 @@
   - Add skeleton loader or spinner
   - **Effort:** 1-2 hours
 
-- [ ] **UX-002:** Confetti animation mentioned in CHANGELOG but not visible
-  - Feature may be incomplete or CSS not loaded
-  - Verify and fix or remove from CHANGELOG
-  - **Effort:** 30 minutes
+- [x] ~~**UX-002:** Confetti animation mentioned in CHANGELOG but not visible~~
+  - **FALSE:** Confetti IS implemented in `templates/quizzes/results.html` using `canvas-confetti` CDN library with multiple bursts for 100% scores.
 
 - [ ] **UX-004:** No keyboard navigation for quiz options
   - Add keyboard shortcuts (1-4 or A-D) for option selection
@@ -276,9 +271,10 @@
   - User tests file is named `tests.py` not `test_*.py` — yet it works because pytest discovers `TestXxx` classes
   - However, this is fragile; either rename the file or add `tests.py` to the pattern
   - **Effort:** 5 minutes
-- [ ] **CLEAN-006:** Unused import: `HttpResponse` imported from `django.shortcuts` in `quizzes/views.py`
+- [ ] **CLEAN-006:** Misleading import: `HttpResponse` imported from `django.shortcuts` in `quizzes/views.py`
   - Line 1: `from django.shortcuts import render, redirect, get_object_or_404, HttpResponse`
-  - `HttpResponse` is actually from `django.http`, not `django.shortcuts` (Django re-exports it, but it's misleading)
+  - `HttpResponse` IS used (lines 142, 186, 290) — it is NOT unused
+  - However, it's imported from `django.shortcuts` instead of `django.http` (Django re-exports it, but the import source is misleading)
   - **Effort:** 2 minutes
 
 ### Documentation

@@ -1,8 +1,18 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.3  
-> **Last Updated:** 2026-01-24
+> **Version:** 1.5.4  
+> **Last Updated:** 2026-02-26
+
+---
+
+## [1.5.4] - 2026-02-26
+
+### Security
+- **SEC-009:** Fixed email verification token parsing — URL now uses separate `<uidb64>/<token>/` path segments matching Django's own pattern, fixing always-failing `check_token()` due to hyphen splitting
+- **SEC-010:** Added `@ratelimit(key='user', rate='3/h')` to `resend_verification` endpoint to prevent email flooding/DoS
+- **SEC-011:** Added `@require_GET` decorator to `demo_results` view for HTTP method restriction consistency
+- **SEC-012:** Fixed `check_models.py` `.env` path to resolve relative to script location instead of CWD
 
 ---
 
