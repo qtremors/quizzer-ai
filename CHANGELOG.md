@@ -1,8 +1,20 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.6  
+> **Version:** 1.5.7  
 > **Last Updated:** 2026-02-26
+
+---
+
+## [1.5.7] - 2026-02-26
+
+### Performance
+- **PERF-001:** Added `prefetch_related('question__options')` to `quiz_results` query to eliminate N+1 queries
+
+### Changed
+- **CODE-009:** Replaced hardcoded `'gemini-flash-lite-latest'` magic string with `settings.DEFAULT_AI_MODEL` across 4 files
+- **CODE-011:** Consolidated `format_time` template filter to delegate to `format_duration()` from utils (now supports hours)
+- **CODE-012:** Added singleton caching to `get_gemini_client()` — client is created once per process
 
 ---
 

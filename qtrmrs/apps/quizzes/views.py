@@ -75,7 +75,7 @@ def create_quiz(request):
     # --- Handle Model Selection ---
     model_id = request.POST.get('ai_model')
     ai_model = None
-    model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
+    model_name = settings.DEFAULT_AI_MODEL
     
     if model_id:
         try:
@@ -290,7 +290,7 @@ def submit_answer(request, quiz_id, question_id):
 def quiz_results(request, quiz_id):
     """Renders the results page."""
     quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
-    user_answers = UserAnswer.objects.filter(quiz=quiz).select_related('question', 'selected_option')
+    user_answers = UserAnswer.objects.filter(quiz=quiz).select_related('question', 'selected_option').prefetch_related('question__options')
     
     correct_count = user_answers.filter(is_correct=True).count()
     skipped_count = user_answers.filter(selected_option__isnull=True).count()
@@ -455,7 +455,7 @@ def quick_quiz(request):
     if default_model:
         model_name = default_model.model_name
     else:
-        model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
+        model_name = settings.DEFAULT_AI_MODEL
         logger.warning(f"No active AI model found, using fallback: {model_name}")
     
     generator = QuizGenerator(model_name=model_name)

@@ -234,7 +234,8 @@ if not DEBUG:
 # =============================================================================
 
 RATELIMIT_VIEW = 'apps.core.views.ratelimited_view'
-DEFAULT_AI_MODEL = os.getenv('DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
+DEFAULT_FALLBACK_MODEL = 'gemini-flash-lite-latest'
+DEFAULT_AI_MODEL = os.getenv('DEFAULT_AI_MODEL', DEFAULT_FALLBACK_MODEL)
 QUIZ_RATE_LIMIT = os.getenv('QUIZ_RATE_LIMIT', '10/m')
 
 # =============================================================================

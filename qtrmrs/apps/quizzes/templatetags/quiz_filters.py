@@ -1,20 +1,15 @@
 from django import template
+from apps.quizzes.utils import format_duration
 
 register = template.Library()
 
 
 @register.filter
 def format_time(seconds):
-    """Format seconds into human-readable time string"""
-    if seconds is None or seconds == 0:
+    """Format seconds into human-readable time string."""
+    if seconds is None:
         return "0s"
-    
-    seconds = int(seconds)
-    if seconds >= 60:
-        minutes = seconds // 60
-        secs = seconds % 60
-        return f"{minutes}m {secs}s"
-    return f"{seconds}s"
+    return format_duration(int(seconds))
 
 
 @register.filter
