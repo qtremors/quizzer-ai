@@ -1,8 +1,19 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.4  
+> **Version:** 1.5.5  
 > **Last Updated:** 2026-02-26
+
+---
+
+## [1.5.5] - 2026-02-26
+
+### Fixed
+- **BUG-005:** `retry_quiz` now resets `xp_awarded` flag so users earn XP on retakes
+- **BUG-006:** Fixed race condition in `submit_answer` — consolidated all quiz field updates onto `locked_quiz` inside the atomic block
+- **BUG-007:** `quick_quiz` authenticated path now sets `quiz_type='tech'` and `language` fields
+- **BUG-008:** `quick_quiz` authenticated path now saves `explanation` on questions
+- **BUG-009:** `quiz_results` score recalculation guard tightened to avoid false triggers on legitimate 0% scores
 
 ---
 

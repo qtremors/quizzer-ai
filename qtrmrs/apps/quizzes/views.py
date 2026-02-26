@@ -244,6 +244,10 @@ def submit_answer(request, quiz_id, question_id):
             # Re-fetch quiz with lock to prevent concurrent XP awards
             locked_quiz = Quiz.objects.select_for_update().get(id=quiz.id)
             
+            # Consolidate all field updates on the locked object to avoid race conditions
+            locked_quiz.score = quiz.score
+            locked_quiz.completed_at = quiz.completed_at
+            
             if not locked_quiz.xp_awarded:
                 # Get user profile with lock
                 from apps.users.models import UserProfile
@@ -266,8 +270,8 @@ def submit_answer(request, quiz_id, question_id):
                 # Update cached stats
                 profile.total_correct_answers += correct_count
                 profile.total_study_time += total_time
-                if quiz.score > profile.best_score:
-                    profile.best_score = quiz.score
+                if locked_quiz.score > profile.best_score:
+                    profile.best_score = locked_quiz.score
                 
                 profile.save()
                 
@@ -276,10 +280,11 @@ def submit_answer(request, quiz_id, question_id):
                 
                 # Mark XP as awarded for this quiz
                 locked_quiz.xp_awarded = True
-                locked_quiz.save(update_fields=['xp_awarded'])
+            
+            locked_quiz.save(update_fields=['score', 'completed_at', 'xp_awarded'])
         
-        # Save score and completed_at (use update_fields to not overwrite xp_awarded)
-        quiz.save(update_fields=['score', 'completed_at'])
+        # Sync local reference for session data below
+        quiz = locked_quiz
         
         # Store XP info in session for display on results page
         request.session['quiz_xp_earned'] = xp_earned
@@ -312,10 +317,13 @@ def quiz_results(request, quiz_id):
     skipped_count = user_answers.filter(selected_option__isnull=True).count()
     wrong_count = quiz.total_questions - correct_count - skipped_count
     
-    # Recalculate score if needed (in case it wasn't set properly)
-    if quiz.score == 0 and correct_count > 0:
-        quiz.score = round((correct_count / quiz.total_questions * 100)) if quiz.total_questions > 0 else 0
-        quiz.save(update_fields=['score'])
+    # Recalculate score only if quiz was completed but score wasn't persisted
+    # (safety net — normal flow always saves score in submit_answer)
+    if quiz.completed_at and quiz.score == 0 and correct_count > 0 and quiz.total_questions > 0:
+        calculated_score = round((correct_count / quiz.total_questions * 100))
+        if calculated_score > 0:
+            quiz.score = calculated_score
+            quiz.save(update_fields=['score'])
     
     # Check if any explanations generated yet
     has_explanations = user_answers.exclude(error_explanation='').exists()
@@ -416,7 +424,8 @@ def retry_quiz(request, quiz_id):
     # Reset quiz state
     quiz.score = 0
     quiz.completed_at = None
-    quiz.save(update_fields=['score', 'completed_at'])
+    quiz.xp_awarded = False
+    quiz.save(update_fields=['score', 'completed_at', 'xp_awarded'])
     
     return redirect('quiz_player', quiz_id=quiz.id)
 
@@ -500,6 +509,8 @@ def quick_quiz(request):
         with transaction.atomic():
             quiz = Quiz.objects.create(
                 user=request.user,
+                quiz_type='tech',
+                language=language,
                 topic_description=f"{language} - {topic}",
                 difficulty='beginner',
                 total_questions=len(questions_data),
@@ -512,6 +523,7 @@ def quick_quiz(request):
                     quiz=quiz,
                     text=q_data.get('text', ''),
                     code_snippet=q_data.get('code_snippet'),
+                    explanation=q_data.get('explanation', ''),
                 )
                 
                 for option_data in q_data.get('options', []):

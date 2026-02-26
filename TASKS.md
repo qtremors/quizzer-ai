@@ -1,7 +1,7 @@
 # Quizzer AI - Tasks
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.4  
+> **Version:** 1.5.5  
 > **Last Updated:** 2026-02-26  
 
 ---
@@ -37,13 +37,13 @@
   - **Effort:** 5 minutes
 
 ### Bugs
-- [ ] **BUG-005:** `retry_quiz` does not reset `xp_awarded` flag
+- [x] **BUG-005:** `retry_quiz` does not reset `xp_awarded` flag
   - `retry_quiz` in `quizzes/views.py` (line 404) resets `score` and `completed_at` but leaves `xp_awarded = True`
   - On retry completion, the user will never earn XP again since the flag is still `True`
   - Add `quiz.xp_awarded = False` and include it in `save(update_fields=[...])`
   - **Effort:** 5 minutes
 
-- [ ] **BUG-006:** Race condition between `quiz.save()` and `locked_quiz.save()` in `submit_answer`
+- [x] **BUG-006:** Race condition between `quiz.save()` and `locked_quiz.save()` in `submit_answer`
   - In `submit_answer`, `quiz.score` and `quiz.completed_at` are set on the original `quiz` object (line 232-233)
   - Then inside the `transaction.atomic()` block, a re-fetched `locked_quiz` saves `xp_awarded` (line 279)
   - After the block, `quiz.save(update_fields=['score', 'completed_at'])` (line 282) writes the *original* `quiz` object
@@ -51,19 +51,19 @@
   - **Fix:** Consolidate all quiz field updates onto a single object
   - **Effort:** 30 minutes
 
-- [ ] **BUG-007:** `quick_quiz` for authenticated users doesn't set `quiz_type` field
+- [x] **BUG-007:** `quick_quiz` for authenticated users doesn't set `quiz_type` field
   - The `Quiz.objects.create(...)` call at line 501 doesn't pass `quiz_type`, so it defaults to `'tech'`
   - But the original quiz setup path in `create_quiz` explicitly sets `quiz_type='tech'`; quick quiz should too
   - Additionally, `language` field is not set — it defaults to `''` instead of the chosen language
   - **Fix:** Add `quiz_type='tech'` and `language=language` to the create call
   - **Effort:** 5 minutes
 
-- [ ] **BUG-008:** `quick_quiz` authenticated path doesn't save `explanation` on questions
+- [x] **BUG-008:** `quick_quiz` authenticated path doesn't save `explanation` on questions
   - `create_quiz` and `process_chat_message` both save `explanation=q_data.get('explanation', '')` on each question
   - `quick_quiz`'s authenticated path (line 511-515) does not, causing explanations to be lost
   - **Effort:** 5 minutes
 
-- [ ] **BUG-009:** `quiz_results` score recalculation can trigger on legitimate 0% scores
+- [x] **BUG-009:** `quiz_results` score recalculation can trigger on legitimate 0% scores
   - Line 316: `if quiz.score == 0 and correct_count > 0` recalculates the score
   - But if the quiz was already scored correctly as 0% (all wrong), and the user revisits results, it stays 0 — this is fine
   - However, the real issue is that `quiz.score` is stored as an integer (0-100) but could be legitimately 0 while `completed_at` is set, so the condition is subtly wrong for edge cases where a quiz completes with some correct answers but due to rounding ends at 0%
