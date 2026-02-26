@@ -1,8 +1,19 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.5  
+> **Version:** 1.5.6  
 > **Last Updated:** 2026-02-26
+
+---
+
+## [1.5.6] - 2026-02-26
+
+### Changed
+- **ARCH-001:** Extracted duplicated quiz creation logic from `create_quiz`, `process_chat_message`, and `quick_quiz` into `quizzes/services.py` with `create_quiz_from_ai_data()`
+
+### Added
+- **TEST-001:** Mocked unit tests for all `QuizGenerator` methods (15 tests in `ai_agent/tests/test_services.py`)
+- **TEST-002:** Integration tests for AI error handling and classification (16 tests in `ai_agent/tests/test_errors.py`)
 
 ---
 

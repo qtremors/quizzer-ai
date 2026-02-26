@@ -9,6 +9,7 @@ from django_ratelimit.decorators import ratelimit
 import logging
 import random
 from .models import Quiz, Question, Option, UserAnswer, AIModel
+from .services import create_quiz_from_ai_data
 from .utils import format_duration
 from apps.ai_agent.services import QuizGenerator, AIError
 from apps.users.gamification import (
@@ -107,37 +108,15 @@ def create_quiz(request):
             'suggestion': "Try again or select a different AI model."
         })
 
-    with transaction.atomic():
-        quiz = Quiz.objects.create(
-            user=request.user,
-            quiz_type='tech',
-            language=language,
-            topic_description=f"{language}: {topic}"[:255],
-            difficulty=level,
-            total_questions=len(questions_data),
-            ai_model=ai_model,
-            model_used=model_name
-        )
-
-        options_to_create = []
-        for q_data in questions_data:
-            question = Question.objects.create(
-                quiz=quiz,
-                text=q_data.get('text', '')[:2000],
-                code_snippet=q_data.get('code_snippet', ''),
-                explanation=q_data.get('explanation', '')
-            )
-            # Prepare options for bulk creation
-            for opt_text in q_data.get('options', []):
-                options_to_create.append(Option(
-                    question=question,
-                    text=str(opt_text)[:255],
-                    is_correct=(str(opt_text) == str(q_data.get('correct_answer', '')))
-                ))
-        
-        # Bulk create all options at once
-        if options_to_create:
-            Option.objects.bulk_create(options_to_create)
+    quiz = create_quiz_from_ai_data(
+        request.user, questions_data,
+        quiz_type='tech',
+        language=language,
+        topic_description=f"{language}: {topic}",
+        difficulty=level,
+        ai_model=ai_model,
+        model_used=model_name
+    )
 
     response = HttpResponse()
     response['HX-Redirect'] = f"/quiz/play/{quiz.id}/"
@@ -505,43 +484,15 @@ def quick_quiz(request):
     logger.info(f"Quick Quiz: Generated {len(questions_data)} questions successfully")
     
     if request.user.is_authenticated:
-        # For logged-in users: save to database like normal
-        with transaction.atomic():
-            quiz = Quiz.objects.create(
-                user=request.user,
-                quiz_type='tech',
-                language=language,
-                topic_description=f"{language} - {topic}",
-                difficulty='beginner',
-                total_questions=len(questions_data),
-                model_used=model_name,
-            )
-            
-            options_to_create = []
-            for q_data in questions_data:
-                question = Question.objects.create(
-                    quiz=quiz,
-                    text=q_data.get('text', ''),
-                    code_snippet=q_data.get('code_snippet'),
-                    explanation=q_data.get('explanation', ''),
-                )
-                
-                for option_data in q_data.get('options', []):
-                    # Handle both string and dict options from AI
-                    if isinstance(option_data, dict):
-                        option_text = str(option_data.get('text', ''))
-                    else:
-                        option_text = str(option_data)
-                    
-                    options_to_create.append(Option(
-                        question=question,
-                        text=option_text,
-                        is_correct=(option_text == str(q_data.get('correct_answer', '')))
-                    ))
-            
-            # Bulk create all options at once
-            if options_to_create:
-                Option.objects.bulk_create(options_to_create)
+        # For logged-in users: save to database using shared service
+        quiz = create_quiz_from_ai_data(
+            request.user, questions_data,
+            quiz_type='tech',
+            language=language,
+            topic_description=f"{language} - {topic}",
+            difficulty='beginner',
+            model_used=model_name,
+        )
         
         return redirect('quiz_player', quiz_id=quiz.id)
     else:

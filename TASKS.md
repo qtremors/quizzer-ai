@@ -1,7 +1,7 @@
 # Quizzer AI - Tasks
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.5  
+> **Version:** 1.5.6  
 > **Last Updated:** 2026-02-26  
 
 ---
@@ -74,17 +74,17 @@
 ## 🟠 High Priority (This Sprint)
 
 ### Testing
-- [ ] **TEST-001:** No tests for `ai_agent` module
+- [x] **TEST-001:** No tests for `ai_agent` module
   - `apps/ai_agent/tests.py` is empty placeholder
   - Add mocked tests for `QuizGenerator` class
   - **Effort:** 4-6 hours
 
-- [ ] **TEST-002:** No integration tests for AI service with mocked responses
+- [x] **TEST-002:** No integration tests for AI service with mocked responses
   - Need tests for error handling (quota, timeout, 404, validation)
   - **Effort:** 2-3 hours
 
 ### Architecture
-- [ ] **ARCH-001:** Quiz creation logic duplicated across 3 views
+- [x] **ARCH-001:** Quiz creation logic duplicated across 3 views
   - `create_quiz`, `process_chat_message`, `quick_quiz` share ~100 lines each
   - Extract to `apps/quizzes/services.py` with `create_quiz_from_ai()` function
   - **Effort:** 2-3 hours
@@ -99,9 +99,6 @@
   - Define `DEFAULT_FALLBACK_MODEL` constant in settings
   - Reference from: ai_agent/views.py, quizzes/views.py (×2)
   - **Effort:** 30 minutes
-
-- [x] ~~**CODE-010:** Settings.py line 150 has typo in DEFAULT_AI_MODEL default~~
-  - **FALSE:** Verified `settings.py` line 237 has the correct value `'gemini-flash-lite-latest'`. No typo exists.
 
 - [ ] **CODE-011:** `format_duration()` in `quizzes/utils.py` duplicates `format_time` template filter
   - `quiz_filters.py` has a `format_time` filter that does the same thing as `format_duration()` in `utils.py`
