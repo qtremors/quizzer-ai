@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
 from .services import QuizGenerator, AIError
-from apps.quizzes.models import AIModel
+from .models import AIModel
 from apps.quizzes.services import create_quiz_from_ai_data
 
 

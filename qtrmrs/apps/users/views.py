@@ -139,7 +139,7 @@ def user_dashboard(request):
     """
     Shows quiz history and statistics with pagination.
     """
-    user_quizzes = Quiz.objects.filter(user=request.user).order_by('-created_at')
+    user_quizzes = Quiz.objects.for_user(request.user)
     
     # Pagination - 12 quizzes per page
     paginator = Paginator(user_quizzes, 12)

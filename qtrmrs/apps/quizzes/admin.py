@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AIModel, Quiz, Question, Option, UserAnswer
+from .models import Quiz, Question, Option, UserAnswer
 
 
 class OptionInline(admin.TabularInline):
@@ -31,12 +31,6 @@ class QuizAdmin(admin.ModelAdmin):
     search_fields = ('topic_description', 'user__email', 'language')
     inlines = [UserAnswerInline]
     date_hierarchy = 'created_at'
-
-
-@admin.register(AIModel)
-class AIModelAdmin(admin.ModelAdmin):
-    list_display = ('display_name', 'model_name', 'is_active', 'is_default')
-    list_filter = ('is_active', 'is_default')
 
 
 admin.site.register(Question, QuestionAdmin)

@@ -8,7 +8,7 @@ import logging
 from google import genai
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from apps.quizzes.models import AIModel
+from apps.ai_agent.models import AIModel
 
 
 class Command(BaseCommand):

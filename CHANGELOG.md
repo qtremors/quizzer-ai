@@ -1,8 +1,19 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.7  
-> **Last Updated:** 2026-02-26
+> **Version:** 1.5.8  
+> **Last Updated:** 2026-02-27
+
+---
+
+## [1.5.8] - 2026-02-27
+
+### Architecture
+- **ARCH-002:** Split `quizzes/views.py` (616 lines) into `views/` package with `setup.py`, `player.py`, `results.py`, `demo.py`
+- **ARCH-003:** Added `QuizQuerySet` custom manager with `for_user()` method on `Quiz` model
+- **ARCH-004:** Extracted gamification logic from `submit_answer` into `award_quiz_completion()` in `quizzes/services.py`
+- **ARCH-005:** Moved `AIModel` from `quizzes` app to `ai_agent` app using `SeparateDatabaseAndState` migrations (zero-downtime, no data migration)
+- **ARCH-006:** Registered `UserProfile`, `Badge`, `UserBadge` in Django admin with list displays and filters
 
 ---
 

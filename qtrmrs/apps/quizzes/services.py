@@ -70,3 +70,83 @@ def create_quiz_from_ai_data(
             Option.objects.bulk_create(options_to_create)
 
     return quiz
+
+
+def award_quiz_completion(quiz, user):
+    """
+    Handle all gamification logic when a quiz is completed.
+    
+    Awards XP, checks for level-ups, updates streaks, updates cached
+    stats, and awards badges. Uses select_for_update to prevent race
+    conditions on concurrent submissions.
+    
+    Args:
+        quiz: The Quiz instance (must have score and completed_at set).
+        user: The User who completed the quiz.
+    
+    Returns:
+        Dict with keys: xp_earned, leveled_up, new_level, new_badges.
+    """
+    from apps.users.models import UserProfile
+    from apps.users.gamification import (
+        calculate_quiz_xp, calculate_level_from_xp,
+        update_user_streak, check_and_award_badges
+    )
+
+    result = {
+        'xp_earned': None,
+        'leveled_up': False,
+        'new_level': None,
+        'new_badges': [],
+    }
+
+    correct_count = quiz.answers.filter(is_correct=True).count()
+
+    with transaction.atomic():
+        # Re-fetch quiz with lock to prevent concurrent XP awards
+        locked_quiz = Quiz.objects.select_for_update().get(id=quiz.id)
+
+        # Consolidate all field updates on the locked object
+        locked_quiz.score = quiz.score
+        locked_quiz.completed_at = quiz.completed_at
+
+        if not locked_quiz.xp_awarded:
+            # Get user profile with lock
+            profile = UserProfile.objects.select_for_update().get(user=user)
+            old_level = profile.level
+
+            # Calculate and award XP
+            total_time = sum(a.time_taken for a in quiz.answers.all())
+            xp_earned = calculate_quiz_xp(correct_count, total_time, quiz.total_questions)
+            profile.xp += xp_earned
+
+            # Check for level up
+            new_level = calculate_level_from_xp(profile.xp)
+            leveled_up = new_level > old_level
+            profile.level = new_level
+
+            # Update streak
+            update_user_streak(profile)
+
+            # Update cached stats
+            profile.total_correct_answers += correct_count
+            profile.total_study_time += total_time
+            if locked_quiz.score > profile.best_score:
+                profile.best_score = locked_quiz.score
+
+            profile.save()
+
+            # Check and award badges
+            new_badges = check_and_award_badges(user, profile)
+
+            # Mark XP as awarded for this quiz
+            locked_quiz.xp_awarded = True
+
+            result['xp_earned'] = xp_earned
+            result['leveled_up'] = leveled_up
+            result['new_level'] = new_level if leveled_up else None
+            result['new_badges'] = new_badges
+
+        locked_quiz.save(update_fields=['score', 'completed_at', 'xp_awarded'])
+
+    return result

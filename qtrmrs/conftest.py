@@ -29,7 +29,7 @@ def authenticated_client(client, user):
 @pytest.fixture
 def ai_model(db):
     """Create a test AI model."""
-    from apps.quizzes.models import AIModel
+    from apps.ai_agent.models import AIModel
     return AIModel.objects.create(
         model_name='gemini-flash-lite-latest',
         display_name='Gemini Flash Lite (Latest)',
