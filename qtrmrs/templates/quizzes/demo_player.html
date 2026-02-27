@@ -6,7 +6,6 @@
     timerInterval: null,
     init() {
         this.startTimer();
-        // Cleanup on navigation/unload
         window.addEventListener('beforeunload', () => this.destroy());
     },
     destroy() {
@@ -30,23 +29,23 @@
     <div class="quiz-header">
         <div class="header-meta">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <span class="topic-badge">{{ topic }}</span>
-                <span class="demo-badge">Demo Mode</span>
+                <span class="topic-badge" style="background: var(--color-primary-container); color: var(--color-on-primary-container);">{{ topic }}</span>
+                <span class="demo-badge" style="background: var(--color-tertiary-container); color: var(--color-on-tertiary-container);">Demo Mode</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 24px;">
                 <!-- Timer -->
-                <span class="q-timer"
-                    style="display: flex; align-items: center; gap: 6px; color: var(--color-text-muted); font-size: 0.9rem;">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">timer</span>
+                <span class="q-timer" style="display: flex; align-items: center; gap: 6px; color: var(--color-on-surface-variant); font-size: 0.95rem; font-weight: 500;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">timer</span>
                     <span x-text="formatTime(timer)">0s</span>
                 </span>
-                <span class="question-counter">
-                    Question {{ question_num }} of {{ total_questions }}
+                <span class="question-counter" style="color: var(--color-on-surface-variant); font-size: 1.05rem; font-weight: 500;">
+                    Question <span style="font-weight: 700; color: var(--color-primary);">{{ question_num }}</span>
+                    <span style="opacity: 0.5; margin: 0 4px;">/</span> {{ total_questions }}
                 </span>
             </div>
         </div>
-        <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ progress }}%;"></div>
+        <div class="progress-bar" style="height: 6px; background: var(--color-surface-variant); border-radius: var(--radius-full); width: 100%; overflow: hidden; margin-top: 16px;">
+            <div class="progress-fill" style="height: 100%; background: var(--color-primary); border-radius: var(--radius-full); width: {{ progress }}%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
         </div>
     </div>
 
@@ -54,30 +53,34 @@
         <form action="{% url 'demo_submit' %}" method="POST" class="quiz-form">
             {% csrf_token %}
 
-            <div class="question-area">
-                <p class="question-text">{{ question.text }}</p>
+            <div class="question-area" style="margin-bottom: 40px; max-width: 800px;">
+                <h2 class="question-text" style="font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.4; font-weight: 500; font-family: var(--font-display); color: var(--color-on-surface);">{{ question.text }}</h2>
 
                 {% if question.code_snippet %}
-                <pre class="code-block"><code>{{ question.code_snippet }}</code></pre>
+                <pre class="code-block" style="background: #1e1e1e; padding: 24px; border-radius: var(--radius-lg); overflow-x: auto; color: #fff; margin-top: 24px;"><code style="font-family: 'Fira Code', monospace; font-size: 0.95rem;">{{ question.code_snippet }}</code></pre>
                 {% endif %}
             </div>
 
-            <div class="options-grid">
+            <div class="options-grid" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; max-width: 800px;">
                 {% for option in question.options %}
-                <label class="option-card">
-                    <input type="radio" name="option" value="{{ option }}" required>
-                    <span class="option-text">{{ option }}</span>
+                <label class="option-card option-block" style="cursor: pointer; display: block;" tabindex="0">
+                    <input type="radio" name="option" value="{{ option }}" required style="display: none;" onchange="document.getElementById('demo-next-btn').disabled = false; document.getElementById('demo-next-btn').style.opacity = '1'; document.getElementById('demo-next-btn').classList.add('active');">
+                    <div class="option-visual" style="display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: var(--radius-md); transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);">
+                        <div class="radio-indicator" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--color-on-surface-variant); flex-shrink: 0; transition: all 0.2s;"></div>
+                        <span class="option-text" style="font-size: 1.1rem; color: var(--color-on-surface); word-break: break-word;">{{ option }}</span>
+                    </div>
                 </label>
                 {% endfor %}
             </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-filled">
+            <div class="form-actions" style="display: flex; justify-content: flex-end; max-width: 800px;">
+                <button type="submit" id="demo-next-btn" class="btn btn-filled" disabled style="opacity: 0.5; transition: opacity 0.3s; padding: 0 32px; height: 48px; font-size: 1.05rem;">
                     {% if question_num == total_questions %}
                     Finish Quiz
                     {% else %}
                     Next Question
                     {% endif %}
+                    <span class="material-symbols-outlined" style="margin-left: 8px;">arrow_forward</span>
                 </button>
             </div>
         </form>
@@ -86,139 +89,20 @@
 </div>
 
 <style>
-    .container {
-        padding: 0 !important;
-        max-width: none !important;
-    }
-
-    .quiz-screen {
-        min-height: calc(100vh - 80px);
-        display: flex;
-        flex-direction: column;
-        padding: 24px;
-    }
-
-    .quiz-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 24px;
-        background: var(--color-surface);
-        border-radius: 16px;
-        margin-bottom: 32px;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .topic-badge {
-        background: var(--color-primary);
-        color: var(--color-on-primary);
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .demo-badge {
-        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-        color: white;
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .progress-bar {
-        height: 6px;
-        background: var(--color-surface-variant);
-        border-radius: 3px;
-        width: 200px;
-        margin-top: 12px;
-    }
-
-    .progress-fill {
-        height: 100%;
-        background: var(--color-primary);
-        border-radius: 3px;
-        transition: width 0.3s ease;
-    }
-
-    .question-counter {
-        color: var(--color-text-muted);
-        font-size: 0.9rem;
-    }
-
-    .quiz-card-container {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-    }
-
-    .quiz-form {
-        max-width: 800px;
-        width: 100%;
-    }
-
-    .question-area {
-        margin-bottom: 32px;
-    }
-
-    .question-text {
-        font-size: 1.4rem;
-        font-weight: 600;
-        line-height: 1.5;
-        margin-bottom: 16px;
-    }
-
-    .code-block {
-        background: var(--color-surface-variant);
-        padding: 16px;
-        border-radius: 12px;
-        overflow-x: auto;
-        font-family: monospace;
-        font-size: 0.95rem;
-    }
-
-    .options-grid {
-        display: grid;
-        gap: 12px;
-        margin-bottom: 32px;
-    }
-
-    .option-card {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 20px 24px;
-        background: var(--color-surface);
-        border: 2px solid var(--color-border);
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .option-card:hover {
-        border-color: var(--color-primary);
-        background: var(--color-primary-container);
-    }
-
-    .option-card:has(input:checked) {
-        border-color: var(--color-primary);
-        background: var(--color-primary-container);
-    }
-
-    .option-card input {
-        display: none;
-    }
-
-    .option-text {
-        font-size: 1.1rem;
-    }
-
-    .form-actions {
-        display: flex;
-        justify-content: center;
-    }
+    .container { padding: 0 !important; max-width: none !important; }
+    .quiz-screen { min-height: calc(100vh - 64px); display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; padding: 32px 24px 80px; }
+    
+    .quiz-header { flex-shrink: 0; margin-bottom: 48px; max-width: 800px; }
+    .header-meta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+    
+    .topic-badge, .demo-badge { padding: 6px 16px; border-radius: var(--radius-full); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    .quiz-card-container { flex: 1; display: flex; flex-direction: column; }
+    .quiz-form { width: 100%; display: flex; flex-direction: column; }
+    
+    .option-block:hover .option-visual { background: var(--color-surface-variant); border-color: var(--color-outline); }
+    .option-block input:checked + .option-visual { background: var(--color-primary-container); border-color: var(--color-primary); color: var(--color-on-primary-container); font-weight: 500; box-shadow: 0 0 0 1px var(--color-primary); }
+    .option-block input:checked + .option-visual .radio-indicator { border-color: var(--color-primary); background: var(--color-primary); box-shadow: inset 0 0 0 5px var(--color-primary-container); }
+    .option-block:focus-within .option-visual { outline: 3px solid var(--color-primary); outline-offset: 2px; }
 </style>
 {% endblock %}

@@ -1,36 +1,10 @@
 # Quizzer AI - Tasks
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.8  
+> **Version:** 1.5.9
 > **Last Updated:** 2026-02-27
 
 ---
-
-## ⚠️ Medium Priority
-
-### Architecture
-- [x] **ARCH-002:** View files too large — `quizzes/views.py` is 616 lines
-  - Split into: `setup.py`, `player.py`, `results.py`, `demo.py`
-  - **Effort:** 2-4 hours
-
-- [x] **ARCH-003:** Missing model managers
-  - `Quiz.objects.filter(user=request.user).order_by('-created_at')` repeated 4 times
-  - Create `QuizQuerySet` with `for_user()` method
-  - **Effort:** 1 hour
-
-- [x] **ARCH-004:** Gamification coupling in `submit_answer`
-  - Profile updates tightly coupled (lines 241-288)
-  - Consider Django signals or separate service for XP/badge logic
-  - **Effort:** 2-3 hours
-
-- [x] **ARCH-005:** `AIModel` model lives in `quizzes` app but logically belongs in `ai_agent`
-  - Both `ai_agent` views and management commands import it from `quizzes`
-  - Consider moving to `ai_agent/models.py` (currently empty)
-  - **Effort:** 1-2 hours (requires migration)
-
-- [x] **ARCH-006:** `Badge` and `UserBadge` admin registrations missing
-  - `users/admin.py` only registers `User` — `UserProfile`, `Badge`, `UserBadge` not registered
-  - **Effort:** 15 minutes
 
 ### Security
 - [ ] **SEC-006:** `'unsafe-inline'` in CSP script-src

@@ -1,70 +1,71 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="max-width: 700px; margin: 0 auto; padding: 40px 24px; width: 100%;">
+<div class="container" style="max-width: 900px; padding-top: 48px; padding-bottom: 80px;">
 
-    <div class="card" style="text-align: center; padding: 40px;">
+    <div class="card" style="text-align: center; margin-bottom: 40px; padding: 56px 40px; box-shadow: var(--elevation-3);">
 
-        <!-- Demo Badge -->
-        <div class="demo-badge" style="display: inline-block; margin-bottom: 16px;">
+        <div class="demo-badge" style="display: inline-block; margin-bottom: 24px; background: var(--color-tertiary-container); color: var(--color-on-tertiary-container); padding: 8px 20px; border-radius: var(--radius-full); font-weight: 600; font-size: 0.95rem;">
             Demo Quiz Complete
         </div>
 
-        <h1 style="margin-bottom: 8px; font-size: 2.5rem;">{{ topic }}</h1>
+        <h1 style="margin-bottom: 12px; font-size: 2.5rem; font-family: var(--font-display);">{{ topic }}</h1>
 
-        <!-- Score Display -->
-        <div
-            style="font-size: 5rem; font-weight: 800; margin: 24px 0; color: {% if score_percent >= 80 %}var(--color-success){% elif score_percent >= 50 %}var(--color-warning){% else %}var(--color-error){% endif %};">
-            {{ score_percent }}%
+        <div style="font-size: 5rem; font-weight: 800; margin: 24px 0; font-family: var(--font-display); line-height: 1; color: {% if score_percent >= 80 %}var(--color-success){% elif score_percent >= 50 %}var(--color-warning){% else %}var(--color-error){% endif %};">
+            {{ score_percent }}<span style="font-size: 3rem;">%</span>
         </div>
 
-        <p style="font-size: 1.2rem; color: var(--color-text-muted); margin-bottom: 24px;">
-            You got <strong>{{ score }}</strong> out of <strong>{{ total }}</strong> questions correct!
+        <p style="font-size: 1.25rem; color: var(--color-on-surface-variant); margin-bottom: 32px;">
+            You got <strong style="color: var(--color-on-surface);">{{ score }}</strong> out of <strong style="color: var(--color-on-surface);">{{ total }}</strong> questions correct!
         </p>
 
-        <!-- CTA to Sign Up -->
-        <div class="signup-cta" style="margin-bottom: 32px;">
-            <p style="font-size: 1.1rem; margin-bottom: 16px;">
-                <span class="material-symbols-outlined"
-                    style="font-size: 1.2em; vertical-align: middle; color: var(--color-primary);">rocket_launch</span>
-                Want to <strong>track your progress</strong>, earn <strong>XP</strong>, and get <strong>AI
-                    explanations</strong>?
+        <div class="signup-cta" style="margin-bottom: 40px; background: var(--color-primary-container); color: var(--color-on-primary-container); border-radius: var(--radius-lg); padding: 32px; display: flex; flex-direction: column; align-items: center;">
+            <p style="font-size: 1.2rem; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <span class="material-symbols-outlined filled" style="font-size: 28px; color: var(--color-primary);">rocket_launch</span>
+                <span>Want to <strong>track progress</strong>, earn <strong>XP</strong>, and get <strong>AI explanations</strong>?</span>
             </p>
-            <a href="{% url 'signup' %}" class="btn btn-filled" style="font-size: 1.1rem; padding: 16px 32px;">
+            <a href="{% url 'signup' %}" class="btn btn-filled" style="font-size: 1.1rem; padding: 0 40px; height: 56px; font-weight: 600;">
                 Create Free Account
             </a>
         </div>
 
-        <!-- Action Buttons -->
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-            <a href="{% url 'quick_quiz' %}" class="btn btn-tonal">
-                <span class="material-symbols-outlined">replay</span>
-                Try Another Quiz
+            <a href="{% url 'quick_quiz' %}" class="btn btn-tonal" style="height: 48px; padding: 0 24px;">
+                <span class="material-symbols-outlined" style="margin-right: 8px;">replay</span> Try Another Quiz
             </a>
-            <a href="{% url 'login' %}" class="btn btn-text">
+            <a href="{% url 'login' %}" class="btn btn-text" style="height: 48px;">
                 Already have an account? Log in
             </a>
         </div>
     </div>
 
-    <!-- Answer Review -->
     {% if answers %}
-    <div style="margin-top: 32px;">
-        <h3 style="margin-bottom: 16px;">Answer Review</h3>
+    <h3 style="margin-bottom: 24px; font-size: 1.5rem; color: var(--color-on-surface); display: flex; align-items: center; gap: 12px;">
+        <span class="material-symbols-outlined">fact_check</span> Answer Review
+    </h3>
 
+    <div style="display: flex; flex-direction: column; gap: 24px;">
         {% for ans in answers %}
-        <div class="card"
-            style="margin-bottom: 12px; padding: 20px; border-left: 4px solid {% if ans.is_correct %}var(--color-success){% else %}var(--color-error){% endif %};">
-            <p style="font-weight: 600; margin-bottom: 8px;">{{ forloop.counter }}. {{ ans.question }}</p>
-            <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.95rem;">
-                <span
-                    style="color: {% if ans.is_correct %}var(--color-success){% else %}var(--color-error){% endif %};">
-                    Your answer: <strong>{{ ans.selected|default:"Skipped" }}</strong>
-                </span>
+        <div class="card result-card" style="padding: 32px; border: 1px solid var(--color-outline-variant); border-left: 6px solid {% if ans.is_correct %}var(--color-success){% else %}var(--color-error){% endif %};">
+            <h4 style="font-size: 1.25rem; font-weight: 500; margin: 0 0 24px 0; line-height: 1.5; color: var(--color-on-surface);">
+                <span style="color: var(--color-primary); margin-right: 8px; font-weight: 700;">{{ forloop.counter }}.</span> {{ ans.question }}
+            </h4>
+            
+            <div style="display: grid; gap: 12px; font-size: 1rem; padding-left: 16px; border-left: 2px solid var(--color-outline-variant);">
+                <div style="color: var(--color-on-surface-variant); display: flex; align-items: flex-start; gap: 8px;">
+                    <span style="font-weight: 500; min-width: 120px;">Your Answer:</span>
+                    <span style="font-weight: 600; color: {% if ans.is_correct %}var(--color-success){% else %}var(--color-error){% endif %};">
+                        {{ ans.selected|default:"Skipped" }}
+                    </span>
+                </div>
+                
                 {% if not ans.is_correct %}
-                <span style="color: var(--color-success);">
-                    Correct: <strong>{{ ans.correct }}</strong>
-                </span>
+                <div style="color: var(--color-on-surface-variant); display: flex; align-items: flex-start; gap: 8px;">
+                    <span style="font-weight: 500; min-width: 120px;">Correct Answer:</span>
+                    <span style="color: var(--color-success); font-weight: 600;">
+                        {{ ans.correct }}
+                    </span>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -75,20 +76,7 @@
 </div>
 
 <style>
-    .demo-badge {
-        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-        color: white;
-        padding: 8px 20px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .signup-cta {
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
-        border: 1px solid rgba(139, 92, 246, 0.2);
-        border-radius: 16px;
-        padding: 24px;
-    }
+    .result-card { transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1); }
+    .result-card:hover { transform: translateY(-4px); box-shadow: var(--elevation-4); }
 </style>
 {% endblock %}

@@ -1,73 +1,58 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+<div class="container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
 
-    <div class="card" style="width: 100%; max-width: 400px; padding: 40px;">
+    <div class="card" style="width: 100%; max-width: 440px; padding: 48px 32px; box-shadow: var(--elevation-3);">
 
-        <div style="text-align: center; margin-bottom: 32px;">
-            <h1 style="font-size: 1.75rem; margin-bottom: 8px;">Welcome Back</h1>
-            <p style="color: var(--color-text-muted);">Sign in to continue learning</p>
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="display: inline-flex; justify-content: center; align-items: center; width: 64px; height: 64px; background: var(--color-primary-container); color: var(--color-on-primary-container); border-radius: var(--radius-full); margin-bottom: 24px;">
+                <span class="material-symbols-outlined" style="font-size: 32px;">person</span>
+            </div>
+            <h1 style="font-size: 2rem; margin-bottom: 8px;">Welcome Back</h1>
+            <p style="color: var(--color-on-surface-variant); font-size: 1rem;">Sign in to continue learning</p>
         </div>
 
         <form method="POST" class="auth-form">
             {% csrf_token %}
 
             {% if form.non_field_errors %}
-            <div
-                style="background: var(--color-error); color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
-                {{ form.non_field_errors.0 }}
+            <div style="background: var(--color-error-container); color: var(--color-on-error-container); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-outlined">error</span>
+                <span>{{ form.non_field_errors.0 }}</span>
             </div>
             {% endif %}
 
             {% for field in form %}
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500;">
-                    {{ field.label }}
-                </label>
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
                 {% if field.errors %}
-                <span style="color: var(--color-error); font-size: 0.85rem;">{{ field.errors.0 }}</span>
+                <div style="color: var(--color-error); font-size: 0.85rem; margin-top: 6px; display: flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">error</span>
+                    {{ field.errors.0 }}
+                </div>
                 {% endif %}
             </div>
             {% endfor %}
 
-            <button type="submit" class="btn btn-filled" style="width: 100%; margin-top: 8px;">
+            <button type="submit" class="btn btn-filled" style="width: 100%; margin-top: 16px; height: 56px; font-size: 1.1rem;">
                 Log In
             </button>
         </form>
 
-        <div style="text-align: center; margin-top: 16px;">
-            <a href="{% url 'password_reset' %}" style="color: var(--color-text-muted); font-size: 0.9rem;">
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{% url 'password_reset' %}" style="color: var(--color-primary); font-weight: 500;">
                 Forgot your password?
             </a>
         </div>
 
-        <div style="text-align: center; margin-top: 16px; font-size: 0.9rem;">
-            <span style="color: var(--color-text-muted);">Don't have an account?</span>
-            <a href="{% url 'signup' %}" style="color: var(--color-primary); font-weight: 600;">Sign up</a>
+        <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-outline-variant);">
+            <span style="color: var(--color-on-surface-variant);">Don't have an account?</span>
+            <a href="{% url 'signup' %}" style="color: var(--color-primary); font-weight: 600; margin-left: 8px;">Sign up</a>
         </div>
 
     </div>
 
 </div>
-
-<style>
-    .form-input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-md);
-        background: var(--color-bg);
-        color: var(--color-text-main);
-        outline: none;
-        font-size: 1rem;
-        transition: border-color 0.2s;
-    }
-
-    .form-input:focus {
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px var(--color-primary-container);
-    }
-</style>
 {% endblock %}

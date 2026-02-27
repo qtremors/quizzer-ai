@@ -1,62 +1,57 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="max-width: 1600px; margin: 0 auto; padding: 40px 24px; width: 100%;">
+<div class="container" style="padding-top: 48px; padding-bottom: 80px;">
 
-    <div class="dashboard-header">
+    <div class="dashboard-header" style="margin-bottom: 48px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 32px;">
         <div>
-            <h1 style="margin-bottom: 8px; font-size: 3rem;">Dashboard</h1>
-            <p style="color: var(--color-text-muted); font-size: 1.2rem;">Welcome back, {{ user.username }}</p>
+            <h1 style="font-size: clamp(2.5rem, 4vw, 3rem); margin-bottom: 8px;">Dashboard</h1>
+            <p style="color: var(--color-on-surface-variant); font-size: 1.25rem; margin: 0;">Welcome back, {{ user.username }}</p>
         </div>
 
-        <div class="stats-row">
+        <div class="stats-row" style="display: flex; gap: 16px; flex-wrap: wrap;">
             <!-- Level & XP -->
-            <div class="stat-card level-card">
+            <div class="card stat-card level-card">
                 <span class="stat-label">Level</span>
                 <span class="stat-value">{{ profile.level }}</span>
-                <div class="xp-bar-mini">
-                    <div class="xp-progress-mini" style="width: {{ profile.xp_progress_percent }}%;"></div>
+                <div class="xp-bar-mini" style="width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: 8px 0 4px; overflow: hidden;">
+                    <div class="xp-progress-mini" style="height: 100%; width: {{ profile.xp_progress_percent }}%; background: #fbbf24; border-radius: 3px; transition: width 0.5s ease;"></div>
                 </div>
-                <span style="font-size: 0.75rem; color: var(--color-text-muted);">{{ profile.xp }} XP</span>
+                <span style="font-size: 0.8rem; opacity: 0.9;">{{ profile.xp }} XP</span>
             </div>
 
             <!-- Streak -->
-            <div class="stat-card">
+            <div class="card stat-card">
                 <span class="stat-label">Streak</span>
-                <span class="stat-value"><span class="material-symbols-outlined"
-                        style="font-size: 1.2em; vertical-align: middle; color: #f97316;">local_fire_department</span>
-                    {{ profile.current_streak }}</span>
+                <span class="stat-value" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span class="material-symbols-outlined filled" style="color: var(--color-warning);">local_fire_department</span>
+                    {{ profile.current_streak }}
+                </span>
             </div>
 
-            <div class="stat-card">
-                <span class="stat-label">Total Quizzes</span>
+            <div class="card stat-card">
+                <span class="stat-label">Quizzes</span>
                 <span class="stat-value">{{ total_quizzes }}</span>
             </div>
-            <div class="stat-card">
-                <span class="stat-label">Average Score</span>
+            
+            <div class="card stat-card">
+                <span class="stat-label">Avg Score</span>
                 <span class="stat-value" style="color: var(--color-primary);">{{ avg_score }}%</span>
             </div>
-            <div class="stat-card">
-                <span class="stat-label">Best Score</span>
-                <span class="stat-value" style="color: var(--color-success);">{{ profile.best_score }}%</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Correct Answers</span>
-                <span class="stat-value">{{ profile.total_correct_answers }}</span>
-            </div>
+
             {% if incomplete_count > 0 %}
-            <div class="stat-card" style="border-color: rgba(245, 158, 11, 0.3);">
-                <span class="stat-label">In Progress</span>
-                <span class="stat-value" style="color: var(--color-warning);">{{ incomplete_count }}</span>
+            <div class="card stat-card" style="border-color: var(--color-warning); background: var(--color-warning-container); color: var(--color-on-warning-container);">
+                <span class="stat-label" style="color: inherit; opacity: 0.8;">In Progress</span>
+                <span class="stat-value">{{ incomplete_count }}</span>
             </div>
             {% endif %}
         </div>
 
         {% if badges %}
-        <div class="badges-row">
+        <div class="badges-row" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; width: 100%;">
             {% for ub in badges %}
-            <div class="badge-item" title="{{ ub.badge.description }}">
-                <span class="badge-icon">{{ ub.badge.icon }}</span>
+            <div class="badge-item" title="{{ ub.badge.description }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--color-surface-variant); border-radius: var(--radius-full); font-size: 0.9rem; font-weight: 500;">
+                <span class="badge-icon" style="font-size: 1.2rem;">{{ ub.badge.icon }}</span>
                 <span class="badge-name">{{ ub.badge.name }}</span>
             </div>
             {% endfor %}
@@ -64,77 +59,70 @@
         {% endif %}
     </div>
 
-    <div
-        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--color-border);">
-        <h3 style="margin: 0; font-size: 1.5rem; color: var(--color-text-main);">Recent Activity</h3>
-        <a href="{% url 'quiz_setup' %}" class="btn btn-text" style="font-size: 0.9rem;">
-            <span class="material-symbols-outlined" style="font-size: 18px;">add</span> New Quiz
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--color-outline-variant);">
+        <h2 style="margin: 0; font-size: 1.75rem;">Recent Activity</h2>
+        <a href="{% url 'quiz_setup' %}" class="btn btn-filled" style="height: 40px; padding: 0 20px;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">add</span> New Quiz
         </a>
     </div>
 
     {% if quizzes %}
-    <div class="quiz-grid">
+    <div class="quiz-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px;">
         {% for quiz in quizzes %}
-        <div class="history-card {% if not quiz.is_complete %}card-incomplete{% endif %}">
+        <div class="card history-card {% if not quiz.is_complete %}card-incomplete{% endif %}" style="display: flex; flex-direction: column; text-decoration: none; padding: 24px;">
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div>
-                    <span class="topic-tag">{{ quiz.topic_description|truncatechars:25 }}</span>
-                    <div style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 6px;">
+                    <h3 style="margin: 0 0 8px 0; font-size: 1.25rem;">{{ quiz.topic_description|truncatechars:30 }}</h3>
+                    <div style="font-size: 0.9rem; color: var(--color-on-surface-variant);">
                         {{ quiz.created_at|date:"M d, Y" }}
                     </div>
                 </div>
 
                 {% if quiz.is_complete %}
-                <!-- Completed Quiz - Show Score -->
                 <div class="score-badge" style="
-                        background: {% if quiz.score >= 80 %}rgba(16,185,129,0.1); color: var(--color-success); border: 1px solid rgba(16,185,129,0.2);
-                        {% elif quiz.score >= 50 %}rgba(245,158,11,0.1); color: var(--color-warning); border: 1px solid rgba(245,158,11,0.2);
-                        {% else %}rgba(239,68,68,0.1); color: var(--color-error); border: 1px solid rgba(239,68,68,0.2);{% endif %}
+                        padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 700; font-size: 1rem;
+                        background: {% if quiz.score >= 80 %}var(--color-success-container); color: var(--color-on-success-container);
+                        {% elif quiz.score >= 50 %}var(--color-warning-container); color: var(--color-on-warning-container);
+                        {% else %}var(--color-error-container); color: var(--color-on-error-container);{% endif %}
                     ">
                     {{ quiz.score }}%
                 </div>
                 {% else %}
-                <!-- Incomplete Quiz - Show Progress -->
                 <div class="incomplete-indicator">
                     <span class="dot"></span>
-                    {{ quiz.answered_count }}/{{ quiz.total_questions }} answered
+                    {{ quiz.answered_count }}/{{ quiz.total_questions }}
                 </div>
                 {% endif %}
             </div>
 
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto;">
-                <div class="meta-item">
-                    <span class="material-symbols-outlined">signal_cellular_alt</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--color-outline-variant);">
+                <div class="meta-item" style="display: flex; align-items: center; gap: 8px; color: var(--color-on-surface-variant); font-size: 0.9rem;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">signal_cellular_alt</span>
                     {{ quiz.difficulty|title }}
                 </div>
 
                 {% if quiz.is_complete %}
-                <!-- Completed Quiz Actions -->
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <form action="{% url 'retry_quiz' quiz.id %}" method="POST" style="display: inline;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <form action="{% url 'retry_quiz' quiz.id %}" method="POST" style="margin: 0;">
                         {% csrf_token %}
-                        <button type="submit" class="action-btn retry" title="Retry Quiz">
+                        <button type="submit" class="action-btn" title="Retry Quiz" style="background: transparent; border: none; color: var(--color-on-surface-variant); cursor: pointer; display: flex; align-items: center; padding: 8px; border-radius: 50%; transition: background 0.2s;">
                             <span class="material-symbols-outlined">replay</span>
                         </button>
                     </form>
-                    <form action="{% url 'delete_quiz' quiz.id %}" method="POST" style="display: inline;"
-                        onsubmit="return confirm('Delete this quiz? This cannot be undone.');">
+                    <form action="{% url 'delete_quiz' quiz.id %}" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this quiz?');">
                         {% csrf_token %}
-                        <button type="submit" class="action-btn delete" title="Delete Quiz">
+                        <button type="submit" class="action-btn delete" title="Delete Quiz" style="background: transparent; border: none; color: var(--color-error); cursor: pointer; display: flex; align-items: center; padding: 8px; border-radius: 50%; transition: background 0.2s;">
                             <span class="material-symbols-outlined">delete</span>
                         </button>
                     </form>
-                    <a href="{% url 'quiz_results' quiz.id %}" class="view-btn">
-                        View Details <span class="material-symbols-outlined"
-                            style="font-size: 16px;">arrow_forward</span>
+                    <a href="{% url 'quiz_results' quiz.id %}" class="btn btn-text" style="padding: 0 12px; height: 36px; font-weight: 600;">
+                        Details <span class="material-symbols-outlined" style="font-size: 18px; margin-left: 4px;">arrow_forward</span>
                     </a>
                 </div>
                 {% else %}
-                <!-- Incomplete Quiz - Continue Button -->
-                <a href="{% url 'quiz_player' quiz.id %}" class="continue-btn">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">play_arrow</span>
-                    Continue
+                <a href="{% url 'quiz_player' quiz.id %}" class="btn btn-filled" style="height: 40px; background: var(--color-warning); color: #fff;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">play_arrow</span> Continue
                 </a>
                 {% endif %}
             </div>
@@ -142,325 +130,74 @@
         {% endfor %}
     </div>
 
-    <!-- Pagination -->
     {% if page_obj.has_other_pages %}
-    <nav
-        style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--color-border);">
+    <nav style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 48px;">
         {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-tonal" style="gap: 8px;">
-            <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
-            Previous
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outlined">
+            <span class="material-symbols-outlined">chevron_left</span> Prev
         </a>
         {% endif %}
-
-        <span style="color: var(--color-text-muted);">
+        <span style="color: var(--color-on-surface-variant); font-weight: 500;">
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
         </span>
-
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-tonal" style="gap: 8px;">
-            Next
-            <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outlined">
+            Next <span class="material-symbols-outlined">chevron_right</span>
         </a>
         {% endif %}
     </nav>
     {% endif %}
 
     {% else %}
-    <div
-        style="text-align: center; padding: 80px; border: 1px dashed var(--color-border); border-radius: 16px; background: var(--color-surface);">
-        <div
-            style="background: var(--color-surface-variant); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto;">
-            <span class="material-symbols-outlined" style="font-size: 32px; color: var(--color-text-muted);">quiz</span>
+    <div style="text-align: center; padding: 80px 24px; border: 2px dashed var(--color-outline); border-radius: var(--radius-lg); background: var(--color-surface-variant); margin-top: 32px;">
+        <div style="background: var(--color-surface); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto; box-shadow: var(--elevation-1);">
+            <span class="material-symbols-outlined" style="font-size: 40px; color: var(--color-primary);">quiz</span>
         </div>
-        <h3 style="margin-bottom: 8px;">No quizzes yet</h3>
-        <p style="color: var(--color-text-muted); margin-bottom: 32px;">Create your first AI-generated quiz to start
-            tracking progress.</p>
-        <a href="{% url 'quiz_setup' %}" class="btn btn-filled">Start Quiz</a>
+        <h3 style="margin-bottom: 12px; font-size: 1.5rem;">No quizzes yet</h3>
+        <p style="color: var(--color-on-surface-variant); margin-bottom: 32px; font-size: 1.1rem;">Create your first AI-generated quiz to start tracking progress.</p>
+        <a href="{% url 'quiz_setup' %}" class="btn btn-filled">Start Your First Quiz</a>
     </div>
     {% endif %}
 
 </div>
 
 <style>
-    /* Header Layout */
-    .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        gap: 32px;
-        margin-bottom: 60px;
-    }
-
-    .stats-row {
-        display: flex;
-        gap: 24px;
-    }
-
-    .badges-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 16px;
-    }
-
-    .badge-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: 20px;
-        font-size: 0.85rem;
-        cursor: help;
-    }
-
-    .badge-icon {
-        font-size: 1.2rem;
-    }
-
-    .badge-name {
-        color: var(--color-text-main);
-        font-weight: 500;
-    }
-
     .stat-card {
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        padding: 16px 32px;
-        border-radius: 16px;
+        padding: 20px 24px;
         text-align: center;
-        min-width: 140px;
-    }
-
-    .stat-label {
-        display: block;
-        font-size: 0.85rem;
-        color: var(--color-text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        line-height: 1;
-    }
-
-    /* THE GRID SYSTEM */
-    .quiz-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-        gap: 24px;
-    }
-
-    /* Card Styling */
-    .history-card {
+        flex: 1 1 140px;
         display: flex;
         flex-direction: column;
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        padding: 24px;
-        border-radius: 16px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        min-height: 180px;
-    }
-
-    .history-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-hover);
-    }
-
-    /* Incomplete card animation */
-    .card-incomplete {
-        border-color: rgba(245, 158, 11, 0.3);
-        animation: breathe 2s ease-in-out infinite;
-    }
-
-    .card-incomplete:hover {
-        border-color: var(--color-warning);
-    }
-
-    @keyframes breathe {
-
-        0%,
-        100% {
-            box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-        }
-
-        50% {
-            box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.1);
-        }
-    }
-
-    /* Incomplete indicator */
-    .incomplete-indicator {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--color-warning);
-        padding: 4px 10px;
-        background: rgba(245, 158, 11, 0.1);
-        border: 1px solid rgba(245, 158, 11, 0.2);
-        border-radius: 20px;
-    }
-
-    .incomplete-indicator .dot {
-        width: 8px;
-        height: 8px;
-        background: var(--color-warning);
-        border-radius: 50%;
-        animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-
-        0%,
-        100% {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        50% {
-            opacity: 0.5;
-            transform: scale(1.2);
-        }
-    }
-
-    .topic-tag {
-        font-weight: 700;
-        font-size: 1.2rem;
-        color: var(--color-text-main);
-        text-transform: capitalize;
-    }
-
-    .meta-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--color-text-muted);
-        font-size: 0.9rem;
-        background: var(--color-surface-variant);
-        padding: 4px 10px;
-        border-radius: 6px;
-    }
-
-    .meta-item .material-symbols-outlined {
-        font-size: 18px;
-    }
-
-    .score-badge {
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.95rem;
-    }
-
-    .view-btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--color-primary);
-        text-decoration: none;
-    }
-
-    .view-btn:hover {
-        text-decoration: underline;
-    }
-
-    /* Continue Button for incomplete quizzes */
-    .continue-btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: white;
-        background: var(--color-warning);
-        padding: 8px 16px;
-        border-radius: 20px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-    .continue-btn:hover {
-        background: #d97706;
-        transform: scale(1.05);
-    }
-
-    /* Action buttons */
-    .action-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 1px solid var(--color-border);
-        background: var(--color-surface);
-        color: var(--color-text-muted);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
     }
-
-    .action-btn .material-symbols-outlined {
-        font-size: 18px;
-    }
-
-    .action-btn.retry:hover {
-        background: var(--color-primary-container);
-        border-color: var(--color-primary);
-        color: var(--color-primary);
-    }
-
-    .action-btn.delete:hover {
-        background: rgba(239, 68, 68, 0.1);
-        border-color: var(--color-error);
-        color: var(--color-error);
-    }
-
-    @media (max-width: 768px) {
-        .dashboard-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .stats-row {
-            justify-content: center;
-        }
-
-        .quiz-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* Level Card & XP Bar Mini */
     .level-card {
-        background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(139, 92, 246, 0.05));
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        border: none;
     }
-
-    .xp-bar-mini {
-        width: 100%;
-        height: 6px;
-        background: var(--color-surface-variant);
-        border-radius: 3px;
-        overflow: hidden;
-        margin: 8px 0 4px 0;
+    .level-card .stat-label { color: rgba(255,255,255,0.8); }
+    .stat-label {
+        font-size: 0.85rem;
+        color: var(--color-on-surface-variant);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+        font-weight: 600;
     }
-
-    .xp-progress-mini {
-        height: 100%;
-        background: linear-gradient(90deg, #fbbf24, #f59e0b);
-        border-radius: 3px;
-        transition: width 0.5s ease;
+    .stat-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 1;
+        font-family: var(--font-display);
+    }
+    .action-btn:hover {
+        background: var(--color-surface-variant) !important;
+    }
+    .action-btn.delete:hover {
+        background: var(--color-error-container) !important;
+    }
+    .card-incomplete {
+        border: 2px solid var(--color-warning);
     }
 </style>
 {% endblock %}

@@ -3,18 +3,25 @@
 {% block title %}Too Many Requests - Quizzer AI{% endblock %}
 
 {% block content %}
-<div style="min-height: 60vh; display: flex; align-items: center; justify-content: center;">
-    <div class="card" style="max-width: 500px; padding: 48px; text-align: center;">
-        <div style="font-size: 4rem; margin-bottom: 16px; color: var(--color-error);">
-            <span class="material-symbols-outlined" style="font-size: inherit;">schedule</span>
+<div class="container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 48px 24px;">
+    
+    <div class="card" style="max-width: 480px; width: 100%; padding: 48px; text-align: center; box-shadow: var(--elevation-3);">
+        
+        <div style="display: inline-flex; justify-content: center; align-items: center; width: 80px; height: 80px; background: var(--color-error-container); color: var(--color-error); border-radius: var(--radius-full); margin-bottom: 24px;">
+            <span class="material-symbols-outlined" style="font-size: 40px;">schedule</span>
         </div>
-        <h1 style="font-size: 1.75rem; margin-bottom: 12px; color: var(--color-error);">Too Many Requests</h1>
-        <p style="color: var(--color-text-muted); margin-bottom: 24px; line-height: 1.6;">
+        
+        <h1 style="font-size: 2rem; margin-bottom: 16px;">Too Many Requests</h1>
+        
+        <p style="color: var(--color-on-surface-variant); margin-bottom: 32px; line-height: 1.6; font-size: 1.1rem;">
             You've made too many requests in a short period. Please wait a moment before trying again.
         </p>
-        <a href="{% url 'home' %}" class="btn btn-filled">
+        
+        <a href="{% url 'home' %}" class="btn btn-filled" style="width: 100%; height: 56px; font-size: 1.1rem;">
             Return to Home
         </a>
+        
     </div>
+
 </div>
 {% endblock %}

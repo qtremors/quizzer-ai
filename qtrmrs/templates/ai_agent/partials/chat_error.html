@@ -1,20 +1,18 @@
-<div class="message ai-message">
-    <div class="avatar ai-avatar">
-        <span class="material-symbols-outlined">psychology</span>
+<div class="message ai-message animate-fade-in" style="display: flex; gap: 16px; width: 100%; max-width: 800px; margin: 0 auto; padding-top: 16px;">
+    <div class="avatar ai-avatar" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; color: var(--color-error);">
+        <span class="material-symbols-outlined filled" style="font-size: 32px;">error</span>
     </div>
-    <div class="bubble" style="border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05);">
-        <div style="display: flex; align-items: flex-start; gap: 12px;">
-            <span class="material-symbols-outlined" style="color: var(--color-error);">error</span>
-            <div>
-                <p style="margin-bottom: 8px;">{{ message|default:"Something went wrong. Please try again." }}</p>
-                {% if suggestion %}
-                <p
-                    style="font-size: 0.9rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 6px;">
-                    <span class="material-symbols-outlined" style="font-size: 14px;">lightbulb</span>
-                    {{ suggestion }}
-                </p>
-                {% endif %}
-            </div>
+    
+    <div class="bubble error-bubble" style="background: var(--color-error-container); color: var(--color-on-error-container); padding: 16px 20px; border-radius: 20px; font-size: 1.05rem; line-height: 1.6; max-width: 90%; border: 1px solid var(--color-error);">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <p style="margin: 0; font-weight: 500;">{{ message|default:"Something went wrong while generating the quiz. Please try again." }}</p>
+            
+            {% if suggestion %}
+            <p style="margin: 0; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; opacity: 0.9;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">lightbulb</span>
+                {{ suggestion }}
+            </p>
+            {% endif %}
         </div>
     </div>
 </div>

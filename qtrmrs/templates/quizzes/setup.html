@@ -1,30 +1,34 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container" style="padding-top: 24px; padding-bottom: 48px;">
+<div class="container" style="padding-top: 48px; padding-bottom: 80px;">
     <div style="max-width: 900px; margin: 0 auto;">
 
-        <div style="margin-bottom: 24px; text-align: center;">
-            <h1 style="margin-bottom: 8px; font-size: 2rem;">Configure Session</h1>
-            <p style="color: var(--color-text-muted); font-size: 1rem;">Customize your AI generation parameters.</p>
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="display: inline-flex; justify-content: center; align-items: center; width: 64px; height: 64px; background: var(--color-primary-container); color: var(--color-on-primary-container); border-radius: var(--radius-full); margin-bottom: 16px;">
+                <span class="material-symbols-outlined" style="font-size: 32px;">tune</span>
+            </div>
+            <h1 style="font-size: clamp(2rem, 3vw, 2.5rem); margin-bottom: 8px;">Configure Session</h1>
+            <p style="color: var(--color-on-surface-variant); font-size: 1.1rem; margin: 0;">Customize your AI generation parameters.</p>
         </div>
 
-        <div class="card" style="padding: 32px; border-radius: 16px;">
+        <div class="card" style="padding: 40px; box-shadow: var(--elevation-3);">
 
-            <form hx-post="{% url 'create_quiz' %}" hx-indicator="#generate-btn" hx-disabled-elt="#generate-btn"
-                class="setup-form">
-
+            <form hx-post="{% url 'create_quiz' %}" hx-indicator="#generate-btn" hx-disabled-elt="#generate-btn" class="setup-form">
                 {% csrf_token %}
 
                 <div class="setup-grid">
 
                     <div class="grid-col">
-                        <h3 class="section-title">Subject Matter</h3>
+                        <h3 class="section-title">
+                            <span class="material-symbols-outlined">menu_book</span>
+                            Subject Matter
+                        </h3>
 
-                        <div class="form-group">
+                        <div class="form-group" style="margin-bottom: 24px;">
                             <label>Language / Technology</label>
-                            <div class="select-wrapper" style="margin-bottom: 12px;">
-                                <select name="language_select" id="lang-select">
+                            <div class="select-wrapper" style="margin-bottom: 12px; position: relative;">
+                                <select name="language_select" class="form-input" id="lang-select">
                                     <option value="Python">Python</option>
                                     <option value="JavaScript">JavaScript</option>
                                     <option value="TypeScript">TypeScript</option>
@@ -38,52 +42,53 @@
                                     <option value="CSS">CSS</option>
                                     <option value="HTML">HTML</option>
                                 </select>
-                                <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                                <span class="material-symbols-outlined arrow-icon" style="position: absolute; right: 16px; top: 16px; pointer-events: none; color: var(--color-on-surface-variant);">expand_more</span>
                             </div>
-                            <input type="text" name="custom_language" placeholder="Or type custom (e.g. Kotlin)..."
-                                class="form-input" style="font-size: 0.9rem; padding: 10px 16px; border-style: dashed;">
+                            <input type="text" name="custom_language" placeholder="Or type custom (e.g. Kotlin)..." class="form-input" style="border-style: dashed; padding: 12px 16px;">
                         </div>
 
                         <div class="form-group">
                             <label>Specific Topic</label>
-                            <input type="text" name="topic" required placeholder="e.g. Flexbox, Recursion"
-                                class="form-input">
+                            <input type="text" name="topic" required placeholder="e.g. Flexbox, Recursion" class="form-input">
                         </div>
                     </div>
 
                     <div class="grid-col">
-                        <h3 class="section-title">Constraints</h3>
-                        <div class="form-row">
-                            <div class="form-group">
+                        <h3 class="section-title">
+                            <span class="material-symbols-outlined">settings_suggest</span>
+                            Constraints
+                        </h3>
+                        
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                            <div class="form-group" style="margin: 0;">
                                 <label>Difficulty</label>
-                                <div class="select-wrapper">
-                                    <select name="level">
+                                <div class="select-wrapper" style="position: relative;">
+                                    <select name="level" class="form-input">
                                         <option value="Beginner">Beginner</option>
                                         <option value="Intermediate" selected>Intermediate</option>
                                         <option value="Expert">Expert</option>
                                     </select>
-                                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                                    <span class="material-symbols-outlined arrow-icon" style="position: absolute; right: 16px; top: 16px; pointer-events: none; color: var(--color-on-surface-variant);">expand_more</span>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="margin: 0;">
                                 <label>Length</label>
-                                <div class="select-wrapper">
-                                    <select name="num_questions">
+                                <div class="select-wrapper" style="position: relative;">
+                                    <select name="num_questions" class="form-input">
                                         <option value="5" selected>5 Qs</option>
                                         <option value="10">10 Qs</option>
                                         <option value="15">15 Qs</option>
                                         <option value="20">20 Qs</option>
                                     </select>
-                                    <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                                    <span class="material-symbols-outlined arrow-icon" style="position: absolute; right: 16px; top: 16px; pointer-events: none; color: var(--color-on-surface-variant);">expand_more</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- AI Model Selector -->
-                        <div class="form-group">
+                        <div class="form-group" style="margin-bottom: 16px;">
                             <label>AI Model</label>
-                            <div class="select-wrapper">
-                                <select name="ai_model">
+                            <div class="select-wrapper" style="position: relative;">
+                                <select name="ai_model" class="form-input">
                                     {% for model in available_models %}
                                     <option value="{{ model.id }}" {% if model.is_default %}selected{% endif %}>
                                         {{ model.display_name }}
@@ -92,16 +97,14 @@
                                     <option value="">Default (Flash Lite)</option>
                                     {% endfor %}
                                 </select>
-                                <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                                <span class="material-symbols-outlined arrow-icon" style="position: absolute; right: 16px; top: 16px; pointer-events: none; color: var(--color-on-surface-variant);">expand_more</span>
                             </div>
                         </div>
 
-                        <div class="toggle-row">
+                        <div class="toggle-row" style="display: flex; justify-content: space-between; align-items: center; background: var(--color-surface-variant); padding: 16px 20px; border-radius: var(--radius-md); margin-top: 24px;">
                             <div>
-                                <span style="font-weight: 600; display: block; color: var(--color-text-main);">Coding
-                                    Challenges</span>
-                                <span style="font-size: 0.85rem; color: var(--color-text-muted);">Include code
-                                    snippets</span>
+                                <span style="font-weight: 600; font-size: 1rem; color: var(--color-on-surface); display: block;">Coding Challenges</span>
+                                <span style="font-size: 0.85rem; color: var(--color-on-surface-variant);">Include code snippets</span>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" name="include_code">
@@ -111,43 +114,31 @@
                     </div>
                 </div>
 
-                <div
-                    style="margin-top: 32px; border-top: 1px solid var(--color-border); padding-top: 24px; text-align: center;">
+                <div style="margin-top: 48px; border-top: 1px solid var(--color-outline-variant); padding-top: 32px; text-align: center;">
 
-                    <button type="submit" id="generate-btn" class="btn btn-filled"
-                        style="height: 52px; padding: 0 40px; font-size: 1.05rem; min-width: 240px; width: 100%; max-width: 300px;">
-
-                        <span class="btn-content"
-                            style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                    <button type="submit" id="generate-btn" class="btn btn-filled" style="height: 56px; padding: 0 40px; font-size: 1.1rem; width: 100%; max-width: 320px;">
+                        <span class="btn-content" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <span class="material-symbols-outlined">auto_awesome</span> Generate Quiz
                         </span>
-
-                        <span class="btn-loading"
-                            style="display: none; align-items: center; justify-content: center; gap: 12px;">
-                            <span class="mini-spinner"></span> AI is thinking...
+                        <span class="btn-loading" style="display: none; align-items: center; justify-content: center; gap: 12px;">
+                            <span class="btn-spinner"></span> AI is thinking...
                         </span>
-
                     </button>
+                    
                 </div>
-
             </form>
         </div>
     </div>
 </div>
 
 <script>
-
     (function () {
         const urlParam = "{{ initial_lang }}";
-
         if (urlParam) {
             const select = document.getElementById('lang-select');
             const customInput = document.querySelector('input[name="custom_language"]');
-
             if (select) {
                 let foundInDropdown = false;
-
-                // 1. Try to find it in the dropdown
                 for (let i = 0; i < select.options.length; i++) {
                     if (select.options[i].value.toLowerCase() === urlParam.toLowerCase()) {
                         select.selectedIndex = i;
@@ -155,8 +146,6 @@
                         break;
                     }
                 }
-
-                // 2. If not in dropdown, put it in the Custom Input
                 if (!foundInDropdown && customInput) {
                     customInput.value = urlParam;
                 }
@@ -166,101 +155,27 @@
 </script>
 
 <style>
-    /* Layout */
     .setup-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 60px;
+        gap: 48px;
     }
-
+    
     .section-title {
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--color-text-muted);
-        margin-bottom: 24px;
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: 8px;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-
-    .form-group {
-        margin-bottom: 24px;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: var(--color-text-main);
-    }
-
-    /* Inputs */
-    .form-input,
-    select {
-        width: 100%;
-        padding: 14px 16px;
-        border-radius: 8px;
-        border: 1px solid var(--color-border);
-        background: var(--color-bg);
-        color: var(--color-text-main);
-        font-size: 1rem;
-        outline: none;
-        appearance: none;
-        transition: border-color 0.2s;
-    }
-
-    .form-input:focus,
-    select:focus {
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px var(--color-primary-container);
-    }
-
-    .select-wrapper {
-        position: relative;
-    }
-
-    .arrow-icon {
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        pointer-events: none;
-        color: var(--color-text-muted);
-    }
-
-    /* Toggle */
-    .toggle-row {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        background: var(--color-bg);
-        border: 1px solid var(--color-border);
-        padding: 20px;
-        border-radius: 12px;
-        margin-top: 10px;
+        gap: 8px;
+        font-size: 1.1rem;
+        color: var(--color-primary);
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--color-primary-container);
     }
-
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 26px;
+    
+    select {
+        appearance: none;
+        -webkit-appearance: none;
     }
-
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    /* Toggle uses theme-aware slider from base.css */
 
     @media (max-width: 768px) {
         .setup-grid {
@@ -269,34 +184,8 @@
         }
     }
 
-    /* --- ANIMATION LOGIC --- */
-
-    #generate-btn.htmx-request .btn-content {
-        display: none !important;
-    }
-
-    #generate-btn.htmx-request .btn-loading {
-        display: flex !important;
-    }
-
-    #generate-btn.htmx-request {
-        opacity: 0.8;
-        cursor: wait;
-    }
-
-    .mini-spinner {
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
+    #generate-btn.htmx-request .btn-content { display: none !important; }
+    #generate-btn.htmx-request .btn-loading { display: flex !important; }
+    #generate-btn.htmx-request { opacity: 0.8; cursor: wait; }
 </style>
 {% endblock %}

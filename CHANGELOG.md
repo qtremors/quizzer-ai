@@ -1,8 +1,20 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.8  
+> **Version:** 1.5.9  
 > **Last Updated:** 2026-02-27
+
+---
+
+## [1.5.9] - 2026-02-27
+
+### UI/UX (Frontend Overhaul)
+- **UI-001:** Complete frontend overhaul to Google Material Design 3 (M3) principles using expressive custom CSS and HTMX.
+- **UI-002:** Replaced existing styles with custom M3 CSS system for dynamic layouts, fluid typography (`Outfit`/`Roboto`), and core components.
+- **UI-003:** Refactored core templates (home, dashboard, settings, authentication) to use M3 elevated cards, filled inputs, and dynamic grids.
+- **UI-004:** Overhauled immersive quiz engine (setup, player, results) with interactive M3 option cards, dynamic progress bars, and semantic result coloring.
+- **UI-005:** Redesigned AI Agent chat interface with quick suggestion chips, animated loading indicators, and modern pill-styled inputs.
+- **UI-006:** Integrated premium M3 expressive micro-interactions, ripple effects, shimmer loads, and restyled snackbars/toasts for feedback.
 
 ---
 
