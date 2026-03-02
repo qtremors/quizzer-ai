@@ -265,6 +265,8 @@ class QuizGenerator:
             
             # Ensure the output length matches the input length
             if isinstance(explanations, list):
+                # BUG-014: Coerce each element to string in case AI returns non-string types
+                explanations = [str(e) for e in explanations]
                 if len(explanations) < len(qa_pairs):
                     explanations.extend(["Unable to generate explanation."] * (len(qa_pairs) - len(explanations)))
                 return explanations[:len(qa_pairs)]

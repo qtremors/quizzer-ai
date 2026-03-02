@@ -134,6 +134,7 @@ def demo_player(request):
     })
 
 
+@ratelimit(key='ip', rate='30/m', method='POST', block=True)
 @require_http_methods(["POST"])
 def demo_submit(request):
     """Handle demo quiz answer submission."""

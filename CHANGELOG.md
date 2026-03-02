@@ -1,8 +1,29 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.6.3  
+> **Version:** 1.6.4  
 > **Last Updated:** 2026-03-02
+
+---
+
+## [1.6.4] - 2026-03-02
+
+### Fixed
+- **BUG-013:** Fixed `quiz_results` score recalculation guard — removed `correct_count > 0` condition so legitimate 0% scores are handled correctly
+- **BUG-014:** `generate_batch_explanations` now coerces each AI response element to `str()` to handle non-string types in the JSON array
+- **BUG-015:** `format_duration` now clamps negative values to 0 instead of producing nonsensical output
+
+### Security
+- **SEC-016:** Added `@ratelimit(key='ip', rate='30/m')` to `demo_submit` to prevent rapid session writes
+- **SEC-019:** `sync_models` management command now uses shared `get_gemini_client()` singleton instead of creating its own client
+
+### Performance
+- **ARCH-007:** `Question.objects.create()` per-question loop replaced with `Question.objects.bulk_create()` — reduces quiz creation from N+1 to 2 INSERT queries
+
+### Changed
+- **CLEAN-010:** Renamed misleading `UserProfile.xp_for_next_level` → `xp_to_next_level` (property returns XP needed within current level, not absolute milestone)
+- **CFG-002:** `build.sh` now runs `sync_models` before `set_active_models` so new Gemini models auto-populate on deploy
+- **DOC-010:** `DEVELOPMENT.md` moved `DATABASE_URL` from required to optional (SQLite fallback added in v1.6.3)
 
 ---
 

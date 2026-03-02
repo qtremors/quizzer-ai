@@ -19,7 +19,8 @@ python manage.py collectstatic --no-input
 # 5. Apply Migrations
 python manage.py migrate
 
-# 5.5. Seed gamification data (badges) and AI model config
+# 5.5. Sync AI models from API, seed gamification data, and configure active models
+python manage.py sync_models
 python manage.py seed_gamification
 python manage.py set_active_models
 

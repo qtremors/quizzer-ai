@@ -21,7 +21,8 @@ def quiz_results(request, quiz_id):
     
     # Recalculate score only if quiz was completed but score wasn't persisted
     # (safety net — normal flow always saves score in submit_answer)
-    if quiz.completed_at and quiz.score == 0 and correct_count > 0 and quiz.total_questions > 0:
+    # BUG-013: Removed `correct_count > 0` guard — legitimate 0% scores should also persist
+    if quiz.completed_at and quiz.score == 0 and quiz.total_questions > 0:
         calculated_score = round((correct_count / quiz.total_questions * 100))
         if calculated_score > 0:
             quiz.score = calculated_score

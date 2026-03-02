@@ -13,6 +13,8 @@ def format_duration(seconds: int) -> str:
     Returns:
         Formatted string like "2m 30s" or "45s"
     """
+    # BUG-015: Clamp negative values to 0
+    seconds = max(0, seconds)
     if seconds >= 3600:
         hours = seconds // 3600
         minutes = (seconds % 3600) // 60

@@ -2,7 +2,7 @@
 
 > Comprehensive documentation for developers working on Quizzer AI.
 
-**Version:** 1.6.3 | **Last Updated:** 2026-03-02
+**Version:** 1.6.4 | **Last Updated:** 2026-03-02
 
 ---
 
@@ -142,13 +142,13 @@ uv run python qtrmrs/manage.py set_active_models
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `GEMINI_API_KEY` | API key from Google AI Studio | `AIzaSy...` |
-| `DATABASE_URL` | NeonDB/PostgreSQL Connection String | `postgres://user:pass@host/db` |
 | `SECRET_KEY` | Django secret key for production | `django-insecure...` |
 
 ### Optional
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string (production) | SQLite in dev |
 | `DEBUG` | Enables debug mode | `False` |
 | `DJANGO_LOG_LEVEL` | Log verbosity (INFO, DEBUG, ERROR) | `INFO` |
 | `DEFAULT_AI_MODEL` | Gemini model version | `gemini-flash-lite-latest` |

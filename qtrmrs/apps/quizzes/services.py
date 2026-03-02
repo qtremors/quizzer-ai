@@ -44,15 +44,20 @@ def create_quiz_from_ai_data(
             model_used=model_used
         )
 
-        options_to_create = []
-        for q_data in questions_data:
-            question = Question.objects.create(
+        # ARCH-007: Bulk-create questions in a single INSERT instead of per-question
+        questions_to_create = [
+            Question(
                 quiz=quiz,
                 text=q_data.get('text', '')[:2000],
                 code_snippet=q_data.get('code_snippet') or '',
                 explanation=q_data.get('explanation', '')
             )
+            for q_data in questions_data
+        ]
+        created_questions = Question.objects.bulk_create(questions_to_create)
 
+        options_to_create = []
+        for question, q_data in zip(created_questions, questions_data):
             # BUG-011: Normalize correct_answer once to handle AI whitespace variations
             correct_answer = str(q_data.get('correct_answer', '')).strip()[:255]
 

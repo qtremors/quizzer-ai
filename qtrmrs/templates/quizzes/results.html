@@ -74,7 +74,7 @@
             <div style="margin-top: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
                 <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--color-on-primary-container); margin-bottom: 8px; font-weight: 600;">
                     <span>Level {{ profile.level }}</span>
-                    <span>{{ profile.xp_in_current_level }} / {{ profile.xp_for_next_level }} XP</span>
+                    <span>{{ profile.xp_in_current_level }} / {{ profile.xp_to_next_level }} XP</span>
                 </div>
                 <div class="xp-bar" style="height: 8px; background: rgba(0,0,0,0.1); border-radius: var(--radius-full); overflow: hidden;">
                     <div class="xp-progress" style="height: 100%; width: {{ profile.xp_progress_percent }}%; background: var(--color-primary); border-radius: var(--radius-full); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);"></div>
