@@ -39,6 +39,24 @@ Explain briefly (in 2 sentences max) why the user's answer is wrong and why the 
 Be encouraging but technically precise.
 """
 
+BATCH_EXPLANATION_PROMPT = """
+You are given a list of questions that a user answered incorrectly.
+
+Task: Provide a unified JSON array of explanations. Provide a brief explanation (2 sentences max) for each item detailing why the user's answer is wrong and the correct answer is right.
+Be encouraging but technically precise.
+
+Input Data:
+{qa_pairs}
+
+Output Format (Strict JSON Array):
+[
+  "Explanation for item 1",
+  "Explanation for item 2",
+  ...
+]
+The array length MUST exactly match the number of input items.
+"""
+
 
 
 

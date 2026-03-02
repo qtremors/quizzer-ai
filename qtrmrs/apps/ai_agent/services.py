@@ -235,6 +235,48 @@ class QuizGenerator:
                 return f"⚠️ Could not generate explanation (API quota exceeded for {self.model_name}). Try a different model."
             return "Unable to generate explanation at this moment."
 
+    def generate_batch_explanations(self, qa_pairs: list[dict]) -> list[str]:
+        """
+        Generates explanations for multiple incorrect answers in a single AI call.
+        qa_pairs should be a list of dicts: {'question': str, 'user_answer': str, 'correct_answer': str}
+        Returns a list of explanation strings of the same length as the input.
+        """
+        if not qa_pairs:
+            return []
+
+        # Format the input data for the prompt
+        formatted_pairs = "\n".join([
+            f"Item {i+1}:\nQuestion: '{p['question']}'\nUser Answer: '{p['user_answer']}'\nCorrect Answer: '{p['correct_answer']}'"
+            for i, p in enumerate(qa_pairs)
+        ])
+
+        from .prompts import BATCH_EXPLANATION_PROMPT
+        prompt = BATCH_EXPLANATION_PROMPT.format(qa_pairs=formatted_pairs)
+        
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+            explanations = json.loads(response.text)
+            
+            # Ensure the output length matches the input length
+            if isinstance(explanations, list):
+                if len(explanations) < len(qa_pairs):
+                    explanations.extend(["Unable to generate explanation."] * (len(qa_pairs) - len(explanations)))
+                return explanations[:len(qa_pairs)]
+                
+            raise ValueError("AI response was not a JSON array")
+        except Exception as e:
+            logger.error(f"Batch Explanation Generation Error: {e}")
+            error_msg = "Unable to generate explanation at this moment."
+            if '429' in str(e) or 'quota' in str(e).lower():
+                error_msg = f"⚠️ Could not generate explanation (API quota exceeded for {self.model_name})."
+            return [error_msg] * len(qa_pairs)
+
     # ==========================================
     # ASYNC METHODS (for ASGI/Django Channels)
     # ==========================================

@@ -1,8 +1,24 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.9  
-> **Last Updated:** 2026-02-27
+> **Version:** 1.6.0  
+> **Last Updated:** 2026-03-02
+
+---
+
+## [1.6.0] - 2026-03-02
+
+### Performance
+- **PERF-002:** Removed `code_snippet` from demo session data to prevent cookie bloat
+- **PERF-003:** Added `<link rel="preload">` for HTMX and Alpine.js CDN resources in `base.html`
+- **PERF-007:** Replaced serial per-question AI calls in `generate_all_explanations` with single batched API call via new `generate_batch_explanations()` method and `BATCH_EXPLANATION_PROMPT`; results saved with `bulk_update` instead of individual saves
+- **PERF-008:** Cached dashboard aggregate stats (total quizzes, avg score, incomplete count) for 15 minutes per user
+- **PERF-009:** Consolidated `answered_ids` query in `submit_answer` to a single fetch; added dashboard cache invalidation on quiz actions
+
+### Security
+- **SEC-008:** Added `@ratelimit(key='ip', rate='5/h')` to password reset endpoint to prevent enumeration
+- **SEC-013:** Documented `CSRF_COOKIE_HTTPONLY = True` latent risk for HTMX on cached pages in `settings.py`
+- **SEC-015:** Added `clean_avatar()` validation with 2MB file size limit on avatar uploads
 
 ---
 

@@ -139,6 +139,8 @@ def user_dashboard(request):
     """
     Shows quiz history and statistics with pagination.
     """
+    from django.core.cache import cache
+    
     user_quizzes = Quiz.objects.for_user(request.user)
     
     # Pagination - 12 quizzes per page
@@ -150,18 +152,27 @@ def user_dashboard(request):
         page_number = 1
     quizzes_page = paginator.get_page(page_number)
     
-    # Calculate Stats (on all quizzes, not just this page)
-    total_quizzes = user_quizzes.count()
-    avg_score = user_quizzes.aggregate(Avg('score'))['score__avg'] or 0
+    # PERF-008: Cache aggregate stats for 15 minutes to prevent heavy DB load per user request
+    cache_key = f'user_dashboard_stats_{request.user.id}'
+    stats = cache.get(cache_key)
     
-    # Count incomplete quizzes (no completed_at)
-    incomplete_count = user_quizzes.filter(completed_at__isnull=True).count()
+    if stats is None:
+        total_quizzes = user_quizzes.count()
+        avg_score = user_quizzes.aggregate(Avg('score'))['score__avg'] or 0
+        incomplete_count = user_quizzes.filter(completed_at__isnull=True).count()
+        
+        stats = {
+            'total_quizzes': total_quizzes,
+            'avg_score': round(avg_score, 1),
+            'incomplete_count': incomplete_count,
+        }
+        cache.set(cache_key, stats, 60 * 15)  # Cache for 15 minutes
     
     context = {
         'quizzes': quizzes_page,
-        'total_quizzes': total_quizzes,
-        'avg_score': round(avg_score, 1),
-        'incomplete_count': incomplete_count,
+        'total_quizzes': stats['total_quizzes'],
+        'avg_score': stats['avg_score'],
+        'incomplete_count': stats['incomplete_count'],
         'page_obj': quizzes_page,  # For pagination template
         'profile': request.user.profile,  # For level/XP/streak display
         'badges': request.user.earned_badges.select_related('badge').order_by('-earned_at')[:6],  # Recent badges

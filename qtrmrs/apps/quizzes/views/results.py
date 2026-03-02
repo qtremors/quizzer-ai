@@ -67,37 +67,39 @@ def generate_all_explanations(request, quiz_id):
     """
     HTMX View: 
     1. Finds ALL wrong/skipped answers.
-    2. Generates AI text for them in a batch (loop).
+    2. Generates AI text for them in a batch (single AI call).
     3. Re-renders the answer list part of the page with explanations included.
     Uses the same AI model that was used to generate the quiz.
     """
     quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
     
-    # Filter for wrong or skipped answers that don't have an explanation yet
-    # (is_correct=False covers both Wrong and Skipped)
-    # prefetch_related avoids N+1 query when accessing options in the loop
-    answers_needing_help = UserAnswer.objects.filter(
+    answers_needing_help = list(UserAnswer.objects.filter(
         quiz=quiz, 
         is_correct=False, 
         error_explanation=''
-    ).select_related('question', 'selected_option').prefetch_related('question__options')
+    ).select_related('question', 'selected_option').prefetch_related('question__options'))
     
-    # Use the same model that generated this quiz
-    model_to_use = quiz.model_used if quiz.model_used else None
-    generator = QuizGenerator(model_name=model_to_use)
-    
-    for ans in answers_needing_help:
-        # Use Python filtering instead of DB query to leverage prefetch
-        correct_opt = next((o for o in ans.question.options.all() if o.is_correct), None)
-        user_text = ans.selected_option.text if ans.selected_option else "Skipped"
+    if answers_needing_help:
+        model_to_use = quiz.model_used if quiz.model_used else None
+        generator = QuizGenerator(model_name=model_to_use)
         
-        explanation = generator.generate_explanation(
-            question_text=ans.question.text,
-            user_answer=user_text,
-            correct_answer=correct_opt.text if correct_opt else "Unknown"
-        )
-        ans.error_explanation = explanation
-        ans.save(update_fields=['error_explanation'])
+        qa_pairs = []
+        for ans in answers_needing_help:
+            correct_opt = next((o for o in ans.question.options.all() if o.is_correct), None)
+            user_text = ans.selected_option.text if ans.selected_option else "Skipped"
+            qa_pairs.append({
+                'question': ans.question.text,
+                'user_answer': user_text,
+                'correct_answer': correct_opt.text if correct_opt else "Unknown"
+            })
+            
+        explanations = generator.generate_batch_explanations(qa_pairs)
+        
+        # Bulk save
+        for ans, explanation in zip(answers_needing_help, explanations):
+            ans.error_explanation = str(explanation)
+            
+        UserAnswer.objects.bulk_update(answers_needing_help, ['error_explanation'])
     
     # Re-fetch all answers to render the list again
     user_answers = UserAnswer.objects.filter(quiz=quiz).select_related(

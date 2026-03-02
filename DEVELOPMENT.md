@@ -2,7 +2,7 @@
 
 > Comprehensive documentation for developers working on Quizzer AI.
 
-**Version:** 1.5.3 | **Last Updated:** 2026-01-24
+**Version:** 1.6.0 | **Last Updated:** 2026-03-02
 
 ---
 

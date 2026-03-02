@@ -91,7 +91,7 @@ def quick_quiz(request):
                 'text': q.get('text', '')[:MAX_TEXT_LENGTH],
                 'options': q.get('options', [])[:6],  # Max 6 options
                 'correct_answer': str(q.get('correct_answer', ''))[:255],
-                'code_snippet': (q.get('code_snippet') or '')[:1000] if q.get('code_snippet') else None,
+                # PERF-002: Omit code_snippet entirely from demo session to prevent cookie bloat
             }
             for q in questions_data[:MAX_DEMO_QUESTIONS]  # Limit questions
         ]

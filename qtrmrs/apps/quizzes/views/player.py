@@ -34,72 +34,60 @@ def submit_answer(request, quiz_id, question_id):
     quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
     question = get_object_or_404(Question, id=question_id, quiz=quiz)
     
+    # PERF-009: Invalidate dashboard cache for this user since a quiz action occurred
+    from django.core.cache import cache
+    cache.delete(f'user_dashboard_stats_{request.user.id}')
+    
     # Check if answer already exists (prevent duplicate submissions)
-    if UserAnswer.objects.filter(quiz=quiz, question=question).exists():
-        # Already answered, just get next question
-        answered_ids = list(quiz.answers.values_list('question_id', flat=True))
-        next_q = quiz.questions.exclude(id__in=answered_ids).first()
+    if not UserAnswer.objects.filter(quiz=quiz, question=question).exists():
+        selected_option_id = request.POST.get('option')
+        action = request.POST.get('action')
         
-        if not next_q:
-            response = HttpResponse()
-            response['HX-Redirect'] = f"/quiz/results/{quiz.id}/"
-            return response
+        # Get time taken (in seconds)
+        try:
+            time_taken = int(request.POST.get('time_taken', 0))
+            time_taken = min(max(time_taken, 0), 3600)  # Clamp 0-1hr
+        except (ValueError, TypeError):
+            time_taken = 0
         
-        total_qs = quiz.questions.count()
-        progress = (len(answered_ids) / total_qs * 100) if total_qs > 0 else 0
-        
-        return render(request, 'quizzes/partials/question_card.html', {
-            'quiz': quiz,
-            'question': next_q,
-            'progress': progress,
-            'is_last': (len(answered_ids) + 1 == total_qs)
-        })
-    
-    selected_option_id = request.POST.get('option')
-    action = request.POST.get('action')
-    
-    # Get time taken (in seconds)
-    try:
-        time_taken = int(request.POST.get('time_taken', 0))
-        time_taken = min(max(time_taken, 0), 3600)  # Clamp 0-1hr
-    except (ValueError, TypeError):
-        time_taken = 0
-    
-    # Create the answer
-    if action == 'skip' or not selected_option_id:
-        user_answer = UserAnswer.objects.create(
-            quiz=quiz, question=question, selected_option=None, 
-            is_correct=False, time_taken=time_taken
-        )
-    else:
-        selected_option = get_object_or_404(Option, id=selected_option_id, question=question)
-        is_correct = selected_option.is_correct
-        user_answer = UserAnswer.objects.create(
-            quiz=quiz, question=question, selected_option=selected_option, 
-            is_correct=is_correct, time_taken=time_taken
-        )
+        # Create the answer
+        if action == 'skip' or not selected_option_id:
+            user_answer = UserAnswer.objects.create(
+                quiz=quiz, question=question, selected_option=None, 
+                is_correct=False, time_taken=time_taken
+            )
+        else:
+            selected_option = get_object_or_404(Option, id=selected_option_id, question=question)
+            is_correct = selected_option.is_correct
+            user_answer = UserAnswer.objects.create(
+                quiz=quiz, question=question, selected_option=selected_option, 
+                is_correct=is_correct, time_taken=time_taken
+            )
 
-    # Get next question
+    # PERF-009: Consolidate getting the list of answered IDs to exactly once.
     answered_ids = list(quiz.answers.values_list('question_id', flat=True))
     next_q = quiz.questions.exclude(id__in=answered_ids).first()
 
     if not next_q:
-        # Quiz completed - calculate final score properly
-        correct_count = quiz.answers.filter(is_correct=True).count()
-        total_qs = quiz.total_questions
-        quiz.score = round((correct_count / total_qs * 100)) if total_qs > 0 else 0
-        quiz.completed_at = timezone.now()
-        
-        # Gamification: XP, levels, streaks, badges
-        gamification = award_quiz_completion(quiz, request.user)
-        
-        # Store XP info in session for display on results page
-        request.session['quiz_xp_earned'] = gamification['xp_earned']
-        request.session['quiz_leveled_up'] = gamification['leveled_up']
-        request.session['quiz_new_level'] = gamification['new_level']
-        request.session['quiz_new_badges'] = (
-            [b.name for b in gamification['new_badges']] if gamification['new_badges'] else []
-        )
+        # Check if score already computed to avoid redundant work if previously finished
+        if quiz.score == 0 and not quiz.completed_at:
+            # Quiz completed - calculate final score properly
+            correct_count = quiz.answers.filter(is_correct=True).count()
+            total_qs = quiz.total_questions
+            quiz.score = round((correct_count / total_qs * 100)) if total_qs > 0 else 0
+            quiz.completed_at = timezone.now()
+            
+            # Gamification: XP, levels, streaks, badges
+            gamification = award_quiz_completion(quiz, request.user)
+            quiz.save()
+            
+            # Store XP info in session for display on results page
+            request.session['quiz_xp_earned'] = gamification['xp_earned']
+            request.session['quiz_leveled_up'] = gamification['leveled_up']
+            request.session['quiz_new_level'] = gamification['new_level']
+            request.session['quiz_new_badges'] = (
+                [b.name for b in gamification['new_badges']] if gamification['new_badges'] else []
+            )
         
         response = HttpResponse()
         response['HX-Redirect'] = f"/quiz/results/{quiz.id}/"

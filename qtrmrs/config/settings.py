@@ -196,6 +196,10 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
+    
+    # Note: Setting CSRF_COOKIE_HTTPONLY = True may break HTMX CSRF functionality on cached pages.
+    # Currently mitigated by server-side template tags, but there is a latent risk if templates 
+    # relying heavily on HTMX are cached extensively without passing CSRF headers properly.
     CSRF_COOKIE_HTTPONLY = True
     
     # Other Security Headers
