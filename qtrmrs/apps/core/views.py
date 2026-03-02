@@ -21,9 +21,9 @@ def ratelimited_view(request, exception):
 @require_GET
 def health_check(request):
     """Basic health check for monitoring and load balancers."""
-    from django.db import connection
+    from django.db import connection, DatabaseError
     try:
         connection.ensure_connection()
         return JsonResponse({'status': 'ok'}, status=200)
-    except Exception:
+    except DatabaseError:
         return JsonResponse({'status': 'error', 'detail': 'database unavailable'}, status=503)

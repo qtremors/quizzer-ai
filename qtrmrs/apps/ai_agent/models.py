@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 
 
 class AIModel(models.Model):
@@ -12,12 +12,22 @@ class AIModel(models.Model):
         return self.display_name
     
     def save(self, *args, **kwargs):
-        # Ensure only one default model exists
-        if self.is_default:
-            AIModel.objects.filter(is_default=True).exclude(pk=self.pk).update(is_default=False)
-        super().save(*args, **kwargs)
+        # PR-002: Atomic transaction with select_for_update to prevent race conditions
+        with transaction.atomic():
+            if self.is_default:
+                AIModel.objects.select_for_update().filter(
+                    is_default=True
+                ).exclude(pk=self.pk).update(is_default=False)
+            super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = "AI Model"
         verbose_name_plural = "AI Models"
         db_table = 'quizzes_aimodel'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['is_default'],
+                condition=models.Q(is_default=True),
+                name='unique_default_ai_model',
+            ),
+        ]

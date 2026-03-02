@@ -30,9 +30,12 @@
         </div>
 
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-            <a href="{% url 'quick_quiz' %}" class="btn btn-tonal" style="height: 48px; padding: 0 24px;">
-                <span class="material-symbols-outlined" style="margin-right: 8px;">replay</span> Try Another Quiz
-            </a>
+            <form method="POST" action="{% url 'quick_quiz' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-tonal" style="height: 48px; padding: 0 24px;">
+                    <span class="material-symbols-outlined" style="margin-right: 8px;">replay</span> Try Another Quiz
+                </button>
+            </form>
             <a href="{% url 'login' %}" class="btn btn-text" style="height: 48px;">
                 Already have an account? Log in
             </a>

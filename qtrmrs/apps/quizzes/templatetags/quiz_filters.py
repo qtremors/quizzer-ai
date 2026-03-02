@@ -9,7 +9,10 @@ def format_time(seconds):
     """Format seconds into human-readable time string."""
     if seconds is None:
         return "0s"
-    return format_duration(int(seconds))
+    try:
+        return format_duration(int(seconds))
+    except (TypeError, ValueError):
+        return "0s"
 
 
 @register.filter

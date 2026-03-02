@@ -106,13 +106,13 @@
                 <div style="display: flex; gap: 12px; align-items: center;">
                     <form action="{% url 'retry_quiz' quiz.id %}" method="POST" style="margin: 0;">
                         {% csrf_token %}
-                        <button type="submit" class="action-btn" title="Retry Quiz" style="background: transparent; border: none; color: var(--color-on-surface-variant); cursor: pointer; display: flex; align-items: center; padding: 8px; border-radius: 50%; transition: background 0.2s;">
+                        <button type="submit" class="action-btn" title="Retry Quiz" aria-label="Retry Quiz" style="background: transparent; border: none; color: var(--color-on-surface-variant); cursor: pointer; display: flex; align-items: center; padding: 8px; border-radius: 50%; transition: background 0.2s;">
                             <span class="material-symbols-outlined">replay</span>
                         </button>
                     </form>
                     <form action="{% url 'delete_quiz' quiz.id %}" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this quiz?');">
                         {% csrf_token %}
-                        <button type="submit" class="action-btn delete" title="Delete Quiz" style="background: transparent; border: none; color: var(--color-error); cursor: pointer; display: flex; align-items: center; padding: 8px; border-radius: 50%; transition: background 0.2s;">
+                        <button type="submit" class="action-btn delete" title="Delete Quiz" aria-label="Delete Quiz" style="background: transparent; border: none; color: var(--color-error); cursor: pointer; display: flex; align-items: center; padding: 8px; border-radius: 50%; transition: background 0.2s;">
                             <span class="material-symbols-outlined">delete</span>
                         </button>
                     </form>

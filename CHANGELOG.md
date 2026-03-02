@@ -1,8 +1,31 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.6.5  
+> **Version:** 1.6.6  
 > **Last Updated:** 2026-03-02
+
+---
+
+## [1.6.6] - 2026-03-02
+
+### Security & Robustness
+- **PR-001:** `sync_models.py` moved `get_gemini_client()` inside `try` block to gracefully catch missing API key `ValueError`.
+- **PR-002:** `models.py` wrapped `AIModel.save()` default-reset in `transaction.atomic()` + `select_for_update()` and added DB `UniqueConstraint`.
+- **PR-003:** `core/views.py` narrowed `except Exception` in `health_check` to `except DatabaseError`.
+- **PR-004:** `quizzes/templatetags/quiz_filters.py` wrapped `int(seconds)` in `try/except` for safe coercion.
+- **PR-005:** Changed `quick_quiz` from `GET` to `POST` endpoint and updated template links to HTMX POST forms.
+- **PR-006:** `quizzes/views/demo.py` normalizes session option shapes by stringifying and truncating.
+- **PR-007:** `quizzes/views/results.py` added explanation length check and `strict=True` to `zip()`.
+- **PR-008:** Removed `|safe` filter from `signup.html` help text to prevent XSS.
+
+### Accessibility (A11Y)
+- **PR-009:** Added `role="alert"` and `aria-live="assertive"` to chat error bubble.
+- **PR-010:** Replaced `display: none` on radio inputs with `.sr-only` visually-hidden class for keyboard focus.
+- **PR-011:** Added `for` attributes to labels and IDs to inputs in `setup.html`.
+- **PR-012:** Added `aria-label` to icon-only Retry/Delete buttons in dashboard.
+
+### UI/UX
+- **PR-013:** URL-encoded `C++` to `C%2B%2B` in `languages.html` to fix parsing issues.
 
 ---
 

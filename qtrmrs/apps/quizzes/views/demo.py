@@ -23,7 +23,8 @@ DEMO_TOPICS = [
 ]
 
 
-@ratelimit(key='user_or_ip', rate='10/m', method='GET', block=True)
+@ratelimit(key='user_or_ip', rate='10/m', method='POST', block=True)
+@require_http_methods(["POST"])
 def quick_quiz(request):
     """
     One-click random quiz - works for both guests and logged-in users.
@@ -89,7 +90,7 @@ def quick_quiz(request):
         optimized_questions = [
             {
                 'text': q.get('text', '')[:MAX_TEXT_LENGTH],
-                'options': q.get('options', [])[:6],  # Max 6 options
+                'options': [str(o)[:MAX_TEXT_LENGTH] for o in q.get('options', [])[:6]],
                 'correct_answer': str(q.get('correct_answer', ''))[:255],
                 # PERF-002: Omit code_snippet entirely from demo session to prevent cookie bloat
             }

@@ -14,15 +14,14 @@ class Command(BaseCommand):
     help = 'Sync available Gemini AI models to the database'
 
     def handle(self, *args, **options):
-        # SEC-019: Use shared client singleton instead of creating a new one
-        client = get_gemini_client()
-        
         self.stdout.write('🔍 Fetching available models from Gemini API...\n')
         
         synced = 0
         created = 0
         
         try:
+            # SEC-019: Use shared client singleton instead of creating a new one
+            client = get_gemini_client()
             for model in client.models.list():
                 # Only models that support content generation
                 if 'generateContent' not in model.supported_actions:

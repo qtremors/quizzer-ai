@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -6,6 +8,8 @@ from django.contrib import messages
 from apps.quizzes.models import Quiz, UserAnswer
 from apps.quizzes.utils import format_duration
 from apps.ai_agent.services import QuizGenerator
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -97,8 +101,15 @@ def generate_all_explanations(request, quiz_id):
             
         explanations = generator.generate_batch_explanations(qa_pairs)
         
+        # PR-007: Guard against length mismatch to prevent silent partial updates
+        if len(answers_needing_help) != len(explanations):
+            logger.warning(
+                "Explanation count mismatch: %d answers vs %d explanations",
+                len(answers_needing_help), len(explanations)
+            )
+
         # Bulk save
-        for ans, explanation in zip(answers_needing_help, explanations):
+        for ans, explanation in zip(answers_needing_help, explanations, strict=True):
             ans.error_explanation = str(explanation)
             
         UserAnswer.objects.bulk_update(answers_needing_help, ['error_explanation'])

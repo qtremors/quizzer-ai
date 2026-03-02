@@ -23,16 +23,19 @@
             Start Quizzing
         </a>
 
-        <a href="{% url 'quick_quiz' %}" class="btn btn-tonal" style="height: 56px; padding: 0 32px; font-size: 1.05rem;" @click="loading = true" :class="{ 'btn-loading-active': loading }">
-            <span x-show="!loading" style="display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-outlined" style="font-size: 24px;">bolt</span>
-                Quick Quiz
-            </span>
-            <span x-show="loading" x-cloak style="display: flex; align-items: center; gap: 8px;">
-                <span class="btn-spinner"></span>
-                Generating...
-            </span>
-        </a>
+        <form method="POST" action="{% url 'quick_quiz' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-tonal" style="height: 56px; padding: 0 32px; font-size: 1.05rem;" @click="loading = true" :class="{ 'btn-loading-active': loading }">
+                <span x-show="!loading" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 24px;">bolt</span>
+                    Quick Quiz
+                </span>
+                <span x-show="loading" x-cloak style="display: flex; align-items: center; gap: 8px;">
+                    <span class="btn-spinner"></span>
+                    Generating...
+                </span>
+            </button>
+        </form>
     </div>
 
 </div>

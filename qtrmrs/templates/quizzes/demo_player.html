@@ -64,7 +64,7 @@
             <div class="options-grid" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; max-width: 800px;">
                 {% for option in question.options %}
                 <label class="option-card option-block" style="cursor: pointer; display: block;" tabindex="0">
-                    <input type="radio" name="option" value="{{ option }}" required style="display: none;" onchange="document.getElementById('demo-next-btn').disabled = false; document.getElementById('demo-next-btn').style.opacity = '1'; document.getElementById('demo-next-btn').classList.add('active');">
+                    <input type="radio" name="option" value="{{ option }}" required class="sr-only" onchange="document.getElementById('demo-next-btn').disabled = false; document.getElementById('demo-next-btn').style.opacity = '1'; document.getElementById('demo-next-btn').classList.add('active');">
                     <div class="option-visual" style="display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: var(--color-surface); border: 1px solid var(--color-outline-variant); border-radius: var(--radius-md); transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);">
                         <div class="radio-indicator" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--color-on-surface-variant); flex-shrink: 0; transition: all 0.2s;"></div>
                         <span class="option-text" style="font-size: 1.1rem; color: var(--color-on-surface); word-break: break-word;">{{ option }}</span>
@@ -104,5 +104,18 @@
     .option-block input:checked + .option-visual { background: var(--color-primary-container); border-color: var(--color-primary); color: var(--color-on-primary-container); font-weight: 500; box-shadow: 0 0 0 1px var(--color-primary); }
     .option-block input:checked + .option-visual .radio-indicator { border-color: var(--color-primary); background: var(--color-primary); box-shadow: inset 0 0 0 5px var(--color-primary-container); }
     .option-block:focus-within .option-visual { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+    /* PR-010: Visually hidden but keyboard-focusable */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
 </style>
 {% endblock %}
