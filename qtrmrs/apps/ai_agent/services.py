@@ -230,8 +230,8 @@ class QuizGenerator:
             )
             return response.text.strip()
         except Exception as e:
-            logger.error(f"Explanation Generation Error: {e}")
-            if '429' in str(e) or 'quota' in str(e).lower():
+            error = self._handle_error(e, "Explanation Generation")
+            if error.error_type == 'quota':
                 return f"⚠️ Could not generate explanation (API quota exceeded for {self.model_name}). Try a different model."
             return "Unable to generate explanation at this moment."
 
@@ -277,55 +277,3 @@ class QuizGenerator:
                 error_msg = f"⚠️ Could not generate explanation (API quota exceeded for {self.model_name})."
             return [error_msg] * len(qa_pairs)
 
-    # ==========================================
-    # ASYNC METHODS (for ASGI/Django Channels)
-    # ==========================================
-
-    async def generate_quiz_async(
-        self, 
-        language: str, 
-        topic: str, 
-        level: str, 
-        num_questions: int = 5, 
-        include_code: bool = False
-    ) -> Union[list[dict], AIError]:
-        """Async version of generate_quiz for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(
-            self.generate_quiz, language, topic, level, num_questions, include_code
-        )
-
-    async def generate_general_quiz_async(
-        self, 
-        subject: str, 
-        topic: str, 
-        level: str, 
-        num_questions: int = 5
-    ) -> Union[list[dict], AIError]:
-        """Async version of generate_general_quiz for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(
-            self.generate_general_quiz, subject, topic, level, num_questions
-        )
-
-    async def parse_intent_async(self, user_message: str) -> dict:
-        """Async version of parse_intent for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(self.parse_intent, user_message)
-
-    async def parse_general_intent_async(self, user_message: str) -> dict:
-        """Async version of parse_general_intent for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(self.parse_general_intent, user_message)
-
-    async def generate_explanation_async(
-        self, 
-        question_text: str, 
-        user_answer: str, 
-        correct_answer: str
-    ) -> str:
-        """Async version of generate_explanation for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(
-            self.generate_explanation, question_text, user_answer, correct_answer
-        )

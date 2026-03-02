@@ -1,8 +1,30 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.6.0  
+> **Version:** 1.6.1  
 > **Last Updated:** 2026-03-02
+
+---
+
+## [1.6.1] - 2026-03-02
+
+### Added
+- **OPS-001:** Health check endpoint at `/health/` — returns JSON `{"status": "ok"}` or 503 if DB is down
+- **OPS-002:** `build.sh` now runs `seed_gamification` and `set_active_models` after migrations
+
+### Fixed
+- **ANOM-002:** `UserProfile.preferred_difficulty` default changed from `'Intermediate'` to `'intermediate'` for consistency
+- **ANOM-003:** `generate_explanation` error handling now delegates to `_handle_error()` instead of duplicating classification logic
+- **CLEAN-005:** Added `tests.py` to pytest `python_files` config so `users/tests.py` is discovered reliably
+- **CLEAN-006:** Fixed `HttpResponse` import — now imported from `django.http` instead of `django.shortcuts` re-export (4 files)
+
+### Removed
+- **ANOM-004:** Removed unused async method stubs from `QuizGenerator` (WSGI-only project)
+- **ANOM-005:** Removed unused `json` log formatter from `LOGGING` config
+- **DOC-009:** Removed unused `QUIZ_RATE_LIMIT` env var from settings
+- **CLEAN-001:** Removed commented-out `rest_framework` from `INSTALLED_APPS`
+- **CLEAN-002/003:** Cleaned up empty placeholder files in `core` app
+- **CLEAN-004:** Deleted orphaned `quizzes/tests.py` placeholder (tests live in `quizzes/tests/`)
 
 ---
 

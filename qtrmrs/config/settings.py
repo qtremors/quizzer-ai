@@ -50,9 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # Third Party
-    # 'rest_framework',
-    
     # Local Apps
     'apps.core',
     'apps.users',
@@ -240,7 +237,6 @@ if not DEBUG:
 RATELIMIT_VIEW = 'apps.core.views.ratelimited_view'
 DEFAULT_FALLBACK_MODEL = 'gemini-flash-lite-latest'
 DEFAULT_AI_MODEL = os.getenv('DEFAULT_AI_MODEL', DEFAULT_FALLBACK_MODEL)
-QUIZ_RATE_LIMIT = os.getenv('QUIZ_RATE_LIMIT', '10/m')
 
 # =============================================================================
 # Logging
@@ -258,10 +254,6 @@ LOGGING = {
         'simple': {
             'format': '{levelname} {message}',
             'style': '{',
-        },
-        'json': {
-            'format': '{"level": "%(levelname)s", "time": "%(asctime)s", "logger": "%(name)s", "message": "%(message)s"}',
-            'datefmt': '%Y-%m-%dT%H:%M:%S',
         },
     },
     'handlers': {

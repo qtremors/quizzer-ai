@@ -17,6 +17,10 @@ python manage.py collectstatic --no-input
 # 5. Apply Migrations
 python manage.py migrate
 
+# 5.5. Seed gamification data (badges) and AI model config
+python manage.py seed_gamification
+python manage.py set_active_models
+
 # 6. Create Superuser (only if it doesn't exist)
 python -c "
 import os

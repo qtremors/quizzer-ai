@@ -1,6 +1,6 @@
 # Quizzer AI — Tasks
 
-> **Version:** 1.6.0  
+> **Version:** 1.6.1  
 > **Last Updated:** 2026-03-02
 
 ---
@@ -26,21 +26,11 @@
 - [ ] **TEST-003:** Missing edge case tests — empty quiz handling, API timeouts, invalid model selection
 
 ### DevOps
-- [ ] **OPS-001:** No health check endpoint — add `/health/`
-- [ ] **OPS-002:** `build.sh` doesn't seed gamification data
 - [ ] **OPS-003:** `build.sh` uses `pip install` but project uses `uv` — document inconsistency
 
 ---
 
 ## 📋 Low Priority (Backlog)
-
-### Code Cleanup
-- [ ] **CLEAN-001:** Remove commented `rest_framework` in `settings.py`
-- [ ] **CLEAN-002:** Empty `models.py` in `core` app
-- [ ] **CLEAN-003:** Empty `tests.py` in `core` app
-- [ ] **CLEAN-004:** `quizzes/tests.py` is an empty placeholder alongside `quizzes/tests/` directory
-- [ ] **CLEAN-005:** `pyproject.toml` `python_files` config doesn't match `tests.py` naming convention
-- [ ] **CLEAN-006:** `HttpResponse` imported from `django.shortcuts` instead of `django.http`
 
 ### Documentation
 - [ ] **DOC-001:** Missing API documentation for view endpoints
@@ -51,14 +41,9 @@
 - [ ] **DOC-006:** README test credentials only exist if env var is set during `build.sh`
 - [ ] **DOC-007:** DEVELOPMENT.md hardcodes "9 total" models — fragile
 - [ ] **DOC-008:** DEVELOPMENT.md `check_models.py` command missing `cd qtrmrs/`
-- [ ] **DOC-009:** `QUIZ_RATE_LIMIT` env var defined in settings but never wired to decorators
 
 ### Anomalies
 - [ ] **ANOM-001:** `Badge.requirement_type='quizzes'` in fixture but handler doesn't support it
-- [ ] **ANOM-002:** `UserProfile.preferred_difficulty` defaults to `'Intermediate'` (capitalized) — inconsistent
-- [ ] **ANOM-003:** `generate_explanation` error handling duplicates `_handle_error` logic
-- [ ] **ANOM-004:** Async methods in `QuizGenerator` are unused (WSGI, not ASGI) — dead code
-- [ ] **ANOM-005:** `LOGGING` config defines unused `json` formatter
 
 ### Accessibility
 - [ ] **A11Y-002:** Timer announcements for screen readers missing

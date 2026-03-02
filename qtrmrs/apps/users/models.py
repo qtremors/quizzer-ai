@@ -31,7 +31,7 @@ class UserProfile(models.Model):
     last_quiz_date = models.DateField(null=True, blank=True)
     
     # === Quiz Preferences ===
-    preferred_difficulty = models.CharField(max_length=20, default='Intermediate')
+    preferred_difficulty = models.CharField(max_length=20, default='intermediate')
     preferred_num_questions = models.PositiveIntegerField(default=5)
     include_code_snippets = models.BooleanField(default=False)
     
