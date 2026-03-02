@@ -1,8 +1,28 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.6.4  
+> **Version:** 1.6.5  
 > **Last Updated:** 2026-03-02
+
+---
+
+## [1.6.5] - 2026-03-02
+
+### Security
+- **SEC-017:** `delete_quiz` no longer echoes AI-generated `topic_description` in success message — prevents potential stored XSS
+- **SEC-018:** `get_gemini_client()` now tracks the cached API key and re-creates the client if the key changes — supports key rotation without process restart
+- **SEC-020:** `quick_quiz` rate limiting changed from `key='ip'` to `key='user_or_ip'` — authenticated users get per-account limits instead of sharing IP-based limits behind proxies
+
+### Added
+- **CLEAN-011:** New `check_ai_config` management command (replaces standalone `check_models.py`) — verifies API connectivity and lists available models via `manage.py check_ai_config`
+- **DOC-001:** Added comprehensive API endpoint documentation to `DEVELOPMENT.md` covering all 4 apps with HTTP methods, auth requirements, and descriptions
+
+### Changed
+- **CLEAN-009:** Added `django.template.context_processors.debug` to template context processors for explicit, complete configuration
+- **CFG-003:** Added explicit `CACHES` setting with named `LocMemCache` backend — dashboard stats caching is now visibly configured
+
+### Fixed
+- **DOC-012:** Removed hardcoded "9 Achievement Badges" count from CHANGELOG v1.3.0 entry
 
 ---
 

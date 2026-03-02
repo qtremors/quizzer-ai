@@ -2,7 +2,7 @@
 
 > Comprehensive documentation for developers working on Quizzer AI.
 
-**Version:** 1.6.4 | **Last Updated:** 2026-03-02
+**Version:** 1.6.5 | **Last Updated:** 2026-03-02
 
 ---
 
@@ -115,10 +115,10 @@ The system uses a 3-step AI pipeline optimized for speed and accuracy:
 The project includes several tools to manage the connection with Google's Gemini API:
 
 ### 1. Verify Connectivity
-Run this script to check if your API key is valid and see which models are available from Google:
+Verify your API key and list available Gemini models:
 ```bash
 cd qtrmrs
-uv run python check_models.py
+uv run python manage.py check_ai_config
 ```
 
 ### 2. Sync Models to Database
@@ -132,6 +132,54 @@ Sets specific models as active and configures the default model (e.g., `gemini-f
 ```bash
 uv run python qtrmrs/manage.py set_active_models
 ```
+
+---
+
+## API Endpoints
+
+### Core (`/`)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/` | No | Home page |
+| GET | `/languages/` | No | Languages list |
+| GET | `/health/` | No | Health check (JSON) |
+
+### Quizzes (`/quiz/`)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/quiz/setup/` | Yes | Quiz configuration form |
+| POST | `/quiz/create/` | Yes | Create quiz from form |
+| GET | `/quiz/play/<id>/` | Yes | Quiz player (current question) |
+| POST | `/quiz/play/<id>/<qid>/submit/` | Yes | Submit answer (HTMX) |
+| GET | `/quiz/results/<id>/` | Yes | Quiz results page |
+| POST | `/quiz/results/<id>/explanations/` | Yes | Generate AI explanations (HTMX) |
+| POST | `/quiz/retry/<id>/` | Yes | Reset and retry quiz |
+| POST | `/quiz/delete/<id>/` | Yes | Delete quiz |
+| GET | `/quiz/quick/` | No | Random demo quiz |
+| GET | `/quiz/demo/play/` | No | Demo player (session-based) |
+| POST | `/quiz/demo/submit/` | No | Demo answer submission |
+| GET | `/quiz/demo/results/` | No | Demo results |
+
+### Users (`/user/`)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET/POST | `/user/signup/` | No | Registration |
+| GET/POST | `/user/login/` | No | Login |
+| GET | `/user/logout/` | Yes | Logout |
+| GET | `/user/dashboard/` | Yes | Dashboard with stats |
+| GET/POST | `/user/settings/` | Yes | Account settings |
+| GET | `/user/verify/<uidb64>/<token>/` | No | Email verification |
+| POST | `/user/resend-verification/` | Yes | Resend verification email |
+
+### AI Agent (`/ai/`)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/ai/` | Yes | Chat interface |
+| POST | `/ai/send/` | Yes | Process chat message (HTMX) |
 
 ---
 

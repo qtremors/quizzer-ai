@@ -143,7 +143,7 @@ def delete_quiz(request, quiz_id):
     Only the quiz owner can delete it.
     """
     quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
-    topic = quiz.topic_description[:50]
     quiz.delete()
-    messages.success(request, f'Quiz "{topic}" deleted successfully.')
+    # SEC-017: Use generic message instead of echoing AI-generated topic_description
+    messages.success(request, 'Quiz deleted successfully.')
     return redirect('dashboard')

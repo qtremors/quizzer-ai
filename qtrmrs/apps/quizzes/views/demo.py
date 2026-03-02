@@ -23,7 +23,7 @@ DEMO_TOPICS = [
 ]
 
 
-@ratelimit(key='ip', rate='10/m', method='GET', block=True)
+@ratelimit(key='user_or_ip', rate='10/m', method='GET', block=True)
 def quick_quiz(request):
     """
     One-click random quiz - works for both guests and logged-in users.

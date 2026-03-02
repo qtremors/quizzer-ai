@@ -87,6 +87,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -108,6 +109,17 @@ DATABASES = {
         conn_health_checks=True,
         ssl_require=not DEBUG,  # SSL required in production only
     )
+}
+
+# =============================================================================
+# Cache (used by dashboard stats, PERF-008)
+# =============================================================================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'quizzer-ai-cache',
+    }
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
