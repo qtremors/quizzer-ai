@@ -2,25 +2,12 @@ from django.db import models
 from django.conf import settings
 
 
-class AIModel(models.Model):
-    """Manages available Gemini versions (Flash, Pro, etc.)"""
-    display_name = models.CharField(max_length=100)
-    model_name = models.CharField(max_length=100, help_text="The API string, e.g., 'gemini-1.5-flash'")
-    is_active = models.BooleanField(default=True)
-    is_default = models.BooleanField(default=False)
+class QuizQuerySet(models.QuerySet):
+    """Custom QuerySet for Quiz with reusable filters."""
 
-    def __str__(self):
-        return self.display_name
-    
-    def save(self, *args, **kwargs):
-        # Ensure only one default model exists
-        if self.is_default:
-            AIModel.objects.filter(is_default=True).exclude(pk=self.pk).update(is_default=False)
-        super().save(*args, **kwargs)
-    
-    class Meta:
-        verbose_name = "AI Model"
-        verbose_name_plural = "AI Models"
+    def for_user(self, user):
+        """Return quizzes owned by a user, newest first."""
+        return self.filter(user=user).order_by('-created_at')
 
 
 class Quiz(models.Model):
@@ -44,12 +31,14 @@ class Quiz(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     # Metadata
-    ai_model = models.ForeignKey(AIModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='quizzes')
+    ai_model = models.ForeignKey('ai_agent.AIModel', on_delete=models.SET_NULL, null=True, blank=True, related_name='quizzes')
     model_used = models.CharField(max_length=100, blank=True)  # Fallback string for display
     total_questions = models.IntegerField(default=0)
     score = models.IntegerField(default=0, help_text="Score percentage")
     completed_at = models.DateTimeField(null=True, blank=True)
     xp_awarded = models.BooleanField(default=False, help_text="Whether XP was already awarded for this quiz")
+    
+    objects = QuizQuerySet.as_manager()
     
 
 

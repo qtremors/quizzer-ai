@@ -1,41 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div
-    style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; padding-top: 60px;">
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 75vh; text-align: center; padding: 64px 0;">
 
-    <div
-        style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; padding: 6px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(59, 130, 246, 0.2); display: inline-flex; align-items: center; gap: 6px;">
-        <span class="material-symbols-outlined" style="font-size: 1.1em;">auto_awesome</span>
+    <div style="background: var(--color-primary-container); color: var(--color-on-primary-container); padding: 8px 20px; border-radius: var(--radius-full); font-size: 0.875rem; font-weight: 600; margin-bottom: 32px; display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--elevation-1);">
+        <span class="material-symbols-outlined" style="font-size: 1.2em;">auto_awesome</span>
         AI-Powered Learning Tool
     </div>
 
-    <h1 style="font-size: 4rem; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 24px;">
+    <h1 style="font-size: clamp(3rem, 8vw, 5rem); line-height: 1.1; margin-bottom: 24px; font-weight: 700;">
         Master Coding <br>
         <span class="text-gradient">Interactively</span>
     </h1>
 
-    <p style="font-size: 1.25rem; color: var(--color-text-muted); max-width: 600px; margin-bottom: 40px;">
-        A powerful quiz generator designed to help you understand complex languages and frameworks through AI-driven
-        challenges.
+    <p style="font-size: clamp(1.1rem, 2vw, 1.25rem); color: var(--color-on-surface-variant); max-width: 650px; margin-bottom: 48px; line-height: 1.6;">
+        A powerful quiz generator designed to help you understand complex languages and frameworks through AI-driven challenges.
     </p>
 
     <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;" x-data="{ loading: false }">
-        <a href="{% url 'quiz_setup' %}" class="btn btn-filled"
-            style="height: 52px; padding: 0 40px; font-size: 1.1rem;">
+        <a href="{% url 'quiz_setup' %}" class="btn btn-filled" style="height: 56px; padding: 0 40px; font-size: 1.1rem;">
             <span class="material-symbols-outlined" style="font-size: 24px;">play_arrow</span>
             Start Quizzing
         </a>
 
-        <a href="{% url 'quick_quiz' %}" class="btn btn-tonal"
-            style="height: 52px; padding: 0 32px; font-size: 1.05rem;" @click="loading = true"
-            :class="{ 'btn-loading-active': loading }">
+        <a href="{% url 'quick_quiz' %}" class="btn btn-tonal" style="height: 56px; padding: 0 32px; font-size: 1.05rem;" @click="loading = true" :class="{ 'btn-loading-active': loading }">
             <span x-show="!loading" style="display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-outlined" style="font-size: 22px;">bolt</span>
+                <span class="material-symbols-outlined" style="font-size: 24px;">bolt</span>
                 Quick Quiz
             </span>
             <span x-show="loading" x-cloak style="display: flex; align-items: center; gap: 8px;">
-                <span class="mini-spinner"></span>
+                <span class="btn-spinner"></span>
                 Generating...
             </span>
         </a>
@@ -43,41 +37,30 @@
 
 </div>
 
-<div
-    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; margin-top: 0px; padding-bottom: 60px;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; padding-bottom: 80px; max-width: 1000px; margin: 0 auto; width: 100%;">
 
-    <a href="{% url 'languages_list' %}" class="card"
-        style="position: relative; overflow: hidden; text-decoration: none; display: block;">
-        <div
-            style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);">
+    <a href="{% url 'languages_list' %}" class="card card-interactive" style="display: flex; flex-direction: column; gap: 16px; text-decoration: none;">
+        <div style="width: 56px; height: 56px; background: var(--color-secondary-container); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-on-secondary-container);">
+            <span class="material-symbols-outlined" style="font-size: 32px;">terminal</span>
         </div>
-
-        <div
-            style="width: 48px; height: 48px; background: rgba(59,130,246,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--color-primary);">
-            <span class="material-symbols-outlined">terminal</span>
+        <div style="flex-grow: 1;">
+            <h3 style="margin-bottom: 8px; font-size: 1.5rem; color: var(--color-on-surface);">Explore Languages</h3>
+            <p style="color: var(--color-on-surface-variant); font-size: 1rem; line-height: 1.5; margin: 0;">
+                Browse our catalog of supported technologies including Python, React, Go, SQL, and more.
+            </p>
         </div>
-
-        <h3 style="color: var(--color-text-main);">Explore Languages</h3>
-        <p style="color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.5;">
-            Browse our catalog of supported technologies. Python, React, Go, SQL, and more.
-        </p>
     </a>
 
-    <a href="{% url 'chat_interface' %}" class="card"
-        style="position: relative; overflow: hidden; text-decoration: none; display: block;">
-        <div
-            style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 70%);">
+    <a href="{% url 'chat_interface' %}" class="card card-interactive" style="display: flex; flex-direction: column; gap: 16px; text-decoration: none;">
+        <div style="width: 56px; height: 56px; background: var(--color-tertiary-container); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-on-tertiary-container);">
+            <span class="material-symbols-outlined" style="font-size: 32px;">smart_toy</span>
         </div>
-
-        <div
-            style="width: 48px; height: 48px; background: rgba(167, 139, 250, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: #a78bfa;">
-            <span class="material-symbols-outlined">smart_toy</span>
+        <div style="flex-grow: 1;">
+            <h3 style="margin-bottom: 8px; font-size: 1.5rem; color: var(--color-on-surface);">AI Chat Agent</h3>
+            <p style="color: var(--color-on-surface-variant); font-size: 1rem; line-height: 1.5; margin: 0;">
+                Generate custom quizzes using natural language. Just ask the AI for exactly what you need.
+            </p>
         </div>
-
-        <h3 style="color: var(--color-text-main);">AI Chat Agent</h3>
-        <p style="color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.5;">
-            Generate custom quizzes using natural language. Just ask the AI for exactly what you need.
-        </p>
     </a>
 
 </div>
@@ -86,10 +69,6 @@
     .btn-loading-active {
         pointer-events: none;
         opacity: 0.8;
-    }
-
-    [x-cloak] {
-        display: none !important;
     }
 </style>
 {% endblock %}

@@ -1,6 +1,6 @@
 [project]
 name = "quizzer-ai"
-version = "1.5.3"
+version = "1.6.5"
 description = "AI-powered quiz platform for developers"
 requires-python = ">=3.11"
 dependencies = [
@@ -26,6 +26,6 @@ dev = [
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
-python_files = ["test_*.py", "*_test.py"]
+python_files = ["test_*.py", "*_test.py", "tests.py"]
 addopts = "-v --tb=short"
 testpaths = ["."]

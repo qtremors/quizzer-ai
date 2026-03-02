@@ -36,3 +36,12 @@ class UserUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-input'})
+            
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get('avatar', False)
+        if avatar:
+            # 2MB MAX_UPLOAD_SIZE
+            max_size = 2 * 1024 * 1024
+            if avatar.size > max_size:
+                raise forms.ValidationError(f"Avatar file size must be under {max_size / 1024 / 1024}MB")
+        return avatar

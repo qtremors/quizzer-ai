@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from apps.quizzes.models import AIModel
+from apps.ai_agent.models import AIModel
 
 class Command(BaseCommand):
     help = 'Configures active and default AI models based on user preference'

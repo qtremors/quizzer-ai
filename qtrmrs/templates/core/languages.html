@@ -1,76 +1,115 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
-<div style="max-width: 1600px; margin: 0 auto; padding: 40px 24px; width: 100%;">
+<div class="container" style="max-width: 1400px; padding-top: 48px; padding-bottom: 80px;">
 
-    <div style="text-align: center; margin-bottom: 60px;">
-        <h1 style="margin-bottom: 12px; font-size: 3rem;">Explore Technologies</h1>
-        <p style="color: var(--color-text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 64px;">
+        <h1 style="font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 16px;">Explore Technologies</h1>
+        <p style="color: var(--color-on-surface-variant); font-size: 1.25rem; max-width: 600px; margin: 0 auto;">
             Select a stack to generate a specialized AI curriculum.
         </p>
     </div>
 
     <div class="lang-grid">
 
-        <a href="{% url 'quiz_setup' %}?language=Python" class="lang-card">
-            <i class="devicon-python-plain colored icon-lg"></i>
-            <h3>Python</h3>
-            <p>Data science, backend logic, and scripting.</p>
+        <a href="{% url 'quiz_setup' %}?language=Python" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #3776AB; background: rgba(55, 118, 171, 0.1);">
+                <i class="devicon-python-plain"></i>
+            </div>
+            <div class="lang-content">
+                <h3>Python</h3>
+                <p>Data science, backend logic, and scripting.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=JavaScript" class="lang-card">
-            <i class="devicon-javascript-plain colored icon-lg"></i>
-            <h3>JavaScript</h3>
-            <p>Async patterns, DOM, and ES6 features.</p>
+        <a href="{% url 'quiz_setup' %}?language=JavaScript" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #F7DF1E; background: rgba(247, 223, 30, 0.1);">
+                <i class="devicon-javascript-plain"></i>
+            </div>
+            <div class="lang-content">
+                <h3>JavaScript</h3>
+                <p>Async patterns, DOM, and ES6 features.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=React" class="lang-card">
-            <i class="devicon-react-original colored icon-lg"></i>
-            <h3>React</h3>
-            <p>Hooks, components, and state management.</p>
+        <a href="{% url 'quiz_setup' %}?language=React" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #61DAFB; background: rgba(97, 218, 251, 0.1);">
+                <i class="devicon-react-original"></i>
+            </div>
+            <div class="lang-content">
+                <h3>React</h3>
+                <p>Hooks, components, and state management.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=Django" class="lang-card">
-            <i class="devicon-django-plain icon-lg" style="color: var(--color-text-main);"></i>
-            <h3>Django</h3>
-            <p>ORM, views, auth, and MVT architecture.</p>
+        <a href="{% url 'quiz_setup' %}?language=Django" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #092E20; background: rgba(9, 46, 32, 0.1);">
+                <i class="devicon-django-plain"></i>
+            </div>
+            <div class="lang-content">
+                <h3>Django</h3>
+                <p>ORM, views, auth, and MVT architecture.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=SQL" class="lang-card">
-            <i class="devicon-postgresql-plain colored icon-lg"></i>
-            <h3>Databases</h3>
-            <p>SQL, joins, normalization, and optimization.</p>
+        <a href="{% url 'quiz_setup' %}?language=SQL" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #336791; background: rgba(51, 103, 145, 0.1);">
+                <i class="devicon-postgresql-plain"></i>
+            </div>
+            <div class="lang-content">
+                <h3>Databases</h3>
+                <p>SQL, joins, normalization, and optimization.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=Go" class="lang-card">
-            <i class="devicon-go-original-wordmark colored icon-lg"></i>
-            <h3>Go</h3>
-            <p>Concurrency, channels, and systems.</p>
+        <a href="{% url 'quiz_setup' %}?language=Go" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #00ADD8; background: rgba(0, 173, 216, 0.1);">
+                <i class="devicon-go-original-wordmark"></i>
+            </div>
+            <div class="lang-content">
+                <h3>Go</h3>
+                <p>Concurrency, channels, and systems.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=Rust" class="lang-card">
-            <i class="devicon-rust-original icon-lg" style="color: var(--color-text-main);"></i>
-            <h3>Rust</h3>
-            <p>Memory safety, borrowing, and ownership.</p>
+        <a href="{% url 'quiz_setup' %}?language=Rust" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #000000; background: rgba(0, 0, 0, 0.05);">
+                <i class="devicon-rust-plain"></i>
+            </div>
+            <div class="lang-content">
+                <h3>Rust</h3>
+                <p>Memory safety, borrowing, and ownership.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=TypeScript" class="lang-card">
-            <i class="devicon-typescript-plain colored icon-lg"></i>
-            <h3>TypeScript</h3>
-            <p>Static typing, interfaces, and generics.</p>
+        <a href="{% url 'quiz_setup' %}?language=TypeScript" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #3178C6; background: rgba(49, 120, 198, 0.1);">
+                <i class="devicon-typescript-plain"></i>
+            </div>
+            <div class="lang-content">
+                <h3>TypeScript</h3>
+                <p>Static typing, interfaces, and generics.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=C++" class="lang-card">
-            <i class="devicon-cplusplus-plain colored icon-lg"></i>
-            <h3>C++</h3>
-            <p>Pointers, memory management, and OOP.</p>
+        <a href="{% url 'quiz_setup' %}?language=C++" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #00599C; background: rgba(0, 89, 156, 0.1);">
+                <i class="devicon-cplusplus-plain"></i>
+            </div>
+            <div class="lang-content">
+                <h3>C++</h3>
+                <p>Pointers, memory management, and OOP.</p>
+            </div>
         </a>
 
-        <a href="{% url 'quiz_setup' %}?language=CSS" class="lang-card">
-            <i class="devicon-css3-plain colored icon-lg"></i>
-            <h3>CSS</h3>
-            <p>Flexbox, Grid, animations, and layout.</p>
+        <a href="{% url 'quiz_setup' %}?language=CSS" class="card card-interactive lang-card">
+            <div class="icon-wrapper" style="color: #1572B6; background: rgba(21, 114, 182, 0.1);">
+                <i class="devicon-css3-plain"></i>
+            </div>
+            <div class="lang-content">
+                <h3>CSS</h3>
+                <p>Flexbox, Grid, animations, and layout.</p>
+            </div>
         </a>
 
     </div>
@@ -79,60 +118,57 @@
 <style>
     .lang-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 24px;
         width: 100%;
     }
 
     .lang-card {
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: 16px;
-        padding: 32px;
-        text-decoration: none;
-        transition: all 0.2s ease;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         height: 100%;
-        min-height: 220px;
-        cursor: pointer;
+        min-height: 240px;
+        position: relative;
+        overflow: hidden;
     }
 
-    .lang-card:hover {
-        transform: translateY(-4px);
-        border-color: var(--color-primary);
-        box-shadow: var(--shadow-hover);
-    }
-
-    /* Active/click state for immediate feedback */
-    .lang-card:active {
-        transform: scale(0.98);
-        opacity: 0.8;
-    }
-
-    .icon-lg {
-        font-size: 4rem;
+    .icon-wrapper {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         margin-bottom: 24px;
+        font-size: 36px;
+        transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
     }
 
-    .lang-card h3 {
+    .lang-card:hover .icon-wrapper {
+        transform: scale(1.1);
+    }
+
+    /* Override dark mode for icon wrappers that rely on black */
+    [data-theme="dark"] .icon-wrapper[style*="color: #000000;"] {
+        color: #FFFFFF !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    [data-theme="dark"] .icon-wrapper[style*="color: #092E20;"] {
+        color: #44B78B !important;
+        background: rgba(68, 183, 139, 0.1) !important;
+    }
+
+    .lang-content h3 {
         margin: 0 0 8px 0;
-        font-size: 1.4rem;
-        color: var(--color-text-main);
+        font-size: 1.5rem;
     }
 
-    .lang-card p {
+    .lang-content p {
         margin: 0;
         font-size: 1rem;
-        color: var(--color-text-muted);
         line-height: 1.5;
-    }
-
-    @media (max-width: 768px) {
-        .lang-grid {
-            grid-template-columns: 1fr;
-        }
     }
 </style>
 {% endblock %}

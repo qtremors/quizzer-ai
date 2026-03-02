@@ -5,18 +5,17 @@ Usage:
     python manage.py sync_models
 """
 import logging
-from google import genai
 from django.core.management.base import BaseCommand
-from django.conf import settings
-from apps.quizzes.models import AIModel
+from apps.ai_agent.models import AIModel
+from apps.ai_agent.client import get_gemini_client
 
 
 class Command(BaseCommand):
     help = 'Sync available Gemini AI models to the database'
 
     def handle(self, *args, **options):
-        # Configure the API
-        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        # SEC-019: Use shared client singleton instead of creating a new one
+        client = get_gemini_client()
         
         self.stdout.write('🔍 Fetching available models from Gemini API...\n')
         

@@ -32,7 +32,7 @@ class QuizGenerator:
     
     def __init__(self, model_name: Optional[str] = None):
         self.client = get_gemini_client()
-        self.model_name = model_name or getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
+        self.model_name = model_name or settings.DEFAULT_AI_MODEL
 
     def _handle_error(self, e: Exception, operation: str) -> AIError:
         """Parse exception and return appropriate AIError."""
@@ -230,60 +230,52 @@ class QuizGenerator:
             )
             return response.text.strip()
         except Exception as e:
-            logger.error(f"Explanation Generation Error: {e}")
-            if '429' in str(e) or 'quota' in str(e).lower():
+            error = self._handle_error(e, "Explanation Generation")
+            if error.error_type == 'quota':
                 return f"⚠️ Could not generate explanation (API quota exceeded for {self.model_name}). Try a different model."
             return "Unable to generate explanation at this moment."
 
-    # ==========================================
-    # ASYNC METHODS (for ASGI/Django Channels)
-    # ==========================================
+    def generate_batch_explanations(self, qa_pairs: list[dict]) -> list[str]:
+        """
+        Generates explanations for multiple incorrect answers in a single AI call.
+        qa_pairs should be a list of dicts: {'question': str, 'user_answer': str, 'correct_answer': str}
+        Returns a list of explanation strings of the same length as the input.
+        """
+        if not qa_pairs:
+            return []
 
-    async def generate_quiz_async(
-        self, 
-        language: str, 
-        topic: str, 
-        level: str, 
-        num_questions: int = 5, 
-        include_code: bool = False
-    ) -> Union[list[dict], AIError]:
-        """Async version of generate_quiz for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(
-            self.generate_quiz, language, topic, level, num_questions, include_code
-        )
+        # Format the input data for the prompt
+        formatted_pairs = "\n".join([
+            f"Item {i+1}:\nQuestion: '{p['question']}'\nUser Answer: '{p['user_answer']}'\nCorrect Answer: '{p['correct_answer']}'"
+            for i, p in enumerate(qa_pairs)
+        ])
 
-    async def generate_general_quiz_async(
-        self, 
-        subject: str, 
-        topic: str, 
-        level: str, 
-        num_questions: int = 5
-    ) -> Union[list[dict], AIError]:
-        """Async version of generate_general_quiz for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(
-            self.generate_general_quiz, subject, topic, level, num_questions
-        )
+        from .prompts import BATCH_EXPLANATION_PROMPT
+        prompt = BATCH_EXPLANATION_PROMPT.format(qa_pairs=formatted_pairs)
+        
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+            explanations = json.loads(response.text)
+            
+            # Ensure the output length matches the input length
+            if isinstance(explanations, list):
+                # BUG-014: Coerce each element to string in case AI returns non-string types
+                explanations = [str(e) for e in explanations]
+                if len(explanations) < len(qa_pairs):
+                    explanations.extend(["Unable to generate explanation."] * (len(qa_pairs) - len(explanations)))
+                return explanations[:len(qa_pairs)]
+                
+            raise ValueError("AI response was not a JSON array")
+        except Exception as e:
+            logger.error(f"Batch Explanation Generation Error: {e}")
+            error_msg = "Unable to generate explanation at this moment."
+            if '429' in str(e) or 'quota' in str(e).lower():
+                error_msg = f"⚠️ Could not generate explanation (API quota exceeded for {self.model_name})."
+            return [error_msg] * len(qa_pairs)
 
-    async def parse_intent_async(self, user_message: str) -> dict:
-        """Async version of parse_intent for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(self.parse_intent, user_message)
-
-    async def parse_general_intent_async(self, user_message: str) -> dict:
-        """Async version of parse_general_intent for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(self.parse_general_intent, user_message)
-
-    async def generate_explanation_async(
-        self, 
-        question_text: str, 
-        user_answer: str, 
-        correct_answer: str
-    ) -> str:
-        """Async version of generate_explanation for ASGI deployments."""
-        import asyncio
-        return await asyncio.to_thread(
-            self.generate_explanation, question_text, user_answer, correct_answer
-        )

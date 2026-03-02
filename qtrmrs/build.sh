@@ -6,6 +6,8 @@ set -o errexit
 # 1. (Already in project root)
 
 # 2. Install Dependencies
+# Note: Uses pip (not uv) because Render's build environment provides pip by default.
+# Locally, use `uv sync` instead. See README.md for local setup.
 pip install -r requirements.txt
 
 # 3. Set production settings
@@ -16,6 +18,11 @@ python manage.py collectstatic --no-input
 
 # 5. Apply Migrations
 python manage.py migrate
+
+# 5.5. Sync AI models from API, seed gamification data, and configure active models
+python manage.py sync_models
+python manage.py seed_gamification
+python manage.py set_active_models
 
 # 6. Create Superuser (only if it doesn't exist)
 python -c "

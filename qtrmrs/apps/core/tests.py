@@ -1,3 +1,1 @@
-from django.test import TestCase
-
-# Create your tests here.
+# Core app tests live alongside their views — no test cases needed here currently.

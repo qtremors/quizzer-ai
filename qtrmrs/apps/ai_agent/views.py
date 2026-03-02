@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET
-from django.db import transaction
 from django.http import HttpResponse
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
 from .services import QuizGenerator, AIError
-from apps.quizzes.models import Quiz, Question, Option, AIModel
+from .models import AIModel
+from apps.quizzes.services import create_quiz_from_ai_data
 
 
 @login_required
@@ -49,7 +49,7 @@ def process_chat_message(request):
     # --- Handle Model Selection ---
     model_id = request.POST.get('ai_model')
     ai_model = None
-    model_name = getattr(settings, 'DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
+    model_name = settings.DEFAULT_AI_MODEL
     
     if model_id:
         try:
@@ -63,8 +63,8 @@ def process_chat_message(request):
     # 1. Parse Intent for general quiz
     params = generator.parse_general_intent(user_message)
     
-    # Override with user's question count selection
-    question_count = num_questions if num_questions else params.get('count', 5)
+    # CLEAN-007: num_questions is always ≥1 after validation above
+    question_count = num_questions
     
     # 2. Generate general-purpose quiz
     questions_data = generator.generate_general_quiz(
@@ -86,43 +86,21 @@ def process_chat_message(request):
             'suggestion': "Try being more specific or select a different AI model."
         })
 
-    # 3. Save to DB
-    with transaction.atomic():
-        # Normalize difficulty to lowercase
-        difficulty = params.get('level', 'Intermediate').lower()
-        if difficulty not in ['beginner', 'intermediate', 'expert']:
-            difficulty = 'intermediate'
-        
-        quiz = Quiz.objects.create(
-            user=request.user,
-            quiz_type='general',
-            language=params.get('subject', 'General')[:50],
-            topic_description=f"{params.get('subject')}: {params.get('topic')}"[:255],
-            difficulty=difficulty,
-            total_questions=len(questions_data),
-            ai_model=ai_model,
-            model_used=model_name
-        )
-
-        options_to_create = []
-        for q_data in questions_data:
-            question = Question.objects.create(
-                quiz=quiz,
-                text=q_data.get('text', '')[:2000],
-                code_snippet='',  # No code for general quizzes
-                explanation=q_data.get('explanation', '')
-            )
-            
-            for opt_text in q_data.get('options', []):
-                options_to_create.append(Option(
-                    question=question,
-                    text=str(opt_text)[:255],
-                    is_correct=(str(opt_text) == str(q_data.get('correct_answer', '')))
-                ))
-        
-        # Bulk create options
-        if options_to_create:
-            Option.objects.bulk_create(options_to_create)
+    # 3. Save to DB using shared service
+    # Normalize difficulty to lowercase
+    difficulty = params.get('level', 'Intermediate').lower()
+    if difficulty not in ['beginner', 'intermediate', 'expert']:
+        difficulty = 'intermediate'
+    
+    quiz = create_quiz_from_ai_data(
+        request.user, questions_data,
+        quiz_type='general',
+        language=params.get('subject', 'General')[:50],
+        topic_description=f"{params.get('subject')}: {params.get('topic')}",
+        difficulty=difficulty,
+        ai_model=ai_model,
+        model_used=model_name
+    )
 
     # 4. Redirect to Player
     response = HttpResponse()

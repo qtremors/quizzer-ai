@@ -1,6 +1,4 @@
-<form hx-post="{% url 'submit_answer' quiz.id question.id %}" hx-target="#quiz-card-container" hx-swap="innerHTML"
-    class="quiz-form fade-in">
-
+<form hx-post="{% url 'submit_answer' quiz.id question.id %}" hx-target="#quiz-card-container" hx-swap="innerHTML" class="quiz-form fade-in">
     {% csrf_token %}
     <input type="hidden" name="time_taken" value="0">
 
@@ -14,11 +12,9 @@
 
             <div class="options-grid">
                 {% for option in question.options.all %}
-                <label class="option-block">
-                    <input type="radio" name="option" value="{{ option.id }}" style="display: none;"
-                        onclick="enableNextBtn()">
-
-                    <div class="option-visual">
+                <label class="option-block" tabindex="0">
+                    <input type="radio" name="option" value="{{ option.id }}" style="display: none;" onclick="enableNextBtn()">
+                    <div class="option-visual card-interactive">
                         <div class="radio-indicator"></div>
                         <span class="opt-text">{{ option.text }}</span>
                     </div>
@@ -27,11 +23,12 @@
             </div>
 
             <div class="quiz-footer">
-                <button type="submit" name="action" value="skip" class="btn-skip"
-                    onclick="return confirm('Skip this question?');">Skip</button>
-                <button type="submit" name="action" value="next" id="next-btn" disabled class="btn-next">
+                <button type="submit" name="action" value="skip" class="btn btn-text" onclick="return confirm('Skip this question?');">
+                    Skip
+                </button>
+                <button type="submit" name="action" value="next" id="next-btn" disabled class="btn btn-filled" style="opacity: 0.5;">
                     {% if is_last %}Finish{% else %}Next{% endif %}
-                    <span class="material-symbols-outlined">arrow_forward</span>
+                    <span class="material-symbols-outlined" style="font-size: 20px; margin-left: 6px;">arrow_forward</span>
                 </button>
             </div>
         </div>
@@ -40,9 +37,11 @@
         <div class="code-col">
             <div class="code-window">
                 <div class="code-header">
-                    <div class="dot red"></div>
-                    <div class="dot yellow"></div>
-                    <div class="dot green"></div>
+                    <div style="display: flex; gap: 6px;">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
                     <span class="lang-label">{{ quiz.language|upper }}</span>
                 </div>
                 <pre><code class="language-{{ quiz.language|lower }}">{{ question.code_snippet }}</code></pre>
@@ -51,7 +50,6 @@
         {% endif %}
 
     </div>
-
 </form>
 
 <div style="display: none;">
@@ -64,15 +62,13 @@
         const btn = document.getElementById('next-btn');
         if (btn) {
             btn.disabled = false;
-            btn.classList.add('active');
+            btn.style.opacity = '1';
+            btn.classList.add('active'); // M3 interactions
         }
     }
 
-    // Keyboard navigation: 1-4 to select options, Enter to submit
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function(e) {
         const key = e.key;
-
-        // Number keys 1-4 select options
         if (['1', '2', '3', '4'].includes(key)) {
             const options = document.querySelectorAll('input[name="option"]');
             const index = parseInt(key) - 1;
@@ -81,274 +77,123 @@
                 enableNextBtn();
             }
         }
-
-        // Enter submits if an option is selected
         if (key === 'Enter') {
             const selected = document.querySelector('input[name="option"]:checked');
             if (selected) {
                 const nextBtn = document.getElementById('next-btn');
-                if (nextBtn && !nextBtn.disabled) {
-                    nextBtn.click();
-                }
+                if (nextBtn && !nextBtn.disabled) nextBtn.click();
             }
         }
     });
 </script>
 
 <style>
-    .quiz-form {
-        height: 100%;
-        width: 100%;
-    }
+    .quiz-form { height: 100%; width: 100%; }
 
     .split-layout {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-        max-width: 800px;
-        margin: 0 auto;
+        display: flex; flex-direction: column; width: 100%; height: 100%;
+        max-width: 800px; margin: 0 auto;
     }
 
-    /* --- PREVENT OVERFLOW IN GRID --- */
     .split-layout.has-code {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        /* Split evenly or use 60/40 */
-        gap: 40px;
-        height: 100%;
-        max-width: 100%;
-        align-items: stretch;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+        max-width: 100%; align-items: stretch;
     }
 
-    /* Left Column */
     .interaction-col {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        overflow-y: auto;
-        min-width: 0;
+        display: flex; flex-direction: column; height: 100%; overflow-y: auto; min-width: 0;
     }
 
-    .question-area {
-        margin-bottom: 32px;
-    }
+    .question-area { margin-bottom: 40px; }
 
-    /* --- FORCE TEXT WRAPPING --- */
     .question-area h2 {
-        font-size: 1.5rem;
-        line-height: 1.5;
-        font-weight: 500;
-        color: var(--color-text-main);
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        word-break: break-word;
-        hyphens: auto;
+        font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.4; font-weight: 500;
+        color: var(--color-on-surface); word-wrap: break-word; overflow-wrap: break-word;
+        font-family: var(--font-display);
     }
 
     .options-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-bottom: auto;
+        display: flex; flex-direction: column; gap: 16px; margin-bottom: auto;
     }
 
-    /* Code Column */
-    .code-col {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        max-height: 80vh;
-        min-width: 0;
-    }
-
-    .code-window {
-        background: #1e1e1e;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .code-header {
-        background: #252526;
-        padding: 10px 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-
-    .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-    }
-
-    .red {
-        background: #ff5f56;
-    }
-
-    .yellow {
-        background: #ffbd2e;
-    }
-
-    .green {
-        background: #27c93f;
-    }
-
-    .lang-label {
-        margin-left: auto;
-        color: #888;
-        font-size: 0.8rem;
-        font-family: monospace;
-        text-transform: uppercase;
-    }
-
-    /* Code block styling with high specificity to override Prism */
-    .code-window pre[class*="language-"] {
-        margin: 0;
-        border-radius: 0;
-        padding: 20px;
-        flex-grow: 1;
-        overflow: auto;
-        white-space: pre;
-        font-size: 0.9rem;
-        width: 100%;
-    }
-
-    /* Options Styling */
+    /* M3 Option visual overriding default interactive card slightly */
     .option-visual {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 16px 20px;
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: 8px;
-        color: var(--color-text-main);
-        font-size: 1rem;
-        transition: all 0.2s ease;
-        cursor: pointer;
+        display: flex; align-items: center; gap: 16px; padding: 20px 24px;
+        background: var(--color-surface); border: 1px solid var(--color-outline-variant);
+        border-radius: var(--radius-md); color: var(--color-on-surface);
+        font-size: 1.1rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
     }
 
-    /* Force wrap on long options too */
-    .opt-text {
-        word-break: break-word;
-    }
+    .opt-text { word-break: break-word; }
 
     .radio-indicator {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        border: 2px solid var(--color-text-muted);
-        flex-shrink: 0;
+        width: 24px; height: 24px; border-radius: var(--radius-full);
+        border: 2px solid var(--color-on-surface-variant); flex-shrink: 0;
+        transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
     }
 
     .option-block:hover .option-visual {
-        background: var(--color-surface-variant);
+        background: var(--color-surface-variant); border-color: var(--color-outline);
     }
 
-    input:checked+.option-visual {
-        background: var(--color-primary-container);
-        border-color: var(--color-primary);
-        color: var(--color-on-primary-container);
-        font-weight: 500;
+    .option-block input:checked + .option-visual {
+        background: var(--color-primary-container); border-color: var(--color-primary);
+        color: var(--color-on-primary-container); font-weight: 500; box-shadow: 0 0 0 1px var(--color-primary);
     }
 
-    input:checked+.option-visual .radio-indicator {
-        border-color: var(--color-primary);
-        background: var(--color-primary);
-        box-shadow: inset 0 0 0 4px var(--color-surface);
+    .option-block input:checked + .option-visual .radio-indicator {
+        border-color: var(--color-primary); background: var(--color-primary);
+        box-shadow: inset 0 0 0 5px var(--color-primary-container);
     }
 
     .quiz-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 32px;
-        margin-top: auto;
+        display: flex; justify-content: space-between; align-items: center;
+        padding-top: 40px; margin-top: 24px;
     }
 
-    .btn-skip {
-        background: transparent;
-        color: var(--color-text-muted);
-        border: none;
-        font-size: 0.95rem;
-        cursor: pointer;
+    /* Code Window */
+    .code-col {
+        display: flex; flex-direction: column; height: 100%; max-height: 80vh; min-width: 0;
     }
 
-    .btn-skip:hover {
-        color: var(--color-text-main);
-        text-decoration: underline;
+    .code-window {
+        background: #1e1e1e; border-radius: var(--radius-lg); overflow: hidden;
+        box-shadow: var(--elevation-4); border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex; flex-direction: column; height: 100%;
     }
 
-    .btn-next {
-        background: var(--color-surface-variant);
-        color: var(--color-text-muted);
-        border: none;
-        padding: 10px 24px;
-        border-radius: 50px;
-        font-size: 1rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: not-allowed;
+    .code-header {
+        background: #252526; padding: 12px 20px; display: flex; align-items: center;
+        justify-content: space-between; flex-shrink: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .btn-next.active {
-        background: var(--color-primary);
-        color: white;
-        cursor: pointer;
-        box-shadow: var(--shadow-hover);
+    .dot { width: 12px; height: 12px; border-radius: 50%; opacity: 0.8; }
+    .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+
+    .lang-label {
+        color: #888; font-size: 0.85rem; font-family: monospace; font-weight: 600;
+        letter-spacing: 0.05em; text-transform: uppercase;
+    }
+
+    .code-window pre[class*="language-"] {
+        margin: 0; border-radius: 0; padding: 24px; flex-grow: 1; overflow: auto;
+        white-space: pre; font-size: 0.95rem; width: 100%; font-family: 'Fira Code', 'Courier New', Courier, monospace;
     }
 
     @media (max-width: 1000px) {
-        .split-layout.has-code {
-            grid-template-columns: 1fr;
-            gap: 32px;
-        }
-
-        .code-col {
-            order: -1;
-            height: auto;
-            max-height: 300px;
-        }
-
-        .code-window {
-            height: 100%;
-        }
+        .split-layout.has-code { grid-template-columns: 1fr; gap: 32px; }
+        .code-col { order: -1; height: auto; max-height: 400px; }
+        .code-window { height: 100%; }
     }
 
-    .fade-in {
-        animation: fadeIn 0.4s ease-out;
-    }
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0, 0, 1); }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(5px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Focus visible styles for accessibility */
     .option-block:focus-within .option-visual {
-        outline: 2px solid var(--color-primary);
-        outline-offset: 2px;
-    }
-
-    .btn-next:focus-visible,
-    .btn-skip:focus-visible {
-        outline: 2px solid var(--color-primary);
-        outline-offset: 2px;
+        outline: 3px solid var(--color-primary); outline-offset: 2px;
     }
 </style>

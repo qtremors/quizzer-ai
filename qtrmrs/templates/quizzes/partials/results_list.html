@@ -1,27 +1,26 @@
 {% load quiz_filters %}
 
 {% for ans in user_answers %}
-<div class="card result-card animate-fade-in" style="margin-bottom: 16px; padding: 24px; border-left: 4px solid 
+<div class="card result-card animate-fade-in" style="margin-bottom: 24px; padding: 32px; border: 1px solid var(--color-outline-variant); border-left: 6px solid 
      {% if ans.is_correct %}var(--color-success)
      {% elif ans.selected_option is None %}var(--color-warning)
      {% else %}var(--color-error){% endif %};">
 
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-        <p style="font-size: 1.1rem; font-weight: 600; flex: 1; margin: 0;">
-            {{ forloop.counter }}. {{ ans.question.text }}
-        </p>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+        <h4 style="font-size: 1.25rem; font-weight: 500; flex: 1; margin: 0; line-height: 1.5; color: var(--color-on-surface);">
+            <span style="color: var(--color-primary); margin-right: 8px; font-weight: 700;">{{ forloop.counter }}.</span> {{ ans.question.text }}
+        </h4>
 
-        <!-- Time Badge -->
-        <div class="time-badge" style="margin-left: 16px; flex-shrink: 0;">
-            <span class="material-symbols-outlined">schedule</span>
+        <div class="time-badge" style="margin-left: 16px; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--color-on-surface-variant); padding: 6px 12px; background: var(--color-surface-variant); border-radius: var(--radius-full); font-weight: 500;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
             {{ ans.time_taken|format_time }}
         </div>
     </div>
 
-    <div style="display: grid; gap: 8px; font-size: 0.95rem; margin-bottom: 20px;">
+    <div style="display: grid; gap: 12px; font-size: 1rem; margin-bottom: 24px; padding-left: 16px; border-left: 2px solid var(--color-outline-variant);">
 
-        <div style="color: var(--color-text-muted);">
-            Your Answer:
+        <div style="color: var(--color-on-surface-variant); display: flex; align-items: flex-start; gap: 8px;">
+            <span style="font-weight: 500; min-width: 120px;">Your Answer:</span>
             <span style="font-weight: 600; color: 
                 {% if ans.is_correct %}var(--color-success)
                 {% elif ans.selected_option is None %}var(--color-warning)
@@ -31,8 +30,8 @@
         </div>
 
         {% if not ans.is_correct %}
-        <div style="color: var(--color-text-muted);">
-            Correct Answer:
+        <div style="color: var(--color-on-surface-variant); display: flex; align-items: flex-start; gap: 8px;">
+            <span style="font-weight: 500; min-width: 120px;">Correct Answer:</span>
             <span style="color: var(--color-success); font-weight: 600;">
                 {% for opt in ans.question.options.all %}{% if opt.is_correct %}{{ opt.text }}{% endif %}{% endfor %}
             </span>
@@ -41,8 +40,8 @@
     </div>
 
     {% if ans.error_explanation %}
-    <div class="explanation-box animate-fade-in">
-        <span class="material-symbols-outlined" style="color: var(--color-primary); flex-shrink: 0;">auto_awesome</span>
+    <div class="explanation-box animate-fade-in" style="background: var(--color-secondary-container); color: var(--color-on-secondary-container); border-radius: var(--radius-md); padding: 20px; display: flex; gap: 16px; font-size: 1rem; line-height: 1.6;">
+        <span class="material-symbols-outlined filled" style="color: var(--color-secondary); flex-shrink: 0; font-size: 24px;">psychology</span>
         <div>{{ ans.error_explanation }}</div>
     </div>
     {% endif %}
@@ -51,54 +50,17 @@
 {% endfor %}
 
 <style>
-    .result-card {
-        transition: transform 0.2s ease;
-    }
-
-    .result-card:hover {
-        transform: translateX(4px);
-    }
-
-    .time-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 0.8rem;
-        color: var(--color-text-muted);
-        padding: 4px 10px;
-        background: var(--color-surface-variant);
-        border-radius: 12px;
-    }
-
-    .time-badge .material-symbols-outlined {
-        font-size: 14px;
-    }
-
-    .explanation-box {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--color-border);
-        border-radius: 8px;
-        padding: 16px;
-        display: flex;
-        gap: 12px;
-        font-size: 0.95rem;
-        line-height: 1.5;
-        color: var(--color-text-main);
-    }
-
-    .animate-fade-in {
-        animation: fadeIn 0.5s ease forwards;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(5px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    .result-card { transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1); }
+    .result-card:hover { transform: translateY(-4px); box-shadow: var(--elevation-4); }
+    
+    .animate-fade-in { animation: fadeInList 0.5s cubic-bezier(0.2, 0, 0, 1) forwards; opacity: 0; }
+    
+    @keyframes fadeInList { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Stagger fade in */
+    .result-card:nth-child(1) { animation-delay: 0.1s; }
+    .result-card:nth-child(2) { animation-delay: 0.2s; }
+    .result-card:nth-child(3) { animation-delay: 0.3s; }
+    .result-card:nth-child(4) { animation-delay: 0.4s; }
+    .result-card:nth-child(5) { animation-delay: 0.5s; }
 </style>

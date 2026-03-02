@@ -31,7 +31,7 @@ class UserProfile(models.Model):
     last_quiz_date = models.DateField(null=True, blank=True)
     
     # === Quiz Preferences ===
-    preferred_difficulty = models.CharField(max_length=20, default='Intermediate')
+    preferred_difficulty = models.CharField(max_length=20, default='intermediate')
     preferred_num_questions = models.PositiveIntegerField(default=5)
     include_code_snippets = models.BooleanField(default=False)
     
@@ -60,8 +60,8 @@ class UserProfile(models.Model):
         self.learning_interests = ','.join(interests)
     
     @property
-    def xp_for_next_level(self):
-        """XP required to reach next level (scales with level)."""
+    def xp_to_next_level(self):
+        """XP needed within the current level to advance (level * 100)."""
         return self.level * 100
     
     @property
@@ -77,9 +77,9 @@ class UserProfile(models.Model):
     @property
     def xp_progress_percent(self):
         """Progress to next level as percentage."""
-        if self.xp_for_next_level == 0:
+        if self.xp_to_next_level == 0:
             return 100
-        return min(100, int((self.xp_in_current_level / self.xp_for_next_level) * 100))
+        return min(100, int((self.xp_in_current_level / self.xp_to_next_level) * 100))
 
 
 class Badge(models.Model):

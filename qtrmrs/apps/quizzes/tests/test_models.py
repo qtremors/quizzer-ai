@@ -3,7 +3,8 @@ Tests for quiz models.
 """
 import pytest
 from django.db import IntegrityError
-from apps.quizzes.models import AIModel, Quiz, Question, Option, UserAnswer
+from apps.quizzes.models import Quiz, Question, Option, UserAnswer
+from apps.ai_agent.models import AIModel
 
 
 class TestAIModel:

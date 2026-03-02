@@ -50,9 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # Third Party
-    # 'rest_framework',
-    
     # Local Apps
     'apps.core',
     'apps.users',
@@ -90,6 +87,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -106,11 +104,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
+        default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
         conn_max_age=600,
         conn_health_checks=True,
         ssl_require=not DEBUG,  # SSL required in production only
     )
+}
+
+# =============================================================================
+# Cache (used by dashboard stats, PERF-008)
+# =============================================================================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'quizzer-ai-cache',
+    }
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -196,6 +205,10 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
+    
+    # Note: Setting CSRF_COOKIE_HTTPONLY = True may break HTMX CSRF functionality on cached pages.
+    # Currently mitigated by server-side template tags, but there is a latent risk if templates 
+    # relying heavily on HTMX are cached extensively without passing CSRF headers properly.
     CSRF_COOKIE_HTTPONLY = True
     
     # Other Security Headers
@@ -234,8 +247,8 @@ if not DEBUG:
 # =============================================================================
 
 RATELIMIT_VIEW = 'apps.core.views.ratelimited_view'
-DEFAULT_AI_MODEL = os.getenv('DEFAULT_AI_MODEL', 'gemini-flash-lite-latest')
-QUIZ_RATE_LIMIT = os.getenv('QUIZ_RATE_LIMIT', '10/m')
+DEFAULT_FALLBACK_MODEL = 'gemini-flash-lite-latest'
+DEFAULT_AI_MODEL = os.getenv('DEFAULT_AI_MODEL', DEFAULT_FALLBACK_MODEL)
 
 # =============================================================================
 # Logging
@@ -253,10 +266,6 @@ LOGGING = {
         'simple': {
             'format': '{levelname} {message}',
             'style': '{',
-        },
-        'json': {
-            'format': '{"level": "%(levelname)s", "time": "%(asctime)s", "logger": "%(name)s", "message": "%(message)s"}',
-            'datefmt': '%Y-%m-%dT%H:%M:%S',
         },
     },
     'handlers': {

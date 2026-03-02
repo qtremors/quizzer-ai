@@ -1,4 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from django_ratelimit.decorators import ratelimit
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
@@ -23,7 +25,7 @@ def send_verification_email(user, request):
     token = default_token_generator.make_token(user)
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     
-    verification_url = request.build_absolute_uri(f'/auth/verify-email/{uid}-{token}/')
+    verification_url = request.build_absolute_uri(f'/auth/verify-email/{uid}/{token}/')
     
     subject = 'Verify your Quizzer AI account'
     message = render_to_string('users/verification_email.txt', {
@@ -96,17 +98,15 @@ def logout_view(request):
 
 
 @require_GET
-def verify_email(request, token):
+def verify_email(request, uidb64, token):
     """Verify user's email address."""
     try:
-        # Token format: uid-token
-        uid, token_value = token.rsplit('-', 1)
-        user_id = force_str(urlsafe_base64_decode(uid))
+        user_id = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=user_id)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     
-    if user is not None and default_token_generator.check_token(user, token_value):
+    if user is not None and default_token_generator.check_token(user, token):
         user.is_email_verified = True
         user.save(update_fields=['is_email_verified'])
         messages.success(request, 'Email verified successfully! Your account is now fully activated.')
@@ -117,6 +117,7 @@ def verify_email(request, token):
 
 
 @login_required
+@ratelimit(key='user', rate='3/h', method='POST', block=True)
 @require_POST
 def resend_verification(request):
     """Resend verification email."""
@@ -139,7 +140,9 @@ def user_dashboard(request):
     """
     Shows quiz history and statistics with pagination.
     """
-    user_quizzes = Quiz.objects.filter(user=request.user).order_by('-created_at')
+    from django.core.cache import cache
+    
+    user_quizzes = Quiz.objects.for_user(request.user)
     
     # Pagination - 12 quizzes per page
     paginator = Paginator(user_quizzes, 12)
@@ -150,18 +153,27 @@ def user_dashboard(request):
         page_number = 1
     quizzes_page = paginator.get_page(page_number)
     
-    # Calculate Stats (on all quizzes, not just this page)
-    total_quizzes = user_quizzes.count()
-    avg_score = user_quizzes.aggregate(Avg('score'))['score__avg'] or 0
+    # PERF-008: Cache aggregate stats for 15 minutes to prevent heavy DB load per user request
+    cache_key = f'user_dashboard_stats_{request.user.id}'
+    stats = cache.get(cache_key)
     
-    # Count incomplete quizzes (no completed_at)
-    incomplete_count = user_quizzes.filter(completed_at__isnull=True).count()
+    if stats is None:
+        total_quizzes = user_quizzes.count()
+        avg_score = user_quizzes.aggregate(Avg('score'))['score__avg'] or 0
+        incomplete_count = user_quizzes.filter(completed_at__isnull=True).count()
+        
+        stats = {
+            'total_quizzes': total_quizzes,
+            'avg_score': round(avg_score, 1),
+            'incomplete_count': incomplete_count,
+        }
+        cache.set(cache_key, stats, 60 * 15)  # Cache for 15 minutes
     
     context = {
         'quizzes': quizzes_page,
-        'total_quizzes': total_quizzes,
-        'avg_score': round(avg_score, 1),
-        'incomplete_count': incomplete_count,
+        'total_quizzes': stats['total_quizzes'],
+        'avg_score': stats['avg_score'],
+        'incomplete_count': stats['incomplete_count'],
         'page_obj': quizzes_page,  # For pagination template
         'profile': request.user.profile,  # For level/XP/streak display
         'badges': request.user.earned_badges.select_related('badge').order_by('-earned_at')[:6],  # Recent badges

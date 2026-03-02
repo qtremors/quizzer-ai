@@ -1,8 +1,191 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.5.3  
-> **Last Updated:** 2026-01-24
+> **Version:** 1.6.5  
+> **Last Updated:** 2026-03-02
+
+---
+
+## [1.6.5] - 2026-03-02
+
+### Security
+- **SEC-017:** `delete_quiz` no longer echoes AI-generated `topic_description` in success message — prevents potential stored XSS
+- **SEC-018:** `get_gemini_client()` now tracks the cached API key and re-creates the client if the key changes — supports key rotation without process restart
+- **SEC-020:** `quick_quiz` rate limiting changed from `key='ip'` to `key='user_or_ip'` — authenticated users get per-account limits instead of sharing IP-based limits behind proxies
+
+### Added
+- **CLEAN-011:** New `check_ai_config` management command (replaces standalone `check_models.py`) — verifies API connectivity and lists available models via `manage.py check_ai_config`
+- **DOC-001:** Added comprehensive API endpoint documentation to `DEVELOPMENT.md` covering all 4 apps with HTTP methods, auth requirements, and descriptions
+
+### Changed
+- **CLEAN-009:** Added `django.template.context_processors.debug` to template context processors for explicit, complete configuration
+- **CFG-003:** Added explicit `CACHES` setting with named `LocMemCache` backend — dashboard stats caching is now visibly configured
+
+### Fixed
+- **DOC-012:** Removed hardcoded "9 Achievement Badges" count from CHANGELOG v1.3.0 entry
+
+---
+
+## [1.6.4] - 2026-03-02
+
+### Fixed
+- **BUG-013:** Fixed `quiz_results` score recalculation guard — removed `correct_count > 0` condition so legitimate 0% scores are handled correctly
+- **BUG-014:** `generate_batch_explanations` now coerces each AI response element to `str()` to handle non-string types in the JSON array
+- **BUG-015:** `format_duration` now clamps negative values to 0 instead of producing nonsensical output
+
+### Security
+- **SEC-016:** Added `@ratelimit(key='ip', rate='30/m')` to `demo_submit` to prevent rapid session writes
+- **SEC-019:** `sync_models` management command now uses shared `get_gemini_client()` singleton instead of creating its own client
+
+### Performance
+- **ARCH-007:** `Question.objects.create()` per-question loop replaced with `Question.objects.bulk_create()` — reduces quiz creation from N+1 to 2 INSERT queries
+
+### Changed
+- **CLEAN-010:** Renamed misleading `UserProfile.xp_for_next_level` → `xp_to_next_level` (property returns XP needed within current level, not absolute milestone)
+- **CFG-002:** `build.sh` now runs `sync_models` before `set_active_models` so new Gemini models auto-populate on deploy
+- **DOC-010:** `DEVELOPMENT.md` moved `DATABASE_URL` from required to optional (SQLite fallback added in v1.6.3)
+
+---
+
+## [1.6.3] - 2026-03-02
+
+### Fixed
+- **BUG-010:** Fixed quiz retry skipping gamification — completion guard changed from `quiz.score == 0 and not quiz.completed_at` to `not quiz.completed_at`; the `xp_awarded` flag already prevents double-awarding
+- **BUG-011:** Fixed fragile option correctness matching in `create_quiz_from_ai_data` — `correct_answer` is now normalized (stripped whitespace) before comparing against options
+- **BUG-012:** Removed redundant `quiz.save()` in `submit_answer` after `award_quiz_completion` — the service already persists all fields via `locked_quiz.save(update_fields=...)`
+
+### Performance
+- **PERF-010:** Moved `correct_count` and `total_time` queries inside the atomic block in `award_quiz_completion` to prevent stale reads
+- **PERF-011:** Cached completed quiz count in `check_and_award_badges` to avoid redundant DB queries per badge
+- **PERF-012:** Replaced `quiz.questions.count()` with pre-stored `quiz.total_questions` in `quiz_player` and `submit_answer`
+
+### Changed
+- **CFG-001:** Added SQLite fallback in `settings.py` when `DATABASE_URL` is not set — local dev no longer crashes on missing env var
+- **CLEAN-007:** Removed dead `else` branch in `process_chat_message` — `num_questions` is always ≥1 after validation
+- **CLEAN-008:** Replaced `len(user_answers)` with `quiz.total_questions` in `quiz_results` to avoid extra COUNT(*) query
+
+### Removed
+- **DOC-011:** Removed stale `QUIZ_RATE_LIMIT` env var from `.env.example` (removed in v1.6.1)
+
+---
+
+## [1.6.2] - 2026-03-02
+
+### Added
+- **DOC-003:** Added docstrings to `create_quiz`, `quiz_player`, and `submit_answer` views
+- **DOC-006:** Added note in README that test credentials require env vars during `build.sh`
+
+### Fixed
+- **ANOM-001:** `check_and_award_badges` now supports `quizzes` requirement type (completed quiz count)
+- **DOC-005:** README Django badge changed from `5.2.8` to `5.2` to avoid tracking patch versions
+- **DOC-007:** Removed hardcoded "9 total" model count from DEVELOPMENT.md
+- **DOC-008:** Fixed `check_models.py` command in DEVELOPMENT.md to include `cd qtrmrs` first
+- **OPS-003:** Documented `pip` vs `uv` inconsistency in `build.sh` with rationale
+
+---
+
+## [1.6.1] - 2026-03-02
+
+### Added
+- **OPS-001:** Health check endpoint at `/health/` — returns JSON `{"status": "ok"}` or 503 if DB is down
+- **OPS-002:** `build.sh` now runs `seed_gamification` and `set_active_models` after migrations
+
+### Fixed
+- **ANOM-002:** `UserProfile.preferred_difficulty` default changed from `'Intermediate'` to `'intermediate'` for consistency
+- **ANOM-003:** `generate_explanation` error handling now delegates to `_handle_error()` instead of duplicating classification logic
+- **CLEAN-005:** Added `tests.py` to pytest `python_files` config so `users/tests.py` is discovered reliably
+- **CLEAN-006:** Fixed `HttpResponse` import — now imported from `django.http` instead of `django.shortcuts` re-export (4 files)
+
+### Removed
+- **ANOM-004:** Removed unused async method stubs from `QuizGenerator` (WSGI-only project)
+- **ANOM-005:** Removed unused `json` log formatter from `LOGGING` config
+- **DOC-009:** Removed unused `QUIZ_RATE_LIMIT` env var from settings
+- **CLEAN-001:** Removed commented-out `rest_framework` from `INSTALLED_APPS`
+- **CLEAN-002/003:** Cleaned up empty placeholder files in `core` app
+- **CLEAN-004:** Deleted orphaned `quizzes/tests.py` placeholder (tests live in `quizzes/tests/`)
+
+---
+
+## [1.6.0] - 2026-03-02
+
+### Performance
+- **PERF-002:** Removed `code_snippet` from demo session data to prevent cookie bloat
+- **PERF-003:** Added `<link rel="preload">` for HTMX and Alpine.js CDN resources in `base.html`
+- **PERF-007:** Replaced serial per-question AI calls in `generate_all_explanations` with single batched API call via new `generate_batch_explanations()` method and `BATCH_EXPLANATION_PROMPT`; results saved with `bulk_update` instead of individual saves
+- **PERF-008:** Cached dashboard aggregate stats (total quizzes, avg score, incomplete count) for 15 minutes per user
+- **PERF-009:** Consolidated `answered_ids` query in `submit_answer` to a single fetch; added dashboard cache invalidation on quiz actions
+
+### Security
+- **SEC-008:** Added `@ratelimit(key='ip', rate='5/h')` to password reset endpoint to prevent enumeration
+- **SEC-013:** Documented `CSRF_COOKIE_HTTPONLY = True` latent risk for HTMX on cached pages in `settings.py`
+- **SEC-015:** Added `clean_avatar()` validation with 2MB file size limit on avatar uploads
+
+---
+
+## [1.5.9] - 2026-02-27
+
+### UI/UX (Frontend Overhaul)
+- **UI-001:** Complete frontend overhaul to Google Material Design 3 (M3) principles using expressive custom CSS and HTMX.
+- **UI-002:** Replaced existing styles with custom M3 CSS system for dynamic layouts, fluid typography (`Outfit`/`Roboto`), and core components.
+- **UI-003:** Refactored core templates (home, dashboard, settings, authentication) to use M3 elevated cards, filled inputs, and dynamic grids.
+- **UI-004:** Overhauled immersive quiz engine (setup, player, results) with interactive M3 option cards, dynamic progress bars, and semantic result coloring.
+- **UI-005:** Redesigned AI Agent chat interface with quick suggestion chips, animated loading indicators, and modern pill-styled inputs.
+- **UI-006:** Integrated premium M3 expressive micro-interactions, ripple effects, shimmer loads, and restyled snackbars/toasts for feedback.
+
+---
+
+## [1.5.8] - 2026-02-27
+
+### Architecture
+- **ARCH-002:** Split `quizzes/views.py` (616 lines) into `views/` package with `setup.py`, `player.py`, `results.py`, `demo.py`
+- **ARCH-003:** Added `QuizQuerySet` custom manager with `for_user()` method on `Quiz` model
+- **ARCH-004:** Extracted gamification logic from `submit_answer` into `award_quiz_completion()` in `quizzes/services.py`
+- **ARCH-005:** Moved `AIModel` from `quizzes` app to `ai_agent` app using `SeparateDatabaseAndState` migrations (zero-downtime, no data migration)
+- **ARCH-006:** Registered `UserProfile`, `Badge`, `UserBadge` in Django admin with list displays and filters
+
+---
+
+## [1.5.7] - 2026-02-26
+
+### Performance
+- **PERF-001:** Added `prefetch_related('question__options')` to `quiz_results` query to eliminate N+1 queries
+
+### Changed
+- **CODE-009:** Replaced hardcoded `'gemini-flash-lite-latest'` magic string with `settings.DEFAULT_AI_MODEL` across 4 files
+- **CODE-011:** Consolidated `format_time` template filter to delegate to `format_duration()` from utils (now supports hours)
+- **CODE-012:** Added singleton caching to `get_gemini_client()` — client is created once per process
+
+---
+
+## [1.5.6] - 2026-02-26
+
+### Changed
+- **ARCH-001:** Extracted duplicated quiz creation logic from `create_quiz`, `process_chat_message`, and `quick_quiz` into `quizzes/services.py` with `create_quiz_from_ai_data()`
+
+### Added
+- **TEST-001:** Mocked unit tests for all `QuizGenerator` methods (15 tests in `ai_agent/tests/test_services.py`)
+- **TEST-002:** Integration tests for AI error handling and classification (16 tests in `ai_agent/tests/test_errors.py`)
+
+---
+
+## [1.5.5] - 2026-02-26
+
+### Fixed
+- **BUG-005:** `retry_quiz` now resets `xp_awarded` flag so users earn XP on retakes
+- **BUG-006:** Fixed race condition in `submit_answer` — consolidated all quiz field updates onto `locked_quiz` inside the atomic block
+- **BUG-007:** `quick_quiz` authenticated path now sets `quiz_type='tech'` and `language` fields
+- **BUG-008:** `quick_quiz` authenticated path now saves `explanation` on questions
+- **BUG-009:** `quiz_results` score recalculation guard tightened to avoid false triggers on legitimate 0% scores
+
+---
+
+## [1.5.4] - 2026-02-26
+
+### Security
+- **SEC-009:** Fixed email verification token parsing — URL now uses separate `<uidb64>/<token>/` path segments matching Django's own pattern, fixing always-failing `check_token()` due to hyphen splitting
+- **SEC-010:** Added `@ratelimit(key='user', rate='3/h')` to `resend_verification` endpoint to prevent email flooding/DoS
+- **SEC-011:** Added `@require_GET` decorator to `demo_results` view for HTTP method restriction consistency
+- **SEC-012:** Fixed `check_models.py` `.env` path to resolve relative to script location instead of CWD
 
 ---
 

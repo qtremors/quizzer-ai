@@ -32,6 +32,10 @@
     <link rel="stylesheet" href="{% static 'css/skeleton.css' %}">
     <link rel="stylesheet" href="{% static 'css/animations.css' %}">
 
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://unpkg.com/htmx.org@1.9.10" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" as="script">
+    
     <script src="https://unpkg.com/htmx.org@1.9.10"
         integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
         crossorigin="anonymous"></script>
@@ -86,13 +90,13 @@
                     <span class="material-symbols-outlined" style="font-size: 18px;">expand_more</span>
                 </button>
 
-                <div x-show="open" x-cloak x-transition.origin.top.right
-                    style="position: absolute; right: 0; top: 50px; width: 220px; max-width: calc(100vw - 32px); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; z-index: 1000;">
+                <div x-show="open" x-cloak x-transition.origin.top.right class="dropdown-menu"
+                    style="position: absolute; right: 0; top: 56px; width: 220px; z-index: 1000;">
 
-                    <div style="padding: 12px 16px; border-bottom: 1px solid var(--color-border);">
-                        <div style="font-weight: 600; color: var(--color-text-main);">{{ user.username }}</div>
+                    <div style="padding: 16px 24px; border-bottom: 1px solid var(--color-outline-variant);">
+                        <div style="font-weight: 600; font-size: 1.1rem; color: var(--color-on-surface);">{{ user.username }}</div>
                         <div
-                            style="font-size: 0.8rem; color: var(--color-text-muted); text-overflow: ellipsis; overflow: hidden;">
+                            style="font-size: 0.85rem; color: var(--color-on-surface-variant); text-overflow: ellipsis; overflow: hidden;">
                             {{ user.email }}</div>
                     </div>
 
@@ -102,12 +106,12 @@
                     <a href="{% url 'account_settings' %}" class="dropdown-item" hx-boost="false">
                         <span class="material-symbols-outlined">settings</span> Settings
                     </a>
-                    <div style="height: 1px; background: var(--color-border); margin: 4px 0;"></div>
+                    <div style="height: 1px; background: var(--color-outline-variant); margin: 8px 0;"></div>
                     <form action="{% url 'logout' %}" method="POST" style="margin: 0;">
                         {% csrf_token %}
                         <button type="submit" class="dropdown-item"
-                            style="color: var(--color-error); width: 100%; background: none; border: none; cursor: pointer; text-align: left; font: inherit;">
-                            <span class="material-symbols-outlined">logout</span> Log Out
+                            style="color: var(--color-error); width: 100%; border: none; background: transparent; cursor: pointer; text-align: left;">
+                            <span class="material-symbols-outlined" style="color: var(--color-error);">logout</span> Log Out
                         </button>
                     </form>
                 </div>
@@ -124,16 +128,16 @@
     <!-- Email Verification Warning Banner -->
     {% if user.is_authenticated and not user.is_email_verified %}
     <div
-        style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px 20px; text-align: center;">
+        style="background: var(--color-warning); color: var(--color-surface); padding: 12px 24px; text-align: center; box-shadow: var(--elevation-2);">
         <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
-            <span style="display: flex; align-items: center; gap: 8px;">
+            <span style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
                 <span class="material-symbols-outlined" style="font-size: 20px;">warning</span>
                 <span>Please verify your email address to fully activate your account.</span>
             </span>
             <form action="{% url 'resend_verification' %}" method="POST" style="margin: 0;">
                 {% csrf_token %}
-                <button type="submit"
-                    style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500;">
+                <button type="submit" class="btn btn-filled"
+                    style="background: var(--color-surface); color: var(--color-warning); height: 32px; padding: 0 16px; font-size: 0.85rem; filter: brightness(1.1); box-shadow: none;">
                     Resend Email
                 </button>
             </form>
