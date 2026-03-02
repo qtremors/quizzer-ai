@@ -32,6 +32,10 @@ def quiz_player(request, quiz_id):
 @login_required
 @require_http_methods(["POST"])
 def submit_answer(request, quiz_id, question_id):
+    """
+    HTMX POST handler: records the user's answer, advances to the next question,
+    and triggers scoring + gamification when the quiz is complete.
+    """
     quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
     question = get_object_or_404(Question, id=question_id, quiz=quiz)
     

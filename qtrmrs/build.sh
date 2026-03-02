@@ -6,6 +6,8 @@ set -o errexit
 # 1. (Already in project root)
 
 # 2. Install Dependencies
+# Note: Uses pip (not uv) because Render's build environment provides pip by default.
+# Locally, use `uv sync` instead. See README.md for local setup.
 pip install -r requirements.txt
 
 # 3. Set production settings

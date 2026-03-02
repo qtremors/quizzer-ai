@@ -125,6 +125,8 @@ def check_and_award_badges(user, profile):
             earned = profile.best_score >= badge.requirement_value
         elif badge.requirement_type == 'correct':
             earned = profile.total_correct_answers >= badge.requirement_value
+        elif badge.requirement_type == 'quizzes':
+            earned = user.quizzes.filter(completed_at__isnull=False).count() >= badge.requirement_value
         
         if earned:
             UserBadge.objects.create(user=user, badge=badge)

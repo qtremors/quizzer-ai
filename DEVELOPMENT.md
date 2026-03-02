@@ -2,7 +2,7 @@
 
 > Comprehensive documentation for developers working on Quizzer AI.
 
-**Version:** 1.6.0 | **Last Updated:** 2026-03-02
+**Version:** 1.6.2 | **Last Updated:** 2026-03-02
 
 ---
 
@@ -78,7 +78,7 @@ quizzer-ai/
 
 ## Database Schema
 
-### Models Overview (9 total)
+### Models Overview
 
 | Model | Purpose | Key Fields |
 |-------|---------|------------|
@@ -117,7 +117,8 @@ The project includes several tools to manage the connection with Google's Gemini
 ### 1. Verify Connectivity
 Run this script to check if your API key is valid and see which models are available from Google:
 ```bash
-uv run check_models.py
+cd qtrmrs
+uv run python check_models.py
 ```
 
 ### 2. Sync Models to Database

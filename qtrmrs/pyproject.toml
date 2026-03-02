@@ -1,6 +1,6 @@
 [project]
 name = "quizzer-ai"
-version = "1.6.1"
+version = "1.6.2"
 description = "AI-powered quiz platform for developers"
 requires-python = ">=3.11"
 dependencies = [

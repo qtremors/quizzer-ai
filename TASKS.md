@@ -1,6 +1,6 @@
 # Quizzer AI — Tasks
 
-> **Version:** 1.6.1  
+> **Version:** 1.6.2  
 > **Last Updated:** 2026-03-02
 
 ---
@@ -25,25 +25,13 @@
 ### Testing
 - [ ] **TEST-003:** Missing edge case tests — empty quiz handling, API timeouts, invalid model selection
 
-### DevOps
-- [ ] **OPS-003:** `build.sh` uses `pip install` but project uses `uv` — document inconsistency
-
 ---
 
 ## 📋 Low Priority (Backlog)
 
 ### Documentation
 - [ ] **DOC-001:** Missing API documentation for view endpoints
-- [ ] **DOC-002:** DEVELOPMENT.md testing section lacks coverage info
-- [ ] **DOC-003:** Missing docstrings in `create_quiz`, `quiz_player`, `submit_answer`
 - [ ] **DOC-004:** CHANGELOG missing version 1.4.0 entries (jumps 1.3.0 → 1.5.0)
-- [ ] **DOC-005:** README badge says "Django-5.2.8" — should track `pyproject.toml`
-- [ ] **DOC-006:** README test credentials only exist if env var is set during `build.sh`
-- [ ] **DOC-007:** DEVELOPMENT.md hardcodes "9 total" models — fragile
-- [ ] **DOC-008:** DEVELOPMENT.md `check_models.py` command missing `cd qtrmrs/`
-
-### Anomalies
-- [ ] **ANOM-001:** `Badge.requirement_type='quizzes'` in fixture but handler doesn't support it
 
 ### Accessibility
 - [ ] **A11Y-002:** Timer announcements for screen readers missing

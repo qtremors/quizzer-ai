@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Django-5.2.8-green?logo=django" alt="Django">
+  <img src="https://img.shields.io/badge/Django-5.2-green?logo=django" alt="Django">
   <img src="https://img.shields.io/badge/AI-Gemini_Flash-blue?logo=google-gemini" alt="Gemini">
   <img src="https://img.shields.io/badge/License-TSL-red" alt="License">
 </p>
@@ -68,6 +68,8 @@ Visit **http://127.0.0.1:8000/**
 |------|-------|
 | Admin Email | `admin@example.com` |
 | Password | `password123` |
+
+> These credentials only exist if `DJANGO_SUPERUSER_EMAIL` and `DJANGO_SUPERUSER_PASSWORD` env vars were set during `build.sh`.
 
 ---
 

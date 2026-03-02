@@ -31,6 +31,10 @@ def quiz_setup(request):
 @ratelimit(key='user', rate='10/m', method='POST', block=True)
 @require_http_methods(["POST"])
 def create_quiz(request):
+    """
+    HTMX POST handler: validates form input, calls AI to generate questions,
+    saves the quiz via create_quiz_from_ai_data, and redirects to the player.
+    """
     # --- Input Validation ---
     topic = request.POST.get('topic', '')[:255]  # Limit length
     if not topic.strip():

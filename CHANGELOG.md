@@ -1,8 +1,23 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.6.1  
+> **Version:** 1.6.2  
 > **Last Updated:** 2026-03-02
+
+---
+
+## [1.6.2] - 2026-03-02
+
+### Added
+- **DOC-003:** Added docstrings to `create_quiz`, `quiz_player`, and `submit_answer` views
+- **DOC-006:** Added note in README that test credentials require env vars during `build.sh`
+
+### Fixed
+- **ANOM-001:** `check_and_award_badges` now supports `quizzes` requirement type (completed quiz count)
+- **DOC-005:** README Django badge changed from `5.2.8` to `5.2` to avoid tracking patch versions
+- **DOC-007:** Removed hardcoded "9 total" model count from DEVELOPMENT.md
+- **DOC-008:** Fixed `check_models.py` command in DEVELOPMENT.md to include `cd qtrmrs` first
+- **OPS-003:** Documented `pip` vs `uv` inconsistency in `build.sh` with rationale
 
 ---
 
