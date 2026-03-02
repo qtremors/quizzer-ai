@@ -63,8 +63,8 @@ def process_chat_message(request):
     # 1. Parse Intent for general quiz
     params = generator.parse_general_intent(user_message)
     
-    # Override with user's question count selection
-    question_count = num_questions if num_questions else params.get('count', 5)
+    # CLEAN-007: num_questions is always ≥1 after validation above
+    question_count = num_questions
     
     # 2. Generate general-purpose quiz
     questions_data = generator.generate_general_quiz(

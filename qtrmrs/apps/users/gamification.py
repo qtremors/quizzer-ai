@@ -114,6 +114,9 @@ def check_and_award_badges(user, profile):
     existing_badge_ids = UserBadge.objects.filter(user=user).values_list('badge_id', flat=True)
     available_badges = Badge.objects.exclude(id__in=existing_badge_ids)
     
+    # PERF-011: Cache completed quiz count to avoid redundant DB queries per badge
+    completed_quiz_count = None
+    
     for badge in available_badges:
         earned = False
         
@@ -126,7 +129,9 @@ def check_and_award_badges(user, profile):
         elif badge.requirement_type == 'correct':
             earned = profile.total_correct_answers >= badge.requirement_value
         elif badge.requirement_type == 'quizzes':
-            earned = user.quizzes.filter(completed_at__isnull=False).count() >= badge.requirement_value
+            if completed_quiz_count is None:
+                completed_quiz_count = user.quizzes.filter(completed_at__isnull=False).count()
+            earned = completed_quiz_count >= badge.requirement_value
         
         if earned:
             UserBadge.objects.create(user=user, badge=badge)

@@ -18,7 +18,7 @@ def quiz_player(request, quiz_id):
     if not current_question:
         return redirect('quiz_results', quiz_id=quiz.id)
 
-    total_qs = quiz.questions.count()
+    total_qs = quiz.total_questions
     # Avoid division by zero
     progress = (len(answered_ids) / total_qs * 100) if total_qs > 0 else 0
 
@@ -74,8 +74,9 @@ def submit_answer(request, quiz_id, question_id):
     next_q = quiz.questions.exclude(id__in=answered_ids).first()
 
     if not next_q:
-        # Check if score already computed to avoid redundant work if previously finished
-        if quiz.score == 0 and not quiz.completed_at:
+        # BUG-010: Only check completed_at — xp_awarded flag inside award_quiz_completion
+        # already prevents double-awarding. Old guard `quiz.score == 0` broke retried quizzes.
+        if not quiz.completed_at:
             # Quiz completed - calculate final score properly
             correct_count = quiz.answers.filter(is_correct=True).count()
             total_qs = quiz.total_questions
@@ -83,8 +84,9 @@ def submit_answer(request, quiz_id, question_id):
             quiz.completed_at = timezone.now()
             
             # Gamification: XP, levels, streaks, badges
+            # BUG-012: award_quiz_completion already saves score/completed_at/xp_awarded
+            # via locked_quiz.save() — do NOT call quiz.save() here to avoid overwriting.
             gamification = award_quiz_completion(quiz, request.user)
-            quiz.save()
             
             # Store XP info in session for display on results page
             request.session['quiz_xp_earned'] = gamification['xp_earned']
@@ -98,7 +100,7 @@ def submit_answer(request, quiz_id, question_id):
         response['HX-Redirect'] = f"/quiz/results/{quiz.id}/"
         return response
 
-    total_qs = quiz.questions.count()
+    total_qs = quiz.total_questions
     progress = (len(answered_ids) / total_qs * 100) if total_qs > 0 else 0
     
     return render(request, 'quizzes/partials/question_card.html', {

@@ -1,8 +1,30 @@
 # Quizzer AI Changelog
 
 > **Project:** Quizzer AI  
-> **Version:** 1.6.2  
+> **Version:** 1.6.3  
 > **Last Updated:** 2026-03-02
+
+---
+
+## [1.6.3] - 2026-03-02
+
+### Fixed
+- **BUG-010:** Fixed quiz retry skipping gamification — completion guard changed from `quiz.score == 0 and not quiz.completed_at` to `not quiz.completed_at`; the `xp_awarded` flag already prevents double-awarding
+- **BUG-011:** Fixed fragile option correctness matching in `create_quiz_from_ai_data` — `correct_answer` is now normalized (stripped whitespace) before comparing against options
+- **BUG-012:** Removed redundant `quiz.save()` in `submit_answer` after `award_quiz_completion` — the service already persists all fields via `locked_quiz.save(update_fields=...)`
+
+### Performance
+- **PERF-010:** Moved `correct_count` and `total_time` queries inside the atomic block in `award_quiz_completion` to prevent stale reads
+- **PERF-011:** Cached completed quiz count in `check_and_award_badges` to avoid redundant DB queries per badge
+- **PERF-012:** Replaced `quiz.questions.count()` with pre-stored `quiz.total_questions` in `quiz_player` and `submit_answer`
+
+### Changed
+- **CFG-001:** Added SQLite fallback in `settings.py` when `DATABASE_URL` is not set — local dev no longer crashes on missing env var
+- **CLEAN-007:** Removed dead `else` branch in `process_chat_message` — `num_questions` is always ≥1 after validation
+- **CLEAN-008:** Replaced `len(user_answers)` with `quiz.total_questions` in `quiz_results` to avoid extra COUNT(*) query
+
+### Removed
+- **DOC-011:** Removed stale `QUIZ_RATE_LIMIT` env var from `.env.example` (removed in v1.6.1)
 
 ---
 

@@ -53,6 +53,9 @@ def create_quiz_from_ai_data(
                 explanation=q_data.get('explanation', '')
             )
 
+            # BUG-011: Normalize correct_answer once to handle AI whitespace variations
+            correct_answer = str(q_data.get('correct_answer', '')).strip()[:255]
+
             for opt in q_data.get('options', []):
                 # Handle both string and dict options from AI
                 if isinstance(opt, dict):
@@ -63,7 +66,7 @@ def create_quiz_from_ai_data(
                 options_to_create.append(Option(
                     question=question,
                     text=opt_text,
-                    is_correct=(opt_text == str(q_data.get('correct_answer', '')))
+                    is_correct=(opt_text.strip() == correct_answer)
                 ))
 
         if options_to_create:
@@ -100,8 +103,7 @@ def award_quiz_completion(quiz, user):
         'new_badges': [],
     }
 
-    correct_count = quiz.answers.filter(is_correct=True).count()
-
+    # PERF-010: All answer queries inside the atomic block to prevent stale reads
     with transaction.atomic():
         # Re-fetch quiz with lock to prevent concurrent XP awards
         locked_quiz = Quiz.objects.select_for_update().get(id=quiz.id)
@@ -115,7 +117,8 @@ def award_quiz_completion(quiz, user):
             profile = UserProfile.objects.select_for_update().get(user=user)
             old_level = profile.level
 
-            # Calculate and award XP
+            # Calculate and award XP (queries inside lock)
+            correct_count = quiz.answers.filter(is_correct=True).count()
             total_time = sum(a.time_taken for a in quiz.answers.all())
             xp_earned = calculate_quiz_xp(correct_count, total_time, quiz.total_questions)
             profile.xp += xp_earned

@@ -32,7 +32,7 @@ def quiz_results(request, quiz_id):
     
     # Calculate time statistics
     total_time = sum(a.time_taken for a in user_answers)
-    avg_time = round(total_time / len(user_answers)) if user_answers else 0
+    avg_time = round(total_time / quiz.total_questions) if quiz.total_questions else 0
     
     # Format total time using utility
     total_time_formatted = format_duration(total_time)
